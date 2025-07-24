@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -10,6 +10,7 @@ import {
   InstantKnowledgeExplanationOutput,
 } from '@/ai/flows/instant-knowledge-explanation';
 import { textToSpeech } from '@/ai/flows/text-to-speech';
+import { speechToText } from '@/ai/flows/speech-to-text';
 import { languages } from '@/lib/data';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
@@ -18,7 +19,8 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Lightbulb, Sparkles, Mic, Volume2 } from 'lucide-react';
+import { Lightbulb, Sparkles, Mic, Volume2, StopCircle } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 const formSchema = z.object({
   language: z.string().min(1, 'Please select a language.'),
@@ -31,6 +33,11 @@ export function KnowledgeBaseClient() {
   const [isSynthesizing, setIsSynthesizing] = useState(false);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const { toast } = useToast();
+
+  const [isRecording, setIsRecording] = useState(false);
+  const [isTranscribing, setIsTranscribing] = useState(false);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -59,12 +66,57 @@ export function KnowledgeBaseClient() {
     }
   }
 
-  function handleAskWithVoice() {
-    toast({
-      title: 'Feature Coming Soon',
-      description: 'Asking questions via voice is under development. Please type your question for now.',
-    });
-  }
+  const handleStartRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaRecorderRef.current = new MediaRecorder(stream);
+      audioChunksRef.current = [];
+
+      mediaRecorderRef.current.ondataavailable = (event) => {
+        audioChunksRef.current.push(event.data);
+      };
+
+      mediaRecorderRef.current.onstop = async () => {
+        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        const reader = new FileReader();
+        reader.readAsDataURL(audioBlob);
+        reader.onloadend = async () => {
+          const base64Audio = reader.result as string;
+          setIsTranscribing(true);
+          try {
+            const { text } = await speechToText({ audioDataUri: base64Audio });
+            form.setValue('question', text);
+          } catch (error) {
+            console.error(error);
+            toast({
+              variant: 'destructive',
+              title: 'An error occurred.',
+              description: 'Failed to transcribe the audio. Please try again.',
+            });
+          } finally {
+            setIsTranscribing(false);
+          }
+        };
+      };
+
+      mediaRecorderRef.current.start();
+      setIsRecording(true);
+    } catch (error) {
+      console.error('Error accessing microphone:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Microphone access denied.',
+        description: 'Please allow microphone access in your browser settings to use this feature.',
+      });
+    }
+  };
+
+  const handleStopRecording = () => {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+    }
+  };
 
   async function handleListen() {
     if (!result) return;
@@ -104,17 +156,29 @@ export function KnowledgeBaseClient() {
                     <FormLabel>Student's Question</FormLabel>
                     <div className="relative">
                       <FormControl>
-                        <Textarea placeholder="e.g., Why is the sky blue?" className="min-h-[120px] pr-10" {...field} />
+                        <Textarea
+                          placeholder="e.g., Why is the sky blue? or click the mic to speak"
+                          className="min-h-[120px] pr-10"
+                          {...field}
+                          disabled={isRecording || isTranscribing}
+                        />
                       </FormControl>
                       <Button
                         type="button"
                         variant="ghost"
                         size="icon"
-                        className="absolute bottom-2 right-2"
-                        onClick={handleAskWithVoice}
+                        className={cn('absolute bottom-2 right-2', isRecording && 'text-red-500')}
+                        onClick={isRecording ? handleStopRecording : handleStartRecording}
+                        disabled={isTranscribing}
                       >
-                        <Mic className="h-5 w-5" />
-                        <span className="sr-only">Ask with voice</span>
+                        {isRecording ? (
+                          <StopCircle className="h-5 w-5 animate-pulse" />
+                        ) : isTranscribing ? (
+                          <Sparkles className="h-5 w-5 animate-spin" />
+                        ) : (
+                          <Mic className="h-5 w-5" />
+                        )}
+                        <span className="sr-only">{isRecording ? 'Stop recording' : 'Ask with voice'}</span>
                       </Button>
                     </div>
                     <FormMessage />
@@ -145,7 +209,7 @@ export function KnowledgeBaseClient() {
                   </FormItem>
                 )}
               />
-              <Button type="submit" disabled={isLoading} className="w-full">
+              <Button type="submit" disabled={isLoading || isRecording || isTranscribing} className="w-full">
                 {isLoading ? 'Thinking...' : 'Explain'}
               </Button>
             </form>
