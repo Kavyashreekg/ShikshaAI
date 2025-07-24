@@ -5,3 +5,5 @@ import '@/ai/flows/design-visual-aid.ts';
 import '@/ai/flows/generate-localized-story.ts';
 import '@/ai/flows/instant-knowledge-explanation.ts';
 import '@/ai/flows/create-differentiated-worksheet.ts';
+import '@/ai/flows/generate-story-video.ts';
+import '@/ai/flows/text-to-speech.ts';

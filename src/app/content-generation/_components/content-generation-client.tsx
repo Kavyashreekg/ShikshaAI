@@ -9,6 +9,7 @@ import {
   generateLocalizedStory,
   GenerateLocalizedStoryOutput,
 } from '@/ai/flows/generate-localized-story';
+import { generateStoryVideo } from '@/ai/flows/generate-story-video';
 import { languages } from '@/lib/data';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
@@ -17,7 +18,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, Video } from 'lucide-react';
 
 const formSchema = z.object({
   language: z.string().min(1, 'Please select a language.'),
@@ -26,7 +27,9 @@ const formSchema = z.object({
 
 export function ContentGenerationClient() {
   const [isLoading, setIsLoading] = useState(false);
+  const [isGeneratingVideo, setIsGeneratingVideo] = useState(false);
   const [result, setResult] = useState<GenerateLocalizedStoryOutput | null>(null);
+  const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -40,6 +43,7 @@ export function ContentGenerationClient() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     setResult(null);
+    setVideoUrl(null);
     try {
       const storyResult = await generateLocalizedStory(values);
       setResult(storyResult);
@@ -52,6 +56,25 @@ export function ContentGenerationClient() {
       });
     } finally {
       setIsLoading(false);
+    }
+  }
+
+  async function handleGenerateVideo() {
+    if (!result?.story) return;
+    setIsGeneratingVideo(true);
+    setVideoUrl(null);
+    try {
+      const videoResult = await generateStoryVideo({ story: result.story });
+      setVideoUrl(videoResult.video);
+    } catch (error) {
+      console.error(error);
+      toast({
+        variant: 'destructive',
+        title: 'An error occurred.',
+        description: 'Failed to generate the video. Please try again.',
+      });
+    } finally {
+      setIsGeneratingVideo(false);
     }
   }
 
@@ -106,7 +129,7 @@ export function ContentGenerationClient() {
                   </FormItem>
                 )}
               />
-              <Button type="submit" disabled={isLoading} className="w-full">
+              <Button type="submit" disabled={isLoading || isGeneratingVideo} className="w-full">
                 {isLoading ? 'Generating...' : 'Generate Content'}
               </Button>
             </form>
@@ -114,8 +137,8 @@ export function ContentGenerationClient() {
         </CardContent>
       </Card>
 
-      <div className="lg:col-span-2">
-        <Card className="min-h-[400px]">
+      <div className="lg:col-span-2 space-y-6">
+        <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <div>
               <CardTitle>Generated Story</CardTitle>
@@ -143,7 +166,35 @@ export function ContentGenerationClient() {
               </div>
             )}
           </CardContent>
+          {result && (
+            <CardFooter>
+              <Button onClick={handleGenerateVideo} disabled={isGeneratingVideo || isLoading} className="w-full">
+                <Video className="mr-2 h-4 w-4" />
+                {isGeneratingVideo ? 'Generating Video...' : 'Generate Video Explanation'}
+              </Button>
+            </CardFooter>
+          )}
         </Card>
+        {(isGeneratingVideo || videoUrl) && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Video Explanation</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {isGeneratingVideo && (
+                <div className="flex items-center justify-center">
+                  <div className="space-y-2">
+                    <Skeleton className="h-48 w-96" />
+                    <p className="text-center text-muted-foreground">Generating video, this may take a minute...</p>
+                  </div>
+                </div>
+              )}
+              {videoUrl && (
+                <video controls src={videoUrl} className="w-full rounded-md" />
+              )}
+            </CardContent>
+          </Card>
+        )}
       </div>
     </div>
   );

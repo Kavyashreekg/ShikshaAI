@@ -9,6 +9,7 @@ import {
   instantKnowledgeExplanation,
   InstantKnowledgeExplanationOutput,
 } from '@/ai/flows/instant-knowledge-explanation';
+import { textToSpeech } from '@/ai/flows/text-to-speech';
 import { languages } from '@/lib/data';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
@@ -17,7 +18,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Lightbulb, Sparkles } from 'lucide-react';
+import { Lightbulb, Sparkles, Mic, Volume2 } from 'lucide-react';
 
 const formSchema = z.object({
   language: z.string().min(1, 'Please select a language.'),
@@ -27,6 +28,8 @@ const formSchema = z.object({
 export function KnowledgeBaseClient() {
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<InstantKnowledgeExplanationOutput | null>(null);
+  const [isSynthesizing, setIsSynthesizing] = useState(false);
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -40,6 +43,7 @@ export function KnowledgeBaseClient() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     setResult(null);
+    setAudioUrl(null);
     try {
       const explanationResult = await instantKnowledgeExplanation(values);
       setResult(explanationResult);
@@ -52,6 +56,33 @@ export function KnowledgeBaseClient() {
       });
     } finally {
       setIsLoading(false);
+    }
+  }
+
+  function handleAskWithVoice() {
+    toast({
+      title: 'Feature Coming Soon',
+      description: 'Asking questions via voice is under development. Please type your question for now.',
+    });
+  }
+
+  async function handleListen() {
+    if (!result) return;
+    setIsSynthesizing(true);
+    setAudioUrl(null);
+    try {
+      const fullText = `Explanation: ${result.explanation}. Analogy: ${result.analogy}`;
+      const audioResult = await textToSpeech({ text: fullText });
+      setAudioUrl(audioResult.audio);
+    } catch (error) {
+      console.error(error);
+      toast({
+        variant: 'destructive',
+        title: 'An error occurred.',
+        description: 'Failed to generate audio. Please try again.',
+      });
+    } finally {
+      setIsSynthesizing(false);
     }
   }
 
@@ -71,9 +102,21 @@ export function KnowledgeBaseClient() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Student's Question</FormLabel>
-                    <FormControl>
-                      <Textarea placeholder="e.g., Why is the sky blue?" className="min-h-[120px]" {...field} />
-                    </FormControl>
+                    <div className="relative">
+                      <FormControl>
+                        <Textarea placeholder="e.g., Why is the sky blue?" className="min-h-[120px] pr-10" {...field} />
+                      </FormControl>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="absolute bottom-2 right-2"
+                        onClick={handleAskWithVoice}
+                      >
+                        <Mic className="h-5 w-5" />
+                        <span className="sr-only">Ask with voice</span>
+                      </Button>
+                    </div>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -111,6 +154,20 @@ export function KnowledgeBaseClient() {
       </Card>
 
       <div className="lg:col-span-2 space-y-6">
+        {result && (
+          <div className="flex justify-end">
+            <Button onClick={handleListen} disabled={isSynthesizing || isLoading}>
+              <Volume2 className="mr-2 h-4 w-4" />
+              {isSynthesizing ? 'Generating Audio...' : 'Listen to Answer'}
+            </Button>
+          </div>
+        )}
+        {isSynthesizing && <Skeleton className="h-14 w-full" />}
+        {audioUrl && (
+          <audio controls src={audioUrl} className="w-full">
+            Your browser does not support the audio element.
+          </audio>
+        )}
         <Card>
           <CardHeader>
             <div className="flex items-center gap-2">
