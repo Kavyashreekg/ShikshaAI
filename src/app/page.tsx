@@ -6,7 +6,7 @@ import { BookText, Layers, BrainCircuit, Paintbrush, Users, CalendarCheck } from
 
 const features = [
   {
-    title: 'Localized Content Generation',
+    title: 'Content Generation',
     description: 'Create stories and examples in local languages.',
     href: '/content-generation',
     icon: <BookText className="h-8 w-8 text-primary" />,

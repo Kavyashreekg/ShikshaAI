@@ -7,7 +7,7 @@ export default function ContentGenerationPage() {
     <AppShell>
       <div className="flex-1 space-y-8 p-4 pt-6 md:p-8">
         <PageHeader
-          title="Localized Content Generation"
+          title="Content Generation"
           description="Create stories, examples, and explanations in local languages to make learning more relatable for your students."
         />
         <ContentGenerationClient />
