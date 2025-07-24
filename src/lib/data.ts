@@ -1,6 +1,7 @@
 export const languages = [
   { value: 'English', label: 'English' },
   { value: 'Hindi', label: 'Hindi' },
+  { value: 'Kashmiri', label: 'Kashmiri' },
   { value: 'Marathi', label: 'Marathi' },
   { value: 'Bengali', label: 'Bengali' },
   { value: 'Tamil', label: 'Tamil' },
