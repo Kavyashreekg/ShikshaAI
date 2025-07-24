@@ -18,7 +18,8 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Lightbulb, Sparkles, Volume2 } from 'lucide-react';
+import { Lightbulb, Sparkles, Volume2, ShieldAlert } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 const formSchema = z.object({
   language: z.string().min(1, 'Please select a language.'),
@@ -30,6 +31,7 @@ export function KnowledgeBaseClient() {
   const [result, setResult] = useState<InstantKnowledgeExplanationOutput | null>(null);
   const [isSynthesizing, setIsSynthesizing] = useState(false);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -44,16 +46,21 @@ export function KnowledgeBaseClient() {
     setIsLoading(true);
     setResult(null);
     setAudioUrl(null);
+    setError(null);
     try {
       const explanationResult = await instantKnowledgeExplanation(values);
       setResult(explanationResult);
-    } catch (error) {
-      console.error(error);
-      toast({
-        variant: 'destructive',
-        title: 'An error occurred.',
-        description: 'Failed to generate the explanation. Please try again.',
-      });
+    } catch (e: any) {
+      console.error(e);
+      if (e.message.includes('SAFETY')) {
+        setError('The response was blocked for safety reasons. Please ask a different question.');
+      } else {
+        toast({
+          variant: 'destructive',
+          title: 'An error occurred.',
+          description: 'Failed to generate the explanation. Please try again.',
+        });
+      }
     } finally {
       setIsLoading(false);
     }
@@ -153,6 +160,13 @@ export function KnowledgeBaseClient() {
             Your browser does not support the audio element.
           </audio>
         )}
+        {error && (
+            <Alert variant="destructive">
+              <ShieldAlert className="h-4 w-4" />
+              <AlertTitle>Content Blocked</AlertTitle>
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+        )}
         <Card>
           <CardHeader>
             <div className="flex items-center gap-2">
@@ -169,7 +183,7 @@ export function KnowledgeBaseClient() {
               </div>
             )}
             {result && <p className="whitespace-pre-wrap">{result.explanation}</p>}
-            {!isLoading && !result && <p className="text-muted-foreground">The explanation will appear here.</p>}
+            {!isLoading && !result && !error && <p className="text-muted-foreground">The explanation will appear here.</p>}
           </CardContent>
         </Card>
         <Card>
@@ -187,7 +201,7 @@ export function KnowledgeBaseClient() {
               </div>
             )}
             {result && <p className="whitespace-pre-wrap">{result.analogy}</p>}
-            {!isLoading && !result && <p className="text-muted-foreground">A helpful analogy will appear here.</p>}
+            {!isLoading && !result && !error && <p className="text-muted-foreground">A helpful analogy will appear here.</p>}
           </CardContent>
         </Card>
       </div>

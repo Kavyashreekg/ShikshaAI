@@ -18,7 +18,8 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Sparkles, Video } from 'lucide-react';
+import { Sparkles, Video, ShieldAlert } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 const formSchema = z.object({
   language: z.string().min(1, 'Please select a language.'),
@@ -30,6 +31,7 @@ export function ContentGenerationClient() {
   const [isGeneratingVideo, setIsGeneratingVideo] = useState(false);
   const [result, setResult] = useState<GenerateLocalizedStoryOutput | null>(null);
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -44,16 +46,21 @@ export function ContentGenerationClient() {
     setIsLoading(true);
     setResult(null);
     setVideoUrl(null);
+    setError(null);
     try {
       const storyResult = await generateLocalizedStory(values);
       setResult(storyResult);
-    } catch (error) {
-      console.error(error);
-      toast({
-        variant: 'destructive',
-        title: 'An error occurred.',
-        description: 'Failed to generate the story. Please try again.',
-      });
+    } catch (e: any) {
+      console.error(e);
+      if (e.message.includes('SAFETY')) {
+        setError('The generated content was blocked for safety reasons. Please rephrase your topic and try again.');
+      } else {
+        toast({
+          variant: 'destructive',
+          title: 'An error occurred.',
+          description: 'Failed to generate the story. Please try again.',
+        });
+      }
     } finally {
       setIsLoading(false);
     }
@@ -63,16 +70,21 @@ export function ContentGenerationClient() {
     if (!result?.story) return;
     setIsGeneratingVideo(true);
     setVideoUrl(null);
+    setError(null);
     try {
       const videoResult = await generateStoryVideo({ story: result.story });
       setVideoUrl(videoResult.video);
-    } catch (error) {
-      console.error(error);
-      toast({
-        variant: 'destructive',
-        title: 'An error occurred.',
-        description: 'Failed to generate the video. Please try again.',
-      });
+    } catch (e: any) {
+      console.error(e);
+      if (e.message.includes('SAFETY')) {
+        setError('The generated video was blocked for safety reasons. The story might contain sensitive content. Please try generating a different story.');
+      } else {
+        toast({
+          variant: 'destructive',
+          title: 'An error occurred.',
+          description: 'Failed to generate the video. Please try again.',
+        });
+      }
     } finally {
       setIsGeneratingVideo(false);
     }
@@ -155,12 +167,19 @@ export function ContentGenerationClient() {
                 <Skeleton className="h-4 w-5/6" />
               </div>
             )}
+            {error && !result && (
+              <Alert variant="destructive">
+                <ShieldAlert className="h-4 w-4" />
+                <AlertTitle>Content Blocked</AlertTitle>
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
             {result && (
               <div className="prose prose-sm max-w-none whitespace-pre-wrap rounded-md bg-muted/50 p-4">
                 {result.story}
               </div>
             )}
-            {!isLoading && !result && (
+            {!isLoading && !result && !error && (
               <div className="flex h-64 items-center justify-center text-center text-muted-foreground">
                 <p>Your generated content will be displayed here once you submit the form.</p>
               </div>
@@ -175,19 +194,24 @@ export function ContentGenerationClient() {
             </CardFooter>
           )}
         </Card>
-        {(isGeneratingVideo || videoUrl) && (
+        {(isGeneratingVideo || videoUrl || (error && result)) && (
           <Card>
             <CardHeader>
               <CardTitle>Video Explanation</CardTitle>
             </CardHeader>
             <CardContent>
               {isGeneratingVideo && (
-                <div className="flex items-center justify-center">
-                  <div className="space-y-2">
-                    <Skeleton className="h-48 w-96" />
-                    <p className="text-center text-muted-foreground">Generating video, this may take a minute...</p>
-                  </div>
+                <div className="flex flex-col items-center justify-center space-y-2">
+                  <Skeleton className="h-48 w-full max-w-lg" />
+                  <p className="text-center text-muted-foreground">Generating video, this may take a minute...</p>
                 </div>
+              )}
+               {error && result && (
+                <Alert variant="destructive">
+                  <ShieldAlert className="h-4 w-4" />
+                  <AlertTitle>Content Blocked</AlertTitle>
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
               )}
               {videoUrl && (
                 <video controls src={videoUrl} className="w-full rounded-md" />

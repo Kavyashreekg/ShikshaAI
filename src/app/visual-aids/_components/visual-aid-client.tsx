@@ -13,7 +13,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Textarea } from '@/components/ui/textarea';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Paintbrush } from 'lucide-react';
+import { Paintbrush, ShieldAlert } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 const formSchema = z.object({
   description: z.string().min(10, 'Please describe the visual aid in at least 10 characters.'),
@@ -22,6 +23,7 @@ const formSchema = z.object({
 export function VisualAidClient() {
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<DesignVisualAidOutput | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -34,16 +36,21 @@ export function VisualAidClient() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     setResult(null);
+    setError(null);
     try {
       const visualAidResult = await designVisualAid(values);
       setResult(visualAidResult);
-    } catch (error) {
-      console.error(error);
-      toast({
-        variant: 'destructive',
-        title: 'An error occurred.',
-        description: 'Failed to generate the visual aid. Please try again.',
-      });
+    } catch (e: any) {
+      console.error(e);
+       if (e.message.includes('SAFETY')) {
+        setError('The generated image was blocked for safety reasons. Please change your description and try again.');
+      } else {
+        toast({
+          variant: 'destructive',
+          title: 'An error occurred.',
+          description: 'Failed to generate the visual aid. Please try again.',
+        });
+      }
     } finally {
       setIsLoading(false);
     }
@@ -92,6 +99,13 @@ export function VisualAidClient() {
           </CardHeader>
           <CardContent className="flex items-center justify-center">
             {isLoading && <Skeleton className="h-80 w-full" />}
+            {error && (
+              <Alert variant="destructive">
+                <ShieldAlert className="h-4 w-4" />
+                <AlertTitle>Image Blocked</AlertTitle>
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
             {result && result.visualAid && (
               <Image
                 src={result.visualAid}
@@ -102,7 +116,7 @@ export function VisualAidClient() {
                 data-ai-hint="diagram drawing"
               />
             )}
-            {!isLoading && !result && (
+            {!isLoading && !result && !error && (
               <div className="flex h-64 flex-col items-center justify-center text-center text-muted-foreground">
                 <Paintbrush className="h-16 w-16 mb-4" />
                 <p>Your generated visual aid will appear here.</p>

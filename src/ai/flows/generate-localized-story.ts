@@ -36,6 +36,14 @@ const prompt = ai.definePrompt({
 
   Please generate a story in {{{language}}} about {{{topic}}}. The story should be simple, engaging, and easy for children to understand. Focus on using culturally relevant examples that would resonate with students in India.
   `,
+  config: {
+    safetySettings: [
+      { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_LOW_AND_ABOVE' },
+      { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_LOW_AND_ABOVE' },
+      { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_LOW_AND_ABOVE' },
+      { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_LOW_AND_ABOVE' },
+    ],
+  },
 });
 
 const generateLocalizedStoryFlow = ai.defineFlow(

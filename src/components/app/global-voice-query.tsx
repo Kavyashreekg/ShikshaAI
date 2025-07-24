@@ -13,7 +13,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Mic, StopCircle, Sparkles, Volume2, Lightbulb } from 'lucide-react';
+import { Mic, StopCircle, Sparkles, Volume2, Lightbulb, ShieldAlert } from 'lucide-react';
 import { speechToText } from '@/ai/flows/speech-to-text';
 import {
   instantKnowledgeExplanation,
@@ -23,6 +23,7 @@ import { textToSpeech } from '@/ai/flows/text-to-speech';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { languages } from '@/lib/data';
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 
 export function GlobalVoiceQuery() {
   const [isOpen, setIsOpen] = useState(false);
@@ -32,6 +33,7 @@ export function GlobalVoiceQuery() {
   const [transcribedText, setTranscribedText] = useState<string | null>(null);
   const [result, setResult] = useState<InstantKnowledgeExplanationOutput | null>(null);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
@@ -44,6 +46,7 @@ export function GlobalVoiceQuery() {
     setTranscribedText(null);
     setResult(null);
     setAudioUrl(null);
+    setError(null);
   };
 
   const handleOpenChange = (open: boolean) => {
@@ -88,14 +91,20 @@ export function GlobalVoiceQuery() {
               setTranscribedText("Sorry, I couldn't hear that. Please try again.");
               setResult(null);
             }
-          } catch (error) {
-            console.error(error);
-            toast({
-              variant: 'destructive',
-              title: 'An error occurred.',
-              description: 'Failed to process your question. Please try again.',
-            });
-            resetState();
+          } catch (e: any) {
+            console.error(e);
+            if (e.message.includes('SAFETY')) {
+              setError('The response was blocked for safety reasons. Please ask a different question.');
+              setResult(null);
+              setTranscribedText(transcribedText);
+            } else {
+              toast({
+                variant: 'destructive',
+                title: 'An error occurred.',
+                description: 'Failed to process your question. Please try again.',
+              });
+              resetState();
+            }
           } finally {
             setIsProcessing(false);
           }
@@ -193,6 +202,14 @@ export function GlobalVoiceQuery() {
                   <p>"{transcribedText}"</p>
                 )}
               </div>
+            )}
+            
+            {error && (
+              <Alert variant="destructive">
+                <ShieldAlert className="h-4 w-4" />
+                <AlertTitle>Content Blocked</AlertTitle>
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
             )}
 
             {result && (

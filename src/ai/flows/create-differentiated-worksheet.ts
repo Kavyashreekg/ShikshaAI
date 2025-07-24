@@ -58,6 +58,14 @@ Textbook Page: {{media url=photoDataUri}}
 Ensure that the output is an array of worksheets, with each worksheet containing the grade level and the worksheet content. Each worksheet should be simple and culturally relevant to engage the students.
 
 {{#each (split gradeLevels ",")}}Grade Level: {{this}}\nWorksheet Content:\n{{/each}}`,
+  config: {
+    safetySettings: [
+      { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_LOW_AND_ABOVE' },
+      { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_LOW_AND_ABOVE' },
+      { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_LOW_AND_ABOVE' },
+      { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_LOW_AND_ABOVE' },
+    ],
+  },
 });
 
 const createDifferentiatedWorksheetFlow = ai.defineFlow(

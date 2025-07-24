@@ -19,7 +19,8 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { UploadCloud, Layers } from 'lucide-react';
+import { UploadCloud, Layers, ShieldAlert } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 const formSchema = z.object({
   photoDataUri: z.string().refine((val) => val.startsWith('data:image/'), {
@@ -35,6 +36,7 @@ export function WorksheetClient() {
   const [result, setResult] = useState<CreateDifferentiatedWorksheetOutput | null>(null);
   const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -63,6 +65,7 @@ export function WorksheetClient() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     setResult(null);
+    setError(null);
     try {
       const worksheetResult = await createDifferentiatedWorksheet(values);
       setResult(worksheetResult);
@@ -73,13 +76,17 @@ export function WorksheetClient() {
           description: 'The AI could not generate worksheets from the provided image. Please try a clearer image or different page.',
         });
       }
-    } catch (error) {
-      console.error(error);
-      toast({
-        variant: 'destructive',
-        title: 'An error occurred.',
-        description: 'Failed to generate worksheets. Please try again.',
-      });
+    } catch (e: any) {
+      console.error(e);
+       if (e.message.includes('SAFETY')) {
+        setError('The generated content was blocked for safety reasons. Please try again with a different textbook page.');
+      } else {
+        toast({
+          variant: 'destructive',
+          title: 'An error occurred.',
+          description: 'Failed to generate worksheets. Please try again.',
+        });
+      }
     } finally {
       setIsLoading(false);
     }
@@ -179,6 +186,13 @@ export function WorksheetClient() {
           </CardHeader>
           <CardContent>
             {isLoading && <div className="space-y-4"><Skeleton className="h-10 w-1/2" /><Skeleton className="h-48 w-full" /></div>}
+            {error && (
+              <Alert variant="destructive">
+                <ShieldAlert className="h-4 w-4" />
+                <AlertTitle>Content Blocked</AlertTitle>
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
             {result && result.worksheets.length > 0 && (
               <Tabs defaultValue={result.worksheets[0].gradeLevel} className="w-full">
                 <TabsList>
@@ -193,7 +207,7 @@ export function WorksheetClient() {
                 ))}
               </Tabs>
             )}
-            {!isLoading && !result && (
+            {!isLoading && !result && !error && (
               <div className="flex h-64 flex-col items-center justify-center text-center text-muted-foreground">
                 <Layers className="h-16 w-16 mb-4" />
                 <p>Your generated worksheets will appear here.</p>
