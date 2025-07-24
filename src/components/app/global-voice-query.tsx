@@ -96,6 +96,7 @@ export function GlobalVoiceQuery() {
             if (e.message.includes('SAFETY')) {
               setError('The response was blocked for safety reasons. Please ask a different question.');
               setResult(null);
+              // Keep the transcribed text to show the user what was blocked
               setTranscribedText(transcribedText);
             } else {
               toast({

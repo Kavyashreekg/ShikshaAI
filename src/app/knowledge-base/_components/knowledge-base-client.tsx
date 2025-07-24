@@ -54,6 +54,7 @@ export function KnowledgeBaseClient() {
       console.error(e);
       if (e.message.includes('SAFETY')) {
         setError('The response was blocked for safety reasons. Please ask a different question.');
+        setResult(null);
       } else {
         toast({
           variant: 'destructive',
