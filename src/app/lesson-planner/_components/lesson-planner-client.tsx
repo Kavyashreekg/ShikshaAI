@@ -1,9 +1,10 @@
 'use client';
 
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
@@ -20,6 +21,52 @@ const formSchema = z.object({
   week: z.string().min(1, 'Please enter a week number or topic.'),
 });
 
+function TextbookLink({ grade, subject }: { grade: string, subject: string }) {
+  const [ncertLink, setNcertLink] = useState('https://ncert.nic.in/textbook.php');
+
+  useEffect(() => {
+    if (grade && subject) {
+      // This is a simplified example. A full implementation would require a mapping
+      // of grades and subjects to the specific NCERT book codes (e.g., 'aemr1').
+      const baseUrl = 'https://ncert.nic.in/textbook.php';
+      const gradeLabel = grades.find(g => g.value === grade)?.label;
+      const subjectLabel = subjects.find(s => s.value === subject)?.label;
+      // A real implementation would need a more robust query builder.
+      // For now, we link to the main textbook page as a fallback.
+      setNcertLink(baseUrl);
+    }
+  }, [grade, subject]);
+
+  if (!grade || !subject) {
+    return (
+       <Link href="https://ncert.nic.in/textbook.php" target="_blank" rel="noopener noreferrer">
+          <Button variant="outline" className="w-full">
+            <BookOpen className="mr-2 h-4 w-4" />
+            Go to NCERT Portal
+          </Button>
+        </Link>
+    );
+  }
+  
+  const gradeLabel = grades.find(g => g.value === grade)?.label;
+  const subjectLabel = subjects.find(s => s.value === subject)?.label;
+
+  return (
+    <div className="text-center space-y-2">
+      <p className="text-sm text-muted-foreground">
+        Find resources for <span className="font-semibold">{gradeLabel}, {subjectLabel}</span>.
+      </p>
+      <Link href={ncertLink} target="_blank" rel="noopener noreferrer">
+        <Button variant="outline" className="w-full">
+          <BookOpen className="mr-2 h-4 w-4" />
+          Search NCERT Portal
+        </Button>
+      </Link>
+    </div>
+  );
+}
+
+
 export function LessonPlannerClient() {
   const { toast } = useToast();
 
@@ -31,6 +78,9 @@ export function LessonPlannerClient() {
       week: '',
     },
   });
+
+  const watchedGrade = useWatch({ control: form.control, name: 'grade' });
+  const watchedSubject = useWatch({ control: form.control, name: 'subject' });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     toast({
@@ -124,12 +174,7 @@ export function LessonPlannerClient() {
             <CardDescription>Access official NCERT textbooks directly.</CardDescription>
           </CardHeader>
           <CardContent>
-            <Link href="https://ncert.nic.in/textbook.php" target="_blank" rel="noopener noreferrer">
-              <Button variant="outline" className="w-full">
-                <BookOpen className="mr-2 h-4 w-4" />
-                Go to NCERT Portal
-              </Button>
-            </Link>
+            <TextbookLink grade={watchedGrade} subject={watchedSubject} />
           </CardContent>
         </Card>
       </div>
