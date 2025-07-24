@@ -18,7 +18,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Lightbulb, Sparkles, Volume2, ShieldAlert } from 'lucide-react';
+import { Lightbulb, Sparkles, Volume2, ShieldAlert, XCircle } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 const formSchema = z.object({
@@ -87,6 +87,12 @@ export function KnowledgeBaseClient() {
     }
   }
 
+  function handleClear() {
+    setResult(null);
+    setAudioUrl(null);
+    setError(null);
+  }
+
   return (
     <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
       <Card className="lg:col-span-1">
@@ -148,10 +154,14 @@ export function KnowledgeBaseClient() {
 
       <div className="lg:col-span-2 space-y-6">
         {result && (
-          <div className="flex justify-end">
+          <div className="flex justify-end gap-2">
             <Button onClick={handleListen} disabled={isSynthesizing || isLoading}>
               <Volume2 className="mr-2 h-4 w-4" />
               {isSynthesizing ? 'Generating Audio...' : 'Listen to Answer'}
+            </Button>
+            <Button onClick={handleClear} variant="outline">
+                <XCircle className="mr-2 h-4 w-4" />
+                Clear
             </Button>
           </div>
         )}
