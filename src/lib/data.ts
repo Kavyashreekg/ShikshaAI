@@ -21,6 +21,11 @@ export const grades = Array.from({ length: 12 }, (_, i) => ({
 
 export const subjects = [
   {
+    value: 'english',
+    label: 'English',
+    chapters: ['Unit 1: First Day at School', 'Unit 2: The Bubble, the Straw, and the Shoe', 'Unit 3: Lalu and Peelu', 'Unit 4: Mittu and the Yellow Mango', 'Unit 5: The Tiger and the Mosquito'],
+  },
+  {
     value: 'mathematics',
     label: 'Mathematics',
     chapters: ['Chapter 1: Number Systems', 'Chapter 2: Algebra', 'Chapter 3: Geometry', 'Chapter 4: Trigonometry', 'Chapter 5: Statistics'],
