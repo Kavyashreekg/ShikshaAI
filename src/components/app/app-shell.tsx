@@ -27,6 +27,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
+import { GlobalVoiceQuery } from './global-voice-query';
 
 const navItems = [
   { href: '/', label: 'Dashboard', icon: LayoutDashboard },
@@ -85,6 +86,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </div>
           </header>
           <main className="flex-1">{children}</main>
+          <GlobalVoiceQuery />
         </SidebarInset>
       </div>
     </SidebarProvider>
