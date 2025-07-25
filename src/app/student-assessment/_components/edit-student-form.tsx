@@ -65,7 +65,6 @@ const translations = {
       gpaMax: 'GPA ५.० पेक्षा जास्त असू शकत नाही.',
     },
   },
-  // Add other languages here...
   Kashmiri: {
     addSubjectFor: (name: string) => `${name} خٲطرٕ مضمون شٲمِل کریو`,
     dialogDescription: 'اَکھ نوٚو مضمون تہٕ طالب علم سُنٛد GPA دِیُت۔',
@@ -250,6 +249,8 @@ export function EditStudentForm({ student, setStudent }: EditStudentFormProps) {
   const typedLanguage = language as keyof typeof translations;
   const t = translations[typedLanguage] || translations['English'];
 
+  const studentName = student.name[language] || student.name['English'];
+
   const formSchema = z.object({
     subject: z.string().min(2, t.formErrors.subjectMin),
     gpa: z.coerce.number().min(0, t.formErrors.gpaMin).max(5, t.formErrors.gpaMax),
@@ -279,7 +280,7 @@ export function EditStudentForm({ student, setStudent }: EditStudentFormProps) {
 
     form.reset();
     setIsDialogOpen(false);
-    toast({ title: t.toastTitle, description: t.toastDescription(values.subject, student.name) });
+    toast({ title: t.toastTitle, description: t.toastDescription(values.subject, studentName) });
   }
 
   return (
@@ -292,7 +293,7 @@ export function EditStudentForm({ student, setStudent }: EditStudentFormProps) {
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{t.addSubjectFor(student.name)}</DialogTitle>
+          <DialogTitle>{t.addSubjectFor(studentName)}</DialogTitle>
           <DialogDescription>{t.dialogDescription}</DialogDescription>
         </DialogHeader>
         <Form {...form}>

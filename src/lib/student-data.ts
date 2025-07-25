@@ -8,7 +8,7 @@ export type SubjectPerformance = z.infer<typeof subjectPerformanceSchema>;
 
 const formSchema = z.object({
   id: z.number(),
-  name: z.string().min(2, 'Name must be at least 2 characters.'),
+  name: z.record(z.string()), // Changed to a record for localization
   grade: z.string().min(1, 'Please select a grade.'),
   notes: z.string().optional(),
   subjects: z.array(subjectPerformanceSchema).optional(),
@@ -20,7 +20,21 @@ export type Student = z.infer<typeof formSchema>;
 export const initialStudents: Student[] = [
   { 
     id: 1, 
-    name: 'Aarav Sharma', 
+    name: {
+      English: 'Aarav Sharma',
+      Hindi: 'आरव शर्मा',
+      Marathi: 'आरव शर्मा',
+      Kashmiri: 'آراو شرما',
+      Bengali: 'আরভ শর্মা',
+      Tamil: 'ஆரவ் சர்மா',
+      Gujarati: 'આરવ શર્મા',
+      Malayalam: 'ആരവ് ശർമ്മ',
+      Punjabi: 'ਆਰਵ ਸ਼ਰਮਾ',
+      Odia: 'ଆରବ ଶର୍ମା',
+      Assamese: 'আৰৱ শৰ্মা',
+      Kannada: 'ಆರವ್ ಶರ್ಮಾ',
+      Telugu: 'ఆరవ్ శర్మ'
+    },
     grade: '3', 
     notes: 'Shows strong aptitude in Mathematics but needs practice with reading comprehension.',
     subjects: [
@@ -31,7 +45,21 @@ export const initialStudents: Student[] = [
   },
   { 
     id: 2, 
-    name: 'Priya Singh', 
+    name: {
+      English: 'Priya Singh',
+      Hindi: 'प्रिया सिंह',
+      Marathi: 'प्रिया सिंग',
+      Kashmiri: 'پریا سنگھ',
+      Bengali: 'প্রিয়া সিং',
+      Tamil: 'பிரியா சிங்',
+      Gujarati: 'પ્રિયા સિંહ',
+      Malayalam: 'പ്രിയ സിംഗ്',
+      Punjabi: 'ਪ੍ਰਿਆ ਸਿੰਘ',
+      Odia: 'ପ୍ରିୟା ସିଂ',
+      Assamese: 'প্ৰিয়া সিং',
+      Kannada: 'ಪ್ರಿಯಾ ಸಿಂಗ್',
+      Telugu: 'ప్రియా సింగ్'
+    },
     grade: '4', 
     notes: 'Excellent in Arts. Struggles with fractions. Consistently completes homework.',
     subjects: [
@@ -42,7 +70,21 @@ export const initialStudents: Student[] = [
   },
   { 
     id: 3, 
-    name: 'Rohan Mehta', 
+    name: {
+      English: 'Rohan Mehta',
+      Hindi: 'रोहन मेहता',
+      Marathi: 'रोहन मेहता',
+      Kashmiri: 'روہن مہتا',
+      Bengali: 'রোহান মেহতা',
+      Tamil: 'ரோஹன் மேத்தா',
+      Gujarati: 'રોહન મહેતા',
+      Malayalam: 'രോഹൻ മേത്ത',
+      Punjabi: 'ਰੋਹਨ ਮਹਿਤਾ',
+      Odia: 'ରୋହନ ମେହେଟା',
+      Assamese: 'ৰোহন মেহতা',
+      Kannada: 'ರೋಹನ್ ಮೆಹ್ತಾ',
+      Telugu: 'రోహన్ మెహతా'
+    },
     grade: '3', 
     notes: 'Very active in physical education. Has difficulty staying focused during science lessons.',
     subjects: [

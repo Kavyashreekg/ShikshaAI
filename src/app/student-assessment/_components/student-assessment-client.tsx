@@ -356,7 +356,13 @@ export function StudentAssessmentClient() {
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    setStudents((prev) => [...prev, { ...values, id: Date.now() }]);
+    // For a new student, create a name record with the English name as default for all languages.
+    const newNameRecord = languages.reduce((acc, lang) => {
+      acc[lang.value] = values.name;
+      return acc;
+    }, {} as Record<string, string>);
+
+    setStudents((prev) => [...prev, { ...values, id: Date.now(), name: newNameRecord }]);
     form.reset();
     setIsDialogOpen(false);
     toast({ title: t.toastTitle, description: t.toastDescription(values.name) });
@@ -446,7 +452,7 @@ export function StudentAssessmentClient() {
                 students.map((student) => (
                   <TableRow key={student.id}>
                     <TableCell className="font-medium">
-                      {student.name}
+                      {student.name[language] || student.name['English']}
                     </TableCell>
                     <TableCell className="text-right">
                        <Button asChild variant="outline" size="sm">

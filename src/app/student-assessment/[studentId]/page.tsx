@@ -198,13 +198,15 @@ export default function StudentDetailPage({ params }: { params: { studentId: str
     notFound();
   }
 
+  const studentName = student.name[language] || student.name['English'];
+
   return (
     <AppShell>
       <div className="flex-1 space-y-8 p-4 pt-6 md:p-8">
         <div className="flex items-center justify-between">
             <PageHeader
-              title={student.name}
-              description={pageTranslation.description(student.name)}
+              title={studentName}
+              description={pageTranslation.description(studentName)}
             />
             <Button asChild variant="outline">
                 <Link href="/student-assessment">
@@ -236,7 +238,7 @@ export default function StudentDetailPage({ params }: { params: { studentId: str
                     <CardContent className="space-y-4">
                         <div className="flex justify-between">
                             <span className="text-muted-foreground">{pageTranslation.name}</span>
-                            <span className="font-medium">{student.name}</span>
+                            <span className="font-medium">{studentName}</span>
                         </div>
                          <div className="flex justify-between">
                             <span className="text-muted-foreground">{pageTranslation.grade}</span>
