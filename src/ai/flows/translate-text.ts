@@ -23,35 +23,32 @@ export type TranslateTextOutput = z.infer<typeof TranslateTextOutputSchema>;
 
 
 export async function translateText(input: TranslateTextInput): Promise<TranslateTextOutput> {
-  return translateTextFlow(input);
+  const outputSchema = z.object({
+    translations: z.object(
+      input.targetLanguages.reduce((acc, lang) => {
+        acc[lang] = z.string().describe(`The translated text in ${lang}.`);
+        return acc;
+      }, {} as Record<string, z.ZodString>)
+    ),
+  });
+
+  const translateTextPrompt = ai.definePrompt({
+    name: 'translateTextDynamicPrompt',
+    input: {schema: TranslateTextInputSchema},
+    output: {schema: outputSchema},
+    prompt: `Translate the following text into the specified target languages.
+
+  Text to Translate: {{{text}}}
+
+  Target Languages:
+  {{#each targetLanguages}}
+  - {{{this}}}
+  {{/each}}
+
+  Return the translations as a JSON object where the keys are the language names and the values are the translated text.
+  `,
+  });
+  
+  const {output} = await translateTextPrompt(input);
+  return output!;
 }
-
-const translateTextPrompt = ai.definePrompt({
-  name: 'translateTextPrompt',
-  input: {schema: TranslateTextInputSchema},
-  output: {schema: TranslateTextOutputSchema},
-  prompt: `Translate the following text into the specified target languages.
-
-Text to Translate: {{{text}}}
-
-Target Languages:
-{{#each targetLanguages}}
-- {{{this}}}
-{{/each}}
-
-Return the translations as a JSON object where the keys are the language names and the values are the translated text.
-`,
-});
-
-
-const translateTextFlow = ai.defineFlow(
-  {
-    name: 'translateTextFlow',
-    inputSchema: TranslateTextInputSchema,
-    outputSchema: TranslateTextOutputSchema,
-  },
-  async (input) => {
-    const {output} = await translateTextPrompt(input);
-    return output!;
-  }
-);
