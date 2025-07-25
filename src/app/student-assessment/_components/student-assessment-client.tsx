@@ -349,7 +349,7 @@ const translations = {
     noStudents: 'এতিয়ালৈকে কোনো শিক্ষাৰ্থী যোগ কৰা হোৱা নাই।',
     translating: 'অনুবাদ কৰি আছে...',
     formErrors: {
-      nameMin: 'নামটো কমেও ২টা আখৰৰ হ’ب লাগিব।',
+      nameMin: 'নামটো কমেও ২টা আখৰৰ হ’ব লাগিব।',
       gradeMin: 'অনুগ্ৰহ কৰি এটা গ্ৰেড বাছনি কৰক।',
     },
   },
@@ -573,7 +573,7 @@ export function StudentAssessmentClient() {
                       </Button>
                       <AlertDialog>
                           <AlertDialogTrigger asChild>
-                            <Button variant="destructive" size="sm">
+                            <Button variant="ghost" size="icon" className="text-destructive hover:bg-destructive/10 hover:text-destructive">
                               <span className="sr-only">{t.remove}</span>
                               <Trash2 className="h-4 w-4" />
                             </Button>
