@@ -79,10 +79,8 @@ const manageStudentFlowPrompt = ai.definePrompt({
     input: { schema: ManageStudentFlowInputSchema },
     output: { schema: ManageStudentFlowOutputSchema },
     tools: [addStudentTool, addSubjectToStudentTool, removeStudentTool],
-    prompt: `You are a student management assistant. Use the available tools to add, edit, or remove students based on the user's query.
-
-    Query: {{{query}}}
-    `,
+    system: "You are a student management assistant. Use the available tools to add, edit, or remove students based on the user's query. Always provide a conversational response, even if you don't use a tool.",
+    prompt: `Query: {{{query}}}`,
 });
 
 
