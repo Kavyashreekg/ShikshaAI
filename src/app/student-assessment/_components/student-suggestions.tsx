@@ -154,12 +154,17 @@ export function StudentSuggestions({ student }: { student: Student }) {
   const typedLanguage = language as keyof typeof translations;
   const t = translations[typedLanguage] || translations['English'];
 
+  const studentName = student.name[language] || student.name['English'];
+
   const handleGenerate = async () => {
     setIsLoading(true);
     setResult(null);
     setError(null);
     try {
-      const suggestions = await generateStudentSuggestions(student);
+      const suggestions = await generateStudentSuggestions({
+        ...student,
+        name: studentName,
+      });
       setResult(suggestions);
     } catch (e: any) {
       console.error(e);
@@ -204,7 +209,7 @@ export function StudentSuggestions({ student }: { student: Student }) {
         {!isLoading && !result && !error && (
             <div className="flex flex-col items-center justify-center text-center text-muted-foreground space-y-4 min-h-[150px]">
                 <Sparkles className="h-12 w-12" />
-                <p>{t.generatePrompt(student.name)}</p>
+                <p>{t.generatePrompt(studentName)}</p>
             </div>
         )}
       </CardContent>
