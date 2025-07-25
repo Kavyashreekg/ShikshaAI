@@ -7,6 +7,7 @@ type StudentContextType = {
   students: Student[];
   addStudent: (student: Student) => void;
   updateStudent: (student: Student) => void;
+  removeStudent: (studentId: number) => void;
 };
 
 const StudentContext = createContext<StudentContextType | undefined>(undefined);
@@ -46,9 +47,15 @@ export function StudentProvider({ children }: { children: ReactNode }) {
         )
     );
   };
+  
+  const removeStudent = (studentId: number) => {
+    setStudents((prevStudents) =>
+      prevStudents.filter((student) => student.id !== studentId)
+    );
+  };
 
   return (
-    <StudentContext.Provider value={{ students, addStudent, updateStudent }}>
+    <StudentContext.Provider value={{ students, addStudent, updateStudent, removeStudent }}>
       {children}
     </StudentContext.Provider>
   );

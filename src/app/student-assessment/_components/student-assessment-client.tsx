@@ -10,13 +10,24 @@ import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from '@/components/ui/dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Textarea } from '@/components/ui/textarea';
 import { grades, languages } from '@/lib/data';
-import { UserPlus } from 'lucide-react';
+import { UserPlus, Trash2 } from 'lucide-react';
 import { useStudent } from '@/context/student-context';
 import { useLanguage } from '@/context/language-context';
 import { translateText } from '@/ai/flows/translate-text';
@@ -41,6 +52,10 @@ const translations = {
     tableName: 'Name',
     tableActions: 'Actions',
     details: 'Details',
+    remove: 'Remove',
+    removeStudentConfirmation: 'Are you sure?',
+    removeStudentDescription: (name: string) => `This will permanently delete ${name} from your roster.`,
+    toastStudentRemoved: 'Student Removed',
     noStudents: 'No students added yet.',
     translating: 'Translating...',
     formErrors: {
@@ -66,6 +81,10 @@ const translations = {
     tableName: 'नाम',
     tableActions: 'कार्रवाइयाँ',
     details: 'विवरण',
+    remove: 'हटाएं',
+    removeStudentConfirmation: 'क्या आप निश्चित हैं?',
+    removeStudentDescription: (name: string) => `यह ${name} को आपके रोस्टर से स्थायी रूप से हटा देगा।`,
+    toastStudentRemoved: 'छात्र हटाया गया',
     noStudents: 'अभी तक कोई छात्र नहीं जोड़ा गया है।',
     translating: 'अनुवाद हो रहा है...',
     formErrors: {
@@ -91,6 +110,10 @@ const translations = {
     tableName: 'नाव',
     tableActions: 'क्रिया',
     details: 'तपशील',
+    remove: 'काढा',
+    removeStudentConfirmation: 'तुम्ही नक्की आहात का?',
+    removeStudentDescription: (name: string) => `हे ${name} ला तुमच्या रोस्टरमधून कायमचे काढून टाकेल.`,
+    toastStudentRemoved: 'विद्यार्थी काढला',
     noStudents: 'अद्याप कोणीही विद्यार्थी जोडलेले नाहीत.',
     translating: 'भाषांतर होत आहे...',
     formErrors: {
@@ -116,6 +139,10 @@ const translations = {
     tableName: 'ناو',
     tableActions: 'کاروٲیی',
     details: 'تفصیلات',
+    remove: 'ہٹاو',
+    removeStudentConfirmation: 'کیاہ توہہِ پکہٕ چھِو؟',
+    removeStudentDescription: (name: string) => `یہِ کرِ ${name} توٚہنٛدِس روسٹر پؠٹھ مستقل طور پٲٹھؠ ختم۔`,
+    toastStudentRemoved: 'طالب علم ہٹاونہٕ آو',
     noStudents: 'وُنی تام چھُ نہٕ کانٛہہ طالب علم شٲمِل کرنہٕ آمُت۔',
     translating: 'ترجمہٕ کران...',
     formErrors: {
@@ -141,6 +168,10 @@ const translations = {
     tableName: 'নাম',
     tableActions: 'ক্রিয়া',
     details: 'বিবরণ',
+    remove: 'সরান',
+    removeStudentConfirmation: 'আপনি কি নিশ্চিত?',
+    removeStudentDescription: (name: string) => `এটি আপনার তালিকা থেকে স্থায়ীভাবে ${name} কে মুছে ফেলবে।`,
+    toastStudentRemoved: 'ছাত্র সরানো হয়েছে',
     noStudents: 'এখনও কোনো ছাত্র যোগ করা হয়নি।',
     translating: 'অনুবাদ করা হচ্ছে...',
     formErrors: {
@@ -166,6 +197,10 @@ const translations = {
     tableName: 'பெயர்',
     tableActions: 'செயல்கள்',
     details: 'விவரங்கள்',
+    remove: 'நீக்கு',
+    removeStudentConfirmation: 'நீங்கள் உறுதியாக இருக்கிறீர்களா?',
+    removeStudentDescription: (name: string) => `இது உங்கள் பட்டியலில் இருந்து ${name} ஐ நிரந்தரமாக நீக்கும்.`,
+    toastStudentRemoved: 'மாணவர் நீக்கப்பட்டார்',
     noStudents: 'இன்னும் மாணவர்கள் சேர்க்கப்படவில்லை।',
     translating: 'மொழிபெயர்க்கிறது...',
     formErrors: {
@@ -191,6 +226,10 @@ const translations = {
     tableName: 'નામ',
     tableActions: 'ક્રિયાઓ',
     details: 'વિગતો',
+    remove: 'દૂર કરો',
+    removeStudentConfirmation: 'શું તમે ચોક્કસ છો?',
+    removeStudentDescription: (name: string) => `આ તમારા રોસ્ટરમાંથી ${name} ને કાયમ માટે કાઢી નાખશે.`,
+    toastStudentRemoved: 'વિદ્યાર્થી દૂર કરવામાં આવ્યો',
     noStudents: 'હજી સુધી કોઈ વિદ્યાર્થી ઉમેરવામાં આવ્યો નથી.',
     translating: 'અનુવાદ કરી રહ્યું છે...',
     formErrors: {
@@ -216,6 +255,10 @@ const translations = {
     tableName: 'പേര്',
     tableActions: 'പ്രവർത്തനങ്ങൾ',
     details: 'വിവരങ്ങൾ',
+    remove: 'നീക്കം ചെയ്യുക',
+    removeStudentConfirmation: 'നിങ്ങൾക്ക് ഉറപ്പാണോ?',
+    removeStudentDescription: (name: string) => `ഇത് നിങ്ങളുടെ പട്ടികയിൽ നിന്ന് ${name} നെ ശാശ്വതമായി ഇല്ലാതാക്കും.`,
+    toastStudentRemoved: 'വിദ്യാർത്ഥിയെ നീക്കം ചെയ്തു',
     noStudents: 'ഇതുവരെ വിദ്യാർത്ഥികളൊന്നും ചേർത്തിട്ടില്ല.',
     translating: 'വിവർത്തനം ചെയ്യുന്നു...',
     formErrors: {
@@ -241,6 +284,10 @@ const translations = {
     tableName: 'ਨਾਮ',
     tableActions: 'ਕਾਰਵਾਈਆਂ',
     details: 'ਵੇਰਵੇ',
+    remove: 'ਹਟਾਓ',
+    removeStudentConfirmation: 'ਕੀ ਤੁਸੀਂ ਯਕੀਨੀ ਹੋ?',
+    removeStudentDescription: (name: string) => `ਇਹ ਤੁਹਾਡੇ ਰੋਸਟਰ ਤੋਂ ${name} ਨੂੰ ਪੱਕੇ ਤੌਰ 'ਤੇ ਹਟਾ ਦੇਵੇਗਾ।`,
+    toastStudentRemoved: 'ਵਿਦਿਆਰਥੀ ਹਟਾ ਦਿੱਤਾ ਗਿਆ',
     noStudents: 'ਅਜੇ ਤੱਕ ਕੋਈ ਵਿਦਿਆਰਥੀ ਸ਼ਾਮਲ ਨਹੀਂ ਕੀਤਾ ਗਿਆ ਹੈ।',
     translating: 'ਅਨੁਵਾਦ ਕੀਤਾ ਜਾ ਰਿਹਾ ਹੈ...',
     formErrors: {
@@ -266,6 +313,10 @@ const translations = {
     tableName: 'ନାମ',
     tableActions: 'କାର୍ଯ୍ୟାନୁଷ୍ଠାନ',
     details: 'ବିବରଣୀ',
+    remove: 'ଅପସାରଣ କରନ୍ତୁ',
+    removeStudentConfirmation: 'ଆପଣ ନିଶ୍ଚିତ କି?',
+    removeStudentDescription: (name: string) => `ଏହା ଆପଣଙ୍କ ରୋଷ୍ଟରରୁ ${name}କୁ ସ୍ଥାୟୀ ଭାବରେ ଡିଲିଟ୍ କରିବ।`,
+    toastStudentRemoved: 'ଛାତ୍ର ଅପସାରିତ ହେଲା',
     noStudents: 'ଏପର୍ଯ୍ୟନ୍ତ କୌଣସି ଛାତ୍ର ଯୋଡି ହୋଇନାହାଁନ୍ତି।',
     translating: 'ଅନୁବାଦ କରୁଛି...',
     formErrors: {
@@ -291,6 +342,10 @@ const translations = {
     tableName: 'নাম',
     tableActions: 'কাৰ্য্য',
     details: 'বিৱৰণ',
+    remove: 'আঁতৰাওক',
+    removeStudentConfirmation: 'আপুনি নিশ্চিতনে?',
+    removeStudentDescription: (name: string) => `ই আপোনাৰ তালিকাৰ পৰা ${name}ক স্থায়ীভাৱে মচি পেলাব।`,
+    toastStudentRemoved: 'শিক্ষাৰ্থী আঁতৰোৱা হ’ল',
     noStudents: 'এতিয়ালৈকে কোনো শিক্ষাৰ্থী যোগ কৰা হোৱা নাই।',
     translating: 'অনুবাদ কৰি আছে...',
     formErrors: {
@@ -316,6 +371,10 @@ const translations = {
     tableName: 'ಹೆಸರು',
     tableActions: 'ಕ್ರಿಯೆಗಳು',
     details: 'ವಿವರಗಳು',
+    remove: 'ತೆಗೆದುಹಾಕಿ',
+    removeStudentConfirmation: 'ನೀವು ಖಚಿತವಾಗಿರುವಿರಾ?',
+    removeStudentDescription: (name: string) => `ಇದು ನಿಮ್ಮ ರೋಸ್ಟರ್‌ನಿಂದ ${name} ಅನ್ನು ಶಾಶ್ವತವಾಗಿ ಅಳಿಸುತ್ತದೆ.`,
+    toastStudentRemoved: 'ವಿದ್ಯಾರ್ಥಿಯನ್ನು ತೆಗೆದುಹಾಕಲಾಗಿದೆ',
     noStudents: 'ಇನ್ನೂ ಯಾವುದೇ ವಿದ್ಯಾರ್ಥಿಗಳನ್ನು ಸೇರಿಸಲಾಗಿಲ್ಲ.',
     translating: 'ಅನುವಾದಿಸಲಾಗುತ್ತಿದೆ...',
     formErrors: {
@@ -341,6 +400,10 @@ const translations = {
     tableName: 'పేరు',
     tableActions: 'చర్యలు',
     details: 'వివరాలు',
+    remove: 'తొలగించు',
+    removeStudentConfirmation: 'మీరు ఖచ్చితంగా ఉన్నారా?',
+    removeStudentDescription: (name: string) => `ఇది మీ రోస్టర్ నుండి ${name}ని శాశ్వతంగా తొలగిస్తుంది.`,
+    toastStudentRemoved: 'విద్యార్థిని తొలగించారు',
     noStudents: 'ఇంకా విద్యార్థులు ఎవరూ జోడించబడలేదు.',
     translating: 'అనువదిస్తోంది...',
     formErrors: {
@@ -351,7 +414,7 @@ const translations = {
 };
 
 export function StudentAssessmentClient() {
-  const { students, addStudent } = useStudent();
+  const { students, addStudent, removeStudent } = useStudent();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isTranslating, setIsTranslating] = useState(false);
   const { toast } = useToast();
@@ -405,6 +468,12 @@ export function StudentAssessmentClient() {
         setIsDialogOpen(false);
     }
   }
+
+  const handleRemoveStudent = (studentId: number, studentName: string) => {
+    removeStudent(studentId);
+    toast({ title: t.toastStudentRemoved, description: `${studentName} has been removed from your roster.` });
+  };
+
 
   return (
     <Card>
@@ -489,23 +558,47 @@ export function StudentAssessmentClient() {
             </TableHeader>
             <TableBody>
               {students.length > 0 ? (
-                students.map((student) => (
+                students.map((student) => {
+                  const studentName = student.name[language] || student.name['English'];
+                  return (
                   <TableRow key={student.id}>
                     <TableCell className="font-medium">
-                      {student.name[language] || student.name['English']}
+                      {studentName}
                     </TableCell>
-                    <TableCell className="text-right">
+                    <TableCell className="text-right space-x-2">
                        <Button asChild variant="outline" size="sm">
                         <Link href={`/student-assessment/${student.id}`}>
                           {t.details}
                         </Link>
                       </Button>
+                      <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button variant="destructive" size="sm">
+                                {t.remove}
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>{t.removeStudentConfirmation}</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                {t.removeStudentDescription(studentName)}
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>{t.cancel}</AlertDialogCancel>
+                              <AlertDialogAction onClick={() => handleRemoveStudent(student.id, studentName)}>
+                                {t.remove}
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
                     </TableCell>
                   </TableRow>
-                ))
+                  );
+                })
               ) : (
                 <TableRow>
-                  <TableCell colSpan={2} className="h-24 text-center">
+                  <TableCell colSpan={3} className="h-24 text-center">
                     {t.noStudents}
                   </TableCell>
                 </TableRow>
