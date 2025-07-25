@@ -16,7 +16,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Textarea } from '@/components/ui/textarea';
 import { grades } from '@/lib/data';
-import { UserPlus, Sparkles } from 'lucide-react';
+import { UserPlus } from 'lucide-react';
 import { initialStudents, Student } from '@/lib/student-data';
 
 
@@ -41,13 +41,6 @@ export function StudentAssessmentClient() {
     form.reset();
     setIsDialogOpen(false);
     toast({ title: 'Student Added', description: `${values.name} has been added to your roster.` });
-  }
-
-  function getAiSuggestions(studentName: string) {
-    toast({
-      title: 'AI Suggestions (Coming Soon)',
-      description: `Personalized suggestions for ${studentName} are under development.`,
-    });
   }
 
   return (
@@ -134,14 +127,13 @@ export function StudentAssessmentClient() {
                 students.map((student) => (
                   <TableRow key={student.id}>
                     <TableCell className="font-medium">
-                       <Link href={`/student-assessment/${student.id}`} className="hover:underline">
-                        {student.name}
-                      </Link>
+                      {student.name}
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button variant="outline" size="sm" onClick={() => getAiSuggestions(student.name)}>
-                        <Sparkles className="mr-2 h-4 w-4" />
-                        Get Suggestions
+                       <Button asChild variant="outline" size="sm">
+                        <Link href={`/student-assessment/${student.id}`}>
+                          Details
+                        </Link>
                       </Button>
                     </TableCell>
                   </TableRow>
