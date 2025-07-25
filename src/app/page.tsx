@@ -9,23 +9,55 @@ import { useLanguage } from '@/context/language-context';
 
 const pageTranslations = {
   English: {
-    title: 'Welcome to your Dashboard',
+    title: 'Welcome Teacher',
     description: "ShikshaAI is your AI teaching companion. Here's what you can do:",
   },
   Hindi: {
-    title: 'आपके डैशबोर्ड में आपका स्वागत है',
+    title: 'नमस्ते, शिक्षक',
     description: 'शिक्षाएआई आपका एआई शिक्षण साथी है। यहाँ आप क्या कर सकते हैं:',
   },
   Marathi: {
-    title: 'तुमच्या डॅशबोर्डवर स्वागत आहे',
+    title: 'नमस्कार, शिक्षक',
     description: 'शिक्षाएआय तुमचा एआय शिक्षण साथी आहे. तुम्ही येथे काय करू शकता ते येथे आहे:',
   },
+  Kashmiri: {
+    title: 'خوش آمدید استاد',
+    description: 'شِکشا اے آی چھُ توٚہُنٛد اے آی ٹیچنگ سٲتھی۔ ییٚتہِ چھُ توٚہہِ ہیٚکِو کٔرِتھ:',
+  },
+  Bengali: {
+    title: 'স্বাগতম শিক্ষক',
+    description: 'শিক্ষাএআই আপনার এআই শিক্ষার সঙ্গী। এখানে আপনি যা করতে পারেন:',
+  },
+  Tamil: {
+    title: 'வாருங்கள் ஆசிரியரே',
+    description: 'ஷிக்ஷாஏஐ உங்கள் ஏஐ கற்பித்தல் துணை। இங்கே நீங்கள் என்ன செய்ய முடியும்:',
+  },
+  Gujarati: {
+    title: 'સ્વાગત છે, શિક્ષક',
+    description: 'શિક્ષાએઆઈ તમારા એઆઈ શિક્ષણ સાથી છે। અહીં તમે શું કરી શકો છો:',
+  },
+  Malayalam: {
+    title: 'സ്വാഗതം, ടീച്ചർ',
+    description: 'ശിക്ഷാഎഐ നിങ്ങളുടെ എഐ അധ്യാപക സഹായിയാണ്। നിങ്ങൾക്ക് ഇവിടെ എന്തുചെയ്യാൻ കഴിയും:',
+  },
+  Punjabi: {
+    title: 'ਜੀ ਆਇਆਂ ਨੂੰ, ਅਧਿਆਪਕ',
+    description: 'ਸ਼ਿਕਸ਼ਾਏਆਈ ਤੁਹਾਡਾ ਏਆਈ ਸਿੱਖਿਆ ਸਾਥੀ ਹੈ। ਇੱਥੇ ਤੁਸੀਂ ਕੀ ਕਰ ਸਕਦੇ ਹੋ:',
+  },
+  Odia: {
+    title: 'ସ୍ୱାଗତ ଶିକ୍ଷକ',
+    description: 'ଶିକ୍ଷାଏଆଇ ଆପଣଙ୍କର ଏଆଇ ଶିକ୍ଷାଦାନ ସାଥୀ ଅଟେ। ଏଠାରେ ଆପଣ କଣ କରିପାରିବେ:',
+  },
+  Assamese: {
+    title: 'স্বাগতম শিক্ষক',
+    description: 'শিক্ষাএআই আপোনাৰ এআই শিক্ষণৰ সঙ্গী। আপুনি ইয়াত কি কৰিব পাৰে সেয়া তলত দিয়া হৈছে:',
+  },
   Kannada: {
-    title: 'ನಿಮ್ಮ ಡ್ಯಾಶ್‌ಬೋರ್ಡ್‌ಗೆ ಸುಸ್ವಾಗತ',
+    title: 'ನಮಸ್ಕಾರ, ಶಿಕ್ಷಕರೆ',
     description: 'ಶಿಕ್ಷಾಎಐ ನಿಮ್ಮ ಎಐ ಬೋಧನಾ ಸಂಗಾತಿಯಾಗಿದೆ. ಇಲ್ಲಿ ನೀವು ಏನು ಮಾಡಬಹುದು ಎಂಬುದು ಇಲ್ಲಿದೆ:',
   },
   Telugu: {
-    title: 'మీ డాష్‌బోర్డ్‌కు స్వాగతం',
+    title: 'స్వాగతం, గురువు గారు',
     description: 'శిక్షాఏఐ మీ ఏఐ బోధన సహచరుడు. ఇక్కడ మీరు ఏమి చేయగలరో చూడండి:',
   },
 };
@@ -191,7 +223,7 @@ const features = [
 
 export default function DashboardPage() {
   const { language } = useLanguage();
-  const typedLanguage = language as keyof typeof features[0]['translations'];
+  const typedLanguage = language as keyof typeof pageTranslations;
   const pageTranslation = pageTranslations[typedLanguage] || pageTranslations['English'];
 
   return (
@@ -203,7 +235,7 @@ export default function DashboardPage() {
         />
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {features.map((feature) => {
-            const translation = feature.translations[typedLanguage] || feature.translations['English'];
+            const translation = feature.translations[language as keyof typeof feature.translations] || feature.translations['English'];
             return (
               <Link href={feature.href} key={feature.href}>
                 <Card className="flex h-full flex-col justify-between transition-all hover:shadow-md hover:-translate-y-1">
