@@ -186,12 +186,12 @@ const pageTranslations = {
     },
 };
 
-export default function StudentDetailPage({ params }: { params: { studentId: string } }) {
+export default function StudentDetailPage({ params: { studentId } }: { params: { studentId: string } }) {
   const { language } = useLanguage();
   const typedLanguage = language as keyof typeof pageTranslations;
   const pageTranslation = pageTranslations[typedLanguage] || pageTranslations['English'];
 
-  const initialStudent = initialStudents.find((s) => s.id.toString() === params.studentId);
+  const initialStudent = initialStudents.find((s) => s.id.toString() === studentId);
   const [student, setStudent] = useState<Student | undefined>(initialStudent);
 
   if (!student) {
