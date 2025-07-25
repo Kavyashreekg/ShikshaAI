@@ -39,6 +39,7 @@ import { cn } from '@/lib/utils';
 import { languages } from '@/lib/data';
 import { useStudent } from '@/context/student-context';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
+import type * as z from 'zod';
 
 type QueryMode = 'knowledge' | 'visual-aid' | 'student-management';
 
