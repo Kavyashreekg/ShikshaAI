@@ -1,11 +1,13 @@
 import { AppShell } from '@/components/app/app-shell';
 import { PageHeader } from '@/components/app/page-header';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { initialStudents } from '@/lib/student-data';
 import { notFound } from 'next/navigation';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { StudentSuggestions } from '../_components/student-suggestions';
 
 export default function StudentDetailPage({ params }: { params: { studentId: string } }) {
   const student = initialStudents.find((s) => s.id.toString() === params.studentId);
@@ -19,11 +21,12 @@ export default function StudentDetailPage({ params }: { params: { studentId: str
       <div className="flex-1 space-y-8 p-4 pt-6 md:p-8">
         <div className="flex items-center justify-between">
             <PageHeader
-            title={student.name}
-            description={`Details and progress for ${student.name}.`}
+              title={student.name}
+              description={`Details and progress for ${student.name}.`}
             />
             <Button asChild variant="outline">
                 <Link href="/student-assessment">
+                    <ArrowLeft className="mr-2 h-4 w-4" />
                     Back to Roster
                 </Link>
             </Button>
@@ -40,17 +43,7 @@ export default function StudentDetailPage({ params }: { params: { studentId: str
                         <p className="whitespace-pre-wrap">{student.notes || 'No notes have been added for this student yet.'}</p>
                     </CardContent>
                 </Card>
-                 <Card>
-                    <CardHeader>
-                        <CardTitle>AI-Powered Suggestions</CardTitle>
-                        <CardDescription>Get personalized suggestions for this student.</CardDescription>
-                    </CardHeader>
-                    <CardContent className="flex flex-col items-center justify-center text-center text-muted-foreground space-y-4 min-h-[200px]">
-                       <Sparkles className="h-12 w-12" />
-                       <p>This feature is coming soon!</p>
-                       <Button disabled>Generate Suggestions</Button>
-                    </CardContent>
-                </Card>
+                <StudentSuggestions student={student} />
             </div>
             <div className="lg:col-span-1">
                 <Card>
@@ -67,6 +60,31 @@ export default function StudentDetailPage({ params }: { params: { studentId: str
                             <span className="font-medium">{student.grade}</span>
                         </div>
                     </CardContent>
+                    {student.subjects && student.subjects.length > 0 && (
+                        <>
+                        <CardHeader className='pt-0'>
+                            <CardTitle className="text-lg">Subject GPA</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead>Subject</TableHead>
+                                        <TableHead className="text-right">GPA</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {student.subjects.map((item) => (
+                                        <TableRow key={item.subject}>
+                                            <TableCell>{item.subject}</TableCell>
+                                            <TableCell className="text-right">{item.gpa.toFixed(1)}</TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </CardContent>
+                        </>
+                    )}
                 </Card>
             </div>
         </div>
