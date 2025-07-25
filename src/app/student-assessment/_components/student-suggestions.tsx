@@ -164,6 +164,7 @@ export function StudentSuggestions({ student }: { student: Student }) {
       const suggestions = await generateStudentSuggestions({
         ...student,
         name: studentName,
+        language: language,
       });
       setResult(suggestions);
     } catch (e: any) {

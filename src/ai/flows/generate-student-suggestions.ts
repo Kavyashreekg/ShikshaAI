@@ -19,6 +19,7 @@ const SubjectPerformanceSchema = z.object({
 const GenerateStudentSuggestionsInputSchema = z.object({
   name: z.string().describe('The name of the student.'),
   grade: z.string().describe('The grade of the student.'),
+  language: z.string().describe('The language for the suggestions.'),
   notes: z.string().optional().describe("The teacher's notes about the student."),
   subjects: z.array(SubjectPerformanceSchema).optional().describe('A list of subjects and the student\'s GPA in each.'),
 });
@@ -57,7 +58,7 @@ const prompt = ai.definePrompt({
     No subject performance data available.
   {{/if}}
 
-  Based on all the information provided, generate a list of 2-3 targeted, positive, and constructive suggestions for the teacher to help this student improve. The suggestions should be formatted as a markdown list.
+  Based on all the information provided, generate a list of 2-3 targeted, positive, and constructive suggestions for the teacher to help this student improve. The suggestions should be formatted as a markdown list and written in {{{language}}}.
   `,
   config: {
     safetySettings: [
