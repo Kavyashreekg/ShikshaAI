@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
+import Link from 'next/link';
 
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
@@ -15,21 +16,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Textarea } from '@/components/ui/textarea';
 import { grades } from '@/lib/data';
-import { PlusCircle, UserPlus, Sparkles } from 'lucide-react';
+import { UserPlus, Sparkles } from 'lucide-react';
+import { initialStudents, Student } from '@/lib/student-data';
+
 
 const formSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters.'),
   grade: z.string().min(1, 'Please select a grade.'),
   notes: z.string().optional(),
 });
-
-type Student = z.infer<typeof formSchema> & { id: number };
-
-const initialStudents: Student[] = [
-  { id: 1, name: 'Aarav Sharma', grade: '3', notes: 'Shows strong aptitude in Mathematics but needs practice with reading comprehension.' },
-  { id: 2, name: 'Priya Singh', grade: '4', notes: 'Excellent in Arts. Struggles with fractions. Consistently completes homework.' },
-  { id: 3, name: 'Rohan Mehta', grade: '3', notes: 'Very active in physical education. Has difficulty staying focused during science lessons.' },
-];
 
 export function StudentAssessmentClient() {
   const [students, setStudents] = useState<Student[]>(initialStudents);
@@ -131,8 +126,6 @@ export function StudentAssessmentClient() {
             <TableHeader>
               <TableRow>
                 <TableHead>Name</TableHead>
-                <TableHead className="w-[100px]">Grade</TableHead>
-                <TableHead>Notes</TableHead>
                 <TableHead className="w-[180px] text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -140,9 +133,11 @@ export function StudentAssessmentClient() {
               {students.length > 0 ? (
                 students.map((student) => (
                   <TableRow key={student.id}>
-                    <TableCell className="font-medium">{student.name}</TableCell>
-                    <TableCell>{student.grade}</TableCell>
-                    <TableCell className="text-muted-foreground">{student.notes || 'No notes yet.'}</TableCell>
+                    <TableCell className="font-medium">
+                       <Link href={`/student-assessment/${student.id}`} className="hover:underline">
+                        {student.name}
+                      </Link>
+                    </TableCell>
                     <TableCell className="text-right">
                       <Button variant="outline" size="sm" onClick={() => getAiSuggestions(student.name)}>
                         <Sparkles className="mr-2 h-4 w-4" />
@@ -153,7 +148,7 @@ export function StudentAssessmentClient() {
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={4} className="h-24 text-center">
+                  <TableCell colSpan={2} className="h-24 text-center">
                     No students added yet.
                   </TableCell>
                 </TableRow>
