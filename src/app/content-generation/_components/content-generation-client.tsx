@@ -382,6 +382,7 @@ export function ContentGenerationClient() {
   const [result, setResult] = useState<GenerateLocalizedStoryOutput | null>(null);
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [videoError, setVideoError] = useState<string | null>(null);
   const { toast } = useToast();
   const { language } = useLanguage();
   const typedLanguage = language as keyof typeof translations;
@@ -405,6 +406,7 @@ export function ContentGenerationClient() {
     setResult(null);
     setVideoUrl(null);
     setError(null);
+    setVideoError(null);
     try {
       const storyResult = await generateLocalizedStory(values);
       setResult(storyResult);
@@ -428,20 +430,16 @@ export function ContentGenerationClient() {
     if (!result?.story) return;
     setIsGeneratingVideo(true);
     setVideoUrl(null);
-    setError(null);
+    setVideoError(null);
     try {
       const videoResult = await generateStoryVideo({ story: result.story });
       setVideoUrl(videoResult.video);
     } catch (e: any) {
       console.error(e);
       if (e.message.includes('SAFETY')) {
-        setError(t.safetyErrorVideo);
+        setVideoError(t.safetyErrorVideo);
       } else {
-        toast({
-          variant: 'destructive',
-          title: t.errorTitle,
-          description: t.errorDescriptionVideo,
-        });
+        setVideoError(e.message || t.errorDescriptionVideo);
       }
     } finally {
       setIsGeneratingVideo(false);
@@ -525,7 +523,7 @@ export function ContentGenerationClient() {
                 <Skeleton className="h-4 w-5/6" />
               </div>
             )}
-            {error && !result && (
+            {error && (
               <Alert variant="destructive">
                 <ShieldAlert className="h-4 w-4" />
                 <AlertTitle>{t.contentBlocked}</AlertTitle>
@@ -552,7 +550,7 @@ export function ContentGenerationClient() {
             </CardFooter>
           )}
         </Card>
-        {(isGeneratingVideo || videoUrl || (error && result)) && (
+        {(isGeneratingVideo || videoUrl || videoError) && (
           <Card>
             <CardHeader>
               <CardTitle>{t.videoExplanationTitle}</CardTitle>
@@ -564,11 +562,11 @@ export function ContentGenerationClient() {
                   <p className="text-center text-muted-foreground">{t.videoGenerationProgress}</p>
                 </div>
               )}
-               {error && result && (
+               {videoError && (
                 <Alert variant="destructive">
                   <ShieldAlert className="h-4 w-4" />
-                  <AlertTitle>{t.contentBlocked}</AlertTitle>
-                  <AlertDescription>{error}</AlertDescription>
+                  <AlertTitle>{t.errorTitle}</AlertTitle>
+                  <AlertDescription>{videoError}</AlertDescription>
                 </Alert>
               )}
               {videoUrl && (
