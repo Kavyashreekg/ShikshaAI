@@ -19,6 +19,7 @@ import { grades, languages } from '@/lib/data';
 import { UserPlus } from 'lucide-react';
 import { initialStudents, Student } from '@/lib/student-data';
 import { useLanguage } from '@/context/language-context';
+import { translateText } from '@/ai/flows/translate-text';
 
 
 const translations = {
@@ -41,6 +42,7 @@ const translations = {
     tableActions: 'Actions',
     details: 'Details',
     noStudents: 'No students added yet.',
+    translating: 'Translating...',
     formErrors: {
         nameMin: 'Name must be at least 2 characters.',
         gradeMin: 'Please select a grade.',
@@ -65,6 +67,7 @@ const translations = {
     tableActions: 'कार्रवाइयाँ',
     details: 'विवरण',
     noStudents: 'अभी तक कोई छात्र नहीं जोड़ा गया है।',
+    translating: 'अनुवाद हो रहा है...',
     formErrors: {
         nameMin: 'नाम कम से कम 2 अक्षरों का होना चाहिए।',
         gradeMin: 'कृपया एक ग्रेड चुनें।',
@@ -89,6 +92,7 @@ const translations = {
     tableActions: 'क्रिया',
     details: 'तपशील',
     noStudents: 'अद्याप कोणीही विद्यार्थी जोडलेले नाहीत.',
+    translating: 'भाषांतर होत आहे...',
     formErrors: {
         nameMin: 'नाव किमान २ अक्षरांचे असावे.',
         gradeMin: 'कृपया एक श्रेणी निवडा.',
@@ -113,6 +117,7 @@ const translations = {
     tableActions: 'کاروٲیی',
     details: 'تفصیلات',
     noStudents: 'وُنی تام چھُ نہٕ کانٛہہ طالب علم شٲمِل کرنہٕ آمُت۔',
+    translating: 'ترجمہٕ کران...',
     formErrors: {
       nameMin: 'ناو گژھہِ کم از کم 2 اَक्षरَن ہُنٛد ٲسُن۔',
       gradeMin: 'مہربانی کرِتھ اکھ گریڈ ژارٕو۔',
@@ -137,6 +142,7 @@ const translations = {
     tableActions: 'ক্রিয়া',
     details: 'বিবরণ',
     noStudents: 'এখনও কোনো ছাত্র যোগ করা হয়নি।',
+    translating: 'অনুবাদ করা হচ্ছে...',
     formErrors: {
       nameMin: 'নাম কমপক্ষে ২ অক্ষরের হতে হবে।',
       gradeMin: 'অনুগ্রহ করে একটি গ্রেড নির্বাচন করুন।',
@@ -161,6 +167,7 @@ const translations = {
     tableActions: 'செயல்கள்',
     details: 'விவரங்கள்',
     noStudents: 'இன்னும் மாணவர்கள் சேர்க்கப்படவில்லை।',
+    translating: 'மொழிபெயர்க்கிறது...',
     formErrors: {
       nameMin: 'பெயர் குறைந்தது 2 எழுத்துகளாக இருக்க வேண்டும்.',
       gradeMin: 'தயவுசெய்து ஒரு தரத்தைத் தேர்ந்தெடுக்கவும்।',
@@ -185,6 +192,7 @@ const translations = {
     tableActions: 'ક્રિયાઓ',
     details: 'વિગતો',
     noStudents: 'હજી સુધી કોઈ વિદ્યાર્થી ઉમેરવામાં આવ્યો નથી.',
+    translating: 'અનુવાદ કરી રહ્યું છે...',
     formErrors: {
       nameMin: 'નામ ઓછામાં ઓછું 2 અક્ષરોનું હોવું જોઈએ.',
       gradeMin: 'કૃપા કરીને એક ગ્રેડ પસંદ કરો.',
@@ -209,6 +217,7 @@ const translations = {
     tableActions: 'പ്രവർത്തനങ്ങൾ',
     details: 'വിവരങ്ങൾ',
     noStudents: 'ഇതുവരെ വിദ്യാർത്ഥികളൊന്നും ചേർത്തിട്ടില്ല.',
+    translating: 'വിവർത്തനം ചെയ്യുന്നു...',
     formErrors: {
       nameMin: 'പേര് കുറഞ്ഞത് 2 അക്ഷരങ്ങളെങ്കിലും ആയിരിക്കണം.',
       gradeMin: 'ദയവായി ഒരു ഗ്രേഡ് തിരഞ്ഞെടുക്കുക.',
@@ -233,6 +242,7 @@ const translations = {
     tableActions: 'ਕਾਰਵਾਈਆਂ',
     details: 'ਵੇਰਵੇ',
     noStudents: 'ਅਜੇ ਤੱਕ ਕੋਈ ਵਿਦਿਆਰਥੀ ਸ਼ਾਮਲ ਨਹੀਂ ਕੀਤਾ ਗਿਆ ਹੈ।',
+    translating: 'ਅਨੁਵਾਦ ਕੀਤਾ ਜਾ ਰਿਹਾ ਹੈ...',
     formErrors: {
       nameMin: 'ਨਾਮ ਘੱਟੋ-ਘੱਟ 2 ਅੱਖਰਾਂ ਦਾ ਹੋਣਾ ਚਾਹੀਦਾ ਹੈ।',
       gradeMin: 'ਕਿਰਪਾ ਕਰਕੇ ਇੱਕ ਗ੍ਰੇਡ ਚੁਣੋ।',
@@ -257,6 +267,7 @@ const translations = {
     tableActions: 'କାର୍ଯ୍ୟାନୁଷ୍ଠାନ',
     details: 'ବିବରଣୀ',
     noStudents: 'ଏପର୍ଯ୍ୟନ୍ତ କୌଣସି ଛାତ୍ର ଯୋଡି ହୋଇନାହାଁନ୍ତି।',
+    translating: 'ଅନୁବାଦ କରୁଛି...',
     formErrors: {
       nameMin: 'ନାମ ଅତିକମରେ ୨ଟି ଅକ୍ଷର ହେବା ଆବଶ୍ୟକ।',
       gradeMin: 'ଦୟାକରି ଏକ ଗ୍ରେଡ୍ ଚୟନ କରନ୍ତୁ।',
@@ -281,6 +292,7 @@ const translations = {
     tableActions: 'কাৰ্য্য',
     details: 'বিৱৰণ',
     noStudents: 'এতিয়ালৈকে কোনো শিক্ষাৰ্থী যোগ কৰা হোৱা নাই।',
+    translating: 'অনুবাদ কৰি আছে...',
     formErrors: {
       nameMin: 'নামটো কমেও ২টা আখৰৰ হ’ব লাগিব।',
       gradeMin: 'অনুগ্ৰহ কৰি এটা গ্ৰেড বাছনি কৰক।',
@@ -305,6 +317,7 @@ const translations = {
     tableActions: 'ಕ್ರಿಯೆಗಳು',
     details: 'ವಿವರಗಳು',
     noStudents: 'ಇನ್ನೂ ಯಾವುದೇ ವಿದ್ಯಾರ್ಥಿಗಳನ್ನು ಸೇರಿಸಲಾಗಿಲ್ಲ.',
+    translating: 'ಅನುವಾದಿಸಲಾಗುತ್ತಿದೆ...',
     formErrors: {
       nameMin: 'ಹೆಸರು ಕನಿಷ್ಠ 2 ಅಕ್ಷರಗಳನ್ನು ಹೊಂದಿರಬೇಕು.',
       gradeMin: 'ದಯವಿಟ್ಟು ಒಂದು ದರ್ಜೆಯನ್ನು ಆಯ್ಕೆಮಾಡಿ.',
@@ -329,6 +342,7 @@ const translations = {
     tableActions: 'చర్యలు',
     details: 'వివరాలు',
     noStudents: 'ఇంకా విద్యార్థులు ఎవరూ జోడించబడలేదు.',
+    translating: 'అనువదిస్తోంది...',
     formErrors: {
       nameMin: 'పేరు కనీసం 2 అక్షరాలు ఉండాలి.',
       gradeMin: 'దయచేసి గ్రేడ్‌ను ఎంచుకోండి.',
@@ -339,6 +353,7 @@ const translations = {
 export function StudentAssessmentClient() {
   const [students, setStudents] = useState<Student[]>(initialStudents);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isTranslating, setIsTranslating] = useState(false);
   const { toast } = useToast();
   const { language } = useLanguage();
   const typedLanguage = language as keyof typeof translations;
@@ -355,17 +370,40 @@ export function StudentAssessmentClient() {
     defaultValues: { name: '', grade: '', notes: '' },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    // For a new student, create a name record with the English name as default for all languages.
-    const newNameRecord = languages.reduce((acc, lang) => {
-      acc[lang.value] = values.name;
-      return acc;
-    }, {} as Record<string, string>);
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    setIsTranslating(true);
+    try {
+      const languageCodes = languages.map(l => l.value);
+      const { translations } = await translateText({
+        text: values.name,
+        targetLanguages: languageCodes,
+      });
 
-    setStudents((prev) => [...prev, { ...values, id: Date.now(), name: newNameRecord }]);
-    form.reset();
-    setIsDialogOpen(false);
-    toast({ title: t.toastTitle, description: t.toastDescription(values.name) });
+      // Ensure the original English name is also included
+      translations['English'] = values.name;
+
+      setStudents((prev) => [...prev, { ...values, id: Date.now(), name: translations }]);
+      form.reset();
+      setIsDialogOpen(false);
+      toast({ title: t.toastTitle, description: t.toastDescription(values.name) });
+    } catch (error) {
+        console.error("Translation failed:", error);
+        // Fallback: Add student with English name only
+        const newNameRecord = languages.reduce((acc, lang) => {
+            acc[lang.value] = values.name;
+            return acc;
+        }, {} as Record<string, string>);
+        
+        setStudents((prev) => [...prev, { ...values, id: Date.now(), name: newNameRecord }]);
+        toast({
+            variant: 'destructive',
+            title: 'Translation Failed',
+            description: 'The student was added, but the name could not be translated. Please try again later.',
+        });
+    } finally {
+        setIsTranslating(false);
+        setIsDialogOpen(false);
+    }
   }
 
   return (
@@ -429,9 +467,11 @@ export function StudentAssessmentClient() {
                 />
                 <DialogFooter>
                   <DialogClose asChild>
-                    <Button type="button" variant="ghost">{t.cancel}</Button>
+                    <Button type="button" variant="ghost" disabled={isTranslating}>{t.cancel}</Button>
                   </DialogClose>
-                  <Button type="submit">{t.addStudent}</Button>
+                  <Button type="submit" disabled={isTranslating}>
+                    {isTranslating ? t.translating : t.addStudent}
+                  </Button>
                 </DialogFooter>
               </form>
             </Form>
