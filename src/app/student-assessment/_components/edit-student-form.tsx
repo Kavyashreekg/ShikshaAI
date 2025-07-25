@@ -239,10 +239,10 @@ const translations = {
 
 interface EditStudentFormProps {
   student: Student;
-  setStudent: React.Dispatch<React.SetStateAction<Student | undefined>>;
+  onUpdate: (student: Student) => void;
 }
 
-export function EditStudentForm({ student, setStudent }: EditStudentFormProps) {
+export function EditStudentForm({ student, onUpdate }: EditStudentFormProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { toast } = useToast();
   const { language } = useLanguage();
@@ -267,16 +267,12 @@ export function EditStudentForm({ student, setStudent }: EditStudentFormProps) {
       gpa: values.gpa,
     };
 
-    setStudent((prevStudent) => {
-      if (!prevStudent) return undefined;
-      
-      const existingSubjects = prevStudent.subjects || [];
-      
-      return {
-        ...prevStudent,
-        subjects: [...existingSubjects, newSubject],
-      };
-    });
+    const updatedStudent = {
+      ...student,
+      subjects: [...(student.subjects || []), newSubject],
+    };
+
+    onUpdate(updatedStudent);
 
     form.reset();
     setIsDialogOpen(false);
