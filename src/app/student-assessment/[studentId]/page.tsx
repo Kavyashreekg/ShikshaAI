@@ -1,11 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { AppShell } from '@/components/app/app-shell';
 import { PageHeader } from '@/components/app/page-header';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { initialStudents, Student } from '@/lib/student-data';
+import { Student } from '@/lib/student-data';
 import { notFound, useParams } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
@@ -13,6 +13,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { StudentSuggestions } from '../_components/student-suggestions';
 import { EditStudentForm } from '../_components/edit-student-form';
 import { useLanguage } from '@/context/language-context';
+import { useStudent } from '@/context/student-context';
 
 const pageTranslations = {
     English: {
@@ -189,15 +190,29 @@ const pageTranslations = {
 export default function StudentDetailPage() {
   const params = useParams();
   const studentId = params.studentId as string;
+  const { students, updateStudent } = useStudent();
   const { language } = useLanguage();
   const typedLanguage = language as keyof typeof pageTranslations;
   const pageTranslation = pageTranslations[typedLanguage] || pageTranslations['English'];
 
-  const initialStudent = initialStudents.find((s) => s.id.toString() === studentId);
-  const [student, setStudent] = useState<Student | undefined>(initialStudent);
+  const [student, setStudent] = useState<Student | undefined>(
+    students.find((s) => s.id.toString() === studentId)
+  );
+
+  useEffect(() => {
+    if (student) {
+        updateStudent(student);
+    }
+  }, [student, updateStudent]);
 
   if (!student) {
-    notFound();
+    // Try to find again in case context updated late
+    const foundStudent = students.find((s) => s.id.toString() === studentId)
+    if (foundStudent) {
+        setStudent(foundStudent)
+    } else {
+       notFound();
+    }
   }
 
   const studentName = student.name[language] || student.name['English'];

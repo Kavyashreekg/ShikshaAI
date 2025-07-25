@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Toaster } from '@/components/ui/toaster';
 import './globals.css';
 import { LanguageProvider } from '@/context/language-context';
+import { StudentProvider } from '@/context/student-context';
 
 export const metadata: Metadata = {
   title: 'ShikshaAI: Teaching Assistant',
@@ -22,8 +23,10 @@ export default function RootLayout({
       </head>
       <body className="font-body antialiased">
         <LanguageProvider>
-          {children}
-          <Toaster />
+            <StudentProvider>
+              {children}
+              <Toaster />
+            </StudentProvider>
         </LanguageProvider>
       </body>
     </html>

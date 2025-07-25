@@ -17,7 +17,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { grades, languages } from '@/lib/data';
 import { UserPlus } from 'lucide-react';
-import { initialStudents, Student } from '@/lib/student-data';
+import { useStudent } from '@/context/student-context';
 import { useLanguage } from '@/context/language-context';
 import { translateText } from '@/ai/flows/translate-text';
 
@@ -351,7 +351,7 @@ const translations = {
 };
 
 export function StudentAssessmentClient() {
-  const [students, setStudents] = useState<Student[]>(initialStudents);
+  const { students, addStudent } = useStudent();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isTranslating, setIsTranslating] = useState(false);
   const { toast } = useToast();
@@ -382,7 +382,7 @@ export function StudentAssessmentClient() {
       // Ensure the original English name is also included
       translations['English'] = values.name;
 
-      setStudents((prev) => [...prev, { ...values, id: Date.now(), name: translations }]);
+      addStudent({ ...values, id: Date.now(), name: translations });
       form.reset();
       setIsDialogOpen(false);
       toast({ title: t.toastTitle, description: t.toastDescription(values.name) });
@@ -394,7 +394,7 @@ export function StudentAssessmentClient() {
             return acc;
         }, {} as Record<string, string>);
         
-        setStudents((prev) => [...prev, { ...values, id: Date.now(), name: newNameRecord }]);
+        addStudent({ ...values, id: Date.now(), name: newNameRecord });
         toast({
             variant: 'destructive',
             title: 'Translation Failed',
