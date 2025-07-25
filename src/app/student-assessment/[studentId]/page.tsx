@@ -6,7 +6,7 @@ import { PageHeader } from '@/components/app/page-header';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { initialStudents, Student } from '@/lib/student-data';
-import { notFound } from 'next/navigation';
+import { notFound, useParams } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -147,7 +147,7 @@ const pageTranslations = {
     },
     Assamese: {
         description: (name: string) => `${name}ৰ বাবে বিৱৰণ আৰু প্ৰগতি।`,
-        backToRoster: 'ৰোষ্টাৰলৈ ঘূৰি যাওক',
+        backToRoster: 'ৰোষ্টাৰলৈ ঘূৰি যাওк',
         teachersNotes: 'শিক্ষকৰ টোকা',
         notesDescription: 'শিক্ষাৰ্থীৰ বিষয়ে পৰ্যবেক্ষণ আৰু টোকা।',
         noNotes: 'এই শিক্ষাৰ্থীৰ বাবে এতিয়ালৈকে কোনো টোকা যোগ কৰা হোৱা নাই।',
@@ -186,7 +186,9 @@ const pageTranslations = {
     },
 };
 
-export default function StudentDetailPage({ params: { studentId } }: { params: { studentId: string } }) {
+export default function StudentDetailPage() {
+  const params = useParams();
+  const studentId = params.studentId as string;
   const { language } = useLanguage();
   const typedLanguage = language as keyof typeof pageTranslations;
   const pageTranslation = pageTranslations[typedLanguage] || pageTranslations['English'];
