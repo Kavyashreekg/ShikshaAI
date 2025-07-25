@@ -13,28 +13,35 @@ type StudentContextType = {
 const StudentContext = createContext<StudentContextType | undefined>(undefined);
 
 export function StudentProvider({ children }: { children: ReactNode }) {
-  const [students, setStudents] = useState<Student[]>(() => {
-    // This function now runs only on the client side to initialize state.
-    if (typeof window === 'undefined') {
-      return initialStudents;
-    }
-    try {
-      const item = window.localStorage.getItem('students');
-      return item ? JSON.parse(item) : initialStudents;
-    } catch (error) {
-      console.error('Failed to parse students from localStorage', error);
-      return initialStudents;
-    }
-  });
+  const [students, setStudents] = useState<Student[]>(initialStudents);
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    // This effect runs whenever the students state changes, saving it to localStorage.
-    try {
-      window.localStorage.setItem('students', JSON.stringify(students));
-    } catch (error) {
-      console.error('Failed to save students to localStorage', error);
+    setIsClient(true);
+  }, []);
+
+  useEffect(() => {
+    if (isClient) {
+      try {
+        const item = window.localStorage.getItem('students');
+        if (item) {
+          setStudents(JSON.parse(item));
+        }
+      } catch (error) {
+        console.error('Failed to parse students from localStorage', error);
+      }
     }
-  }, [students]);
+  }, [isClient]);
+
+  useEffect(() => {
+    if (isClient) {
+      try {
+        window.localStorage.setItem('students', JSON.stringify(students));
+      } catch (error) {
+        console.error('Failed to save students to localStorage', error);
+      }
+    }
+  }, [students, isClient]);
 
   const addStudent = (student: Student) => {
     setStudents((prevStudents) => [...prevStudents, student]);
