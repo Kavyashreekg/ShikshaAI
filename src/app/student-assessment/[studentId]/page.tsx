@@ -1,16 +1,21 @@
+'use client';
+
+import { useState } from 'react';
 import { AppShell } from '@/components/app/app-shell';
 import { PageHeader } from '@/components/app/page-header';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { initialStudents } from '@/lib/student-data';
+import { initialStudents, Student } from '@/lib/student-data';
 import { notFound } from 'next/navigation';
 import { Sparkles, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { StudentSuggestions } from '../_components/student-suggestions';
+import { EditStudentForm } from '../_components/edit-student-form';
 
 export default function StudentDetailPage({ params }: { params: { studentId: string } }) {
-  const student = initialStudents.find((s) => s.id.toString() === params.studentId);
+  const initialStudent = initialStudents.find((s) => s.id.toString() === params.studentId);
+  const [student, setStudent] = useState<Student | undefined>(initialStudent);
 
   if (!student) {
     notFound();
@@ -47,8 +52,9 @@ export default function StudentDetailPage({ params }: { params: { studentId: str
             </div>
             <div className="lg:col-span-1">
                 <Card>
-                    <CardHeader>
+                    <CardHeader className="flex flex-row items-center justify-between">
                         <CardTitle>Student Information</CardTitle>
+                        <EditStudentForm student={student} setStudent={setStudent} />
                     </CardHeader>
                     <CardContent className="space-y-4">
                         <div className="flex justify-between">

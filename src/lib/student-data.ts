@@ -4,6 +4,7 @@ const subjectPerformanceSchema = z.object({
   subject: z.string(),
   gpa: z.number(),
 });
+export type SubjectPerformance = z.infer<typeof subjectPerformanceSchema>;
 
 const formSchema = z.object({
   id: z.number(),
@@ -14,7 +15,7 @@ const formSchema = z.object({
 });
 
 export type Student = z.infer<typeof formSchema>;
-export type SubjectPerformance = z.infer<typeof subjectPerformanceSchema>;
+
 
 export const initialStudents: Student[] = [
   { 
