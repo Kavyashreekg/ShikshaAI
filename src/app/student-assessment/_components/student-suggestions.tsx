@@ -6,7 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Sparkles, ShieldAlert } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Student } from '@/lib/student-data';
-import { generateStudentSuggestions, GenerateStudentSuggestionsOutput } from '@/ai/flows/generate-student-suggestions';
+import { generateStudentSuggestions } from '@/ai/flows/generate-student-suggestions';
+import type { GenerateStudentSuggestionsOutput } from '@/ai/flows/generate-student-suggestions';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 

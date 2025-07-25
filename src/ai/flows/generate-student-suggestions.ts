@@ -16,7 +16,7 @@ const SubjectPerformanceSchema = z.object({
   gpa: z.number(),
 });
 
-export const GenerateStudentSuggestionsInputSchema = z.object({
+const GenerateStudentSuggestionsInputSchema = z.object({
   name: z.string().describe('The name of the student.'),
   grade: z.string().describe('The grade of the student.'),
   notes: z.string().optional().describe("The teacher's notes about the student."),
@@ -24,7 +24,7 @@ export const GenerateStudentSuggestionsInputSchema = z.object({
 });
 export type GenerateStudentSuggestionsInput = z.infer<typeof GenerateStudentSuggestionsInputSchema>;
 
-export const GenerateStudentSuggestionsOutputSchema = z.object({
+const GenerateStudentSuggestionsOutputSchema = z.object({
   suggestions: z.string().describe('Personalized suggestions for the student, formatted as a markdown list.'),
 });
 export type GenerateStudentSuggestionsOutput = z.infer<typeof GenerateStudentSuggestionsOutputSchema>;
