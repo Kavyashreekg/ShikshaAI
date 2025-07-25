@@ -28,6 +28,7 @@ import { Button } from '@/components/ui/button';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 import { GlobalVoiceQuery } from './global-voice-query';
+import { LanguageSwitcher } from './language-switcher';
 
 const navItems = [
   { href: '/', label: 'Dashboard', icon: LayoutDashboard },
@@ -84,6 +85,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <div className="w-full flex-1">
               {/* Can add breadcrumbs or page title here */}
             </div>
+            <LanguageSwitcher />
           </header>
           <main className="flex-1">{children}</main>
           <GlobalVoiceQuery />
