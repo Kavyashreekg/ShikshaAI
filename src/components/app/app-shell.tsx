@@ -6,7 +6,7 @@ import {
   BookText,
   BrainCircuit,
   CalendarCheck,
-  Image as ImageIcon,
+  ImageIcon,
   LayoutDashboard,
   Layers,
   Users,
