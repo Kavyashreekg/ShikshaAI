@@ -1,3 +1,4 @@
+
 // src/ai/flows/create-differentiated-worksheet.ts
 'use server';
 /**
@@ -39,9 +40,13 @@ export async function createDifferentiatedWorksheet(input: CreateDifferentiatedW
   return createDifferentiatedWorksheetFlow(input);
 }
 
+const promptInputSchema = CreateDifferentiatedWorksheetInputSchema.extend({
+  gradeLevelsArray: z.array(z.string()),
+});
+
 const createDifferentiatedWorksheetPrompt = ai.definePrompt({
   name: 'createDifferentiatedWorksheetPrompt',
-  input: {schema: CreateDifferentiatedWorksheetInputSchema},
+  input: {schema: promptInputSchema},
   output: {schema: CreateDifferentiatedWorksheetOutputSchema},
   prompt: `You are an expert teacher specializing in creating differentiated worksheets for multi-grade classrooms in Indian schools.
 
@@ -51,13 +56,16 @@ Your task is to generate a worksheet tailored to each specified grade level. The
 
 Subject: {{{subject}}}
 Chapter: {{{chapter}}}
-Grade Levels: {{{gradeLevels}}}
 
 Textbook Page: {{media url=photoDataUri}}
 
 Ensure that the output is an array of worksheets, with each worksheet containing the grade level and the worksheet content. Each worksheet should be simple and culturally relevant to engage the students.
 
-{{#each (split gradeLevels ",")}}Grade Level: {{this}}\nWorksheet Content:\n{{/each}}`,
+Please generate worksheets for the following grade levels:
+{{#each gradeLevelsArray}}
+- Grade Level: {{this}}
+{{/each}}
+`,
   config: {
     safetySettings: [
       { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_LOW_AND_ABOVE' },
@@ -75,7 +83,8 @@ const createDifferentiatedWorksheetFlow = ai.defineFlow(
     outputSchema: CreateDifferentiatedWorksheetOutputSchema,
   },
   async input => {
-    const {output} = await createDifferentiatedWorksheetPrompt(input);
+    const gradeLevelsArray = input.gradeLevels.split(',').map(s => s.trim()).filter(s => s);
+    const {output} = await createDifferentiatedWorksheetPrompt({...input, gradeLevelsArray});
     return output!;
   }
 );
