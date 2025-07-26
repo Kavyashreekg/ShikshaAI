@@ -5,8 +5,11 @@ import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import Image from 'next/image';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
+
 
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
@@ -15,7 +18,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { grades, subjects } from '@/lib/data';
-import { CalendarCheck, BookOpen, UploadCloud, Layers, ShieldAlert, XCircle } from 'lucide-react';
+import { CalendarCheck, BookOpen, UploadCloud, Layers, ShieldAlert, XCircle, FileDown } from 'lucide-react';
 import { useLanguage } from '@/context/language-context';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
@@ -52,6 +55,8 @@ const translations = {
       subject: 'Please select a subject.',
       lessonName: 'Please enter a lesson topic.',
     },
+    downloadPdf: 'Download PDF',
+    downloading: 'Downloading...',
   },
   Hindi: {
     lessonPlanDetails: 'पाठ योजना विवरण',
@@ -82,6 +87,8 @@ const translations = {
       subject: 'कृपया एक विषय चुनें।',
       lessonName: 'कृपया पाठ का विषय दर्ज करें।',
     },
+    downloadPdf: 'पीडीएफ डाउनलोड करें',
+    downloading: 'डाउनलोड हो रहा है...',
   },
   Marathi: {
     lessonPlanDetails: 'पाठ योजना तपशील',
@@ -112,6 +119,8 @@ const translations = {
       subject: 'कृपया एक विषय निवडा.',
       lessonName: 'कृपया पाठाचा विषय प्रविष्ट करा.',
     },
+    downloadPdf: 'पीडीएफ डाउनलोड करा',
+    downloading: 'डाउनलोड करत आहे...',
   },
 };
 
@@ -165,8 +174,10 @@ export function LessonPlannerClient() {
   const t = translations[typedLanguage] || translations['English'];
 
   const [isLoading, setIsLoading] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
   const [result, setResult] = useState<GenerateLessonPlanOutput | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const lessonPlanRef = useRef<HTMLDivElement>(null);
 
   const formSchema = z.object({
     grade: z.string().min(1, t.formErrors.grade),
@@ -215,6 +226,43 @@ export function LessonPlannerClient() {
       setIsLoading(false);
     }
   }
+
+  const handleDownloadPDF = async () => {
+    if (!lessonPlanRef.current) return;
+    setIsDownloading(true);
+    try {
+      const canvas = await html2canvas(lessonPlanRef.current, { scale: 2 });
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      const imgWidth = canvas.width;
+      const imgHeight = canvas.height;
+      const ratio = imgWidth / imgHeight;
+      const widthInPdf = pdfWidth - 20;
+      const heightInPdf = widthInPdf / ratio;
+      
+      let position = 10;
+      let heightLeft = heightInPdf;
+
+      pdf.addImage(imgData, 'PNG', 10, position, widthInPdf, heightInPdf);
+      heightLeft -= pdfHeight;
+
+      while (heightLeft > 0) {
+        position = heightLeft - heightInPdf;
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 10, position, widthInPdf, heightInPdf);
+        heightLeft -= pdfHeight;
+      }
+      
+      pdf.save('lesson-plan.pdf');
+    } catch (error) {
+        console.error('Error generating PDF:', error);
+        toast({ variant: 'destructive', title: 'Error', description: 'Could not generate PDF.' });
+    } finally {
+        setIsDownloading(false);
+    }
+  };
 
   return (
     <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
@@ -288,7 +336,7 @@ export function LessonPlannerClient() {
                     </FormItem>
                   )}
                 />
-                <Button type="submit" className="w-full" disabled={isLoading}>
+                <Button type="submit" className="w-full" disabled={isLoading || isDownloading}>
                   {isLoading ? t.generatingPlan : t.generatePlan}
                 </Button>
               </form>
@@ -314,10 +362,16 @@ export function LessonPlannerClient() {
                 <CardDescription>{t.planWillBeStructured}</CardDescription>
             </div>
             {result && (
-              <Button onClick={handleClear} variant="ghost" size="icon">
-                <XCircle className="h-5 w-5" />
-                <span className="sr-only">{t.clearButton}</span>
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button onClick={handleDownloadPDF} variant="outline" size="sm" disabled={isDownloading}>
+                    <FileDown className="mr-2 h-4 w-4" />
+                    {isDownloading ? t.downloading : t.downloadPdf}
+                </Button>
+                <Button onClick={handleClear} variant="ghost" size="icon">
+                  <XCircle className="h-5 w-5" />
+                  <span className="sr-only">{t.clearButton}</span>
+                </Button>
+              </div>
             )}
           </CardHeader>
            <CardContent>
@@ -338,7 +392,7 @@ export function LessonPlannerClient() {
               </Alert>
             )}
             {result && (
-              <div className="prose prose-sm max-w-none whitespace-pre-wrap rounded-md border bg-muted/50 p-4">
+              <div ref={lessonPlanRef} className="prose prose-sm max-w-none whitespace-pre-wrap rounded-md border bg-muted/50 p-4">
                 {result.lessonPlanContent}
               </div>
             )}
