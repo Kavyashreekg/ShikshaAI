@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -30,7 +31,6 @@ import {
 import { Button } from '@/components/ui/button';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
-import { GlobalVoiceQuery } from './global-voice-query';
 import { LanguageSwitcher } from './language-switcher';
 import { useLanguage } from '@/context/language-context';
 import { useAuth } from '@/context/auth-context';
@@ -229,7 +229,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   const navItems = [
     { href: '/', label: t.dashboard, icon: LayoutDashboard },
-    { href: '/sahayak-bot', label: t.sahayakBot, icon: MessageCircleQuestion },
     { href: '/content-generation', label: t.contentGeneration, icon: BookText },
     { href: '/worksheets', label: t.worksheets, icon: Layers },
     { href: '/knowledge-base', label: t.knowledgeBase, icon: BrainCircuit },
@@ -311,7 +310,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <LanguageSwitcher />
           </header>
           <main className="flex-1">{children}</main>
-          <GlobalVoiceQuery />
         </SidebarInset>
       </div>
     </SidebarProvider>
