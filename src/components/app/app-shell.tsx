@@ -13,6 +13,7 @@ import {
   BotMessageSquare,
   FileSignature,
   LogOut,
+  MessageCircleQuestion,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -48,6 +49,7 @@ const translations = {
     English: {
       shikshaAI: 'ShikshaAI',
       dashboard: 'Dashboard',
+      sahayakBot: 'Sahayak Bot',
       contentGeneration: 'Content Generation',
       worksheets: 'Worksheets',
       knowledgeBase: 'Knowledge Base',
@@ -60,6 +62,7 @@ const translations = {
     Hindi: {
       shikshaAI: 'शिक्षाएआई',
       dashboard: 'डैशबोर्ड',
+      sahayakBot: 'सहायक बॉट',
       contentGeneration: 'सामग्री निर्माण',
       worksheets: 'कार्यपत्रक',
       knowledgeBase: 'ज्ञान कोष',
@@ -72,6 +75,7 @@ const translations = {
     Marathi: {
       shikshaAI: 'शिक्षाएआय',
       dashboard: 'डॅशबोर्ड',
+      sahayakBot: 'सहायक बॉट',
       contentGeneration: 'सामग्री निर्मिती',
       worksheets: 'कार्यपत्रके',
       knowledgeBase: 'ज्ञान आधार',
@@ -84,6 +88,7 @@ const translations = {
     Kashmiri: {
       shikshaAI: 'شِکشا اے آی',
       dashboard: 'ڈیش بورڈ',
+      sahayakBot: 'سہایک بوٹ',
       contentGeneration: 'مواد جنریشن',
       worksheets: 'ورک شیٹس',
       knowledgeBase: 'علمٕچ بنیاد',
@@ -96,6 +101,7 @@ const translations = {
     Bengali: {
         shikshaAI: 'শিক্ষাএআই',
         dashboard: 'ড্যাশবোর্ড',
+        sahayakBot: 'সহায়ক বট',
         contentGeneration: 'বিষয়বস্তু তৈরি',
         worksheets: 'ওয়ার্কশিট',
         knowledgeBase: 'জ্ঞান ভান্ডার',
@@ -108,6 +114,7 @@ const translations = {
     Tamil: {
         shikshaAI: 'ஷிக்ஷாஏஐ',
         dashboard: 'டாஷ்போர்டு',
+        sahayakBot: 'சஹாயக் பாட்',
         contentGeneration: 'உள்ளடக்க உருவாக்கம்',
         worksheets: 'பணித்தாள்கள்',
         knowledgeBase: 'அறிவுத் தளம்',
@@ -120,6 +127,7 @@ const translations = {
     Gujarati: {
         shikshaAI: 'શિક્ષાએઆઈ',
         dashboard: 'ડેશબોર્ડ',
+        sahayakBot: 'સહાયક બોટ',
         contentGeneration: 'સામગ્રી નિર્માણ',
         worksheets: 'વર્કશીટ',
         knowledgeBase: 'જ્ઞાન આધાર',
@@ -132,6 +140,7 @@ const translations = {
     Malayalam: {
         shikshaAI: 'ശിക്ഷാഎഐ',
         dashboard: 'ഡാഷ്ബോർഡ്',
+        sahayakBot: 'സഹായക് ബോട്ട്',
         contentGeneration: 'ഉള്ളടക്ക നിർമ്മാണം',
         worksheets: 'വർക്ക്ഷീറ്റുകൾ',
         knowledgeBase: 'വിജ്ഞാന കേന്ദ്രം',
@@ -144,6 +153,7 @@ const translations = {
     Punjabi: {
         shikshaAI: 'ਸ਼ਿਕਸ਼ਾਏਆਈ',
         dashboard: 'ਡੈਸ਼ਬੋਰਡ',
+        sahayakBot: 'ਸਹਾਇਕ ਬੋਟ',
         contentGeneration: 'ਸਮੱਗਰੀ ਸਿਰਜਣਾ',
         worksheets: 'ਵਰਕਸ਼ੀਟਾਂ',
         knowledgeBase: 'ਗਿਆਨ ਅਧਾਰ',
@@ -156,6 +166,7 @@ const translations = {
     Odia: {
         shikshaAI: 'ଶିକ୍ଷାଏଆଇ',
         dashboard: 'ଡ୍ୟାସବୋର୍ଡ',
+        sahayakBot: 'ସହାୟକ ବଟ୍',
         contentGeneration: 'ବିଷୟବସ୍ତୁ ସୃଷ୍ଟି',
         worksheets: 'କାର୍ଯ୍ୟପତ୍ର',
         knowledgeBase: 'ଜ୍ଞାନ ଆଧାର',
@@ -168,6 +179,7 @@ const translations = {
     Assamese: {
         shikshaAI: 'শিক্ষাএআই',
         dashboard: 'ডেশ্বৰ্ড',
+        sahayakBot: 'সহায়ক বট',
         contentGeneration: 'বিষয়বস্তু সৃষ্টি',
         worksheets: 'কাৰ্যপত্ৰ',
         knowledgeBase: 'জ্ঞান ভিত্তি',
@@ -180,6 +192,7 @@ const translations = {
     Kannada: {
         shikshaAI: 'ಶಿಕ್ಷಾಎಐ',
         dashboard: 'ಡ್ಯಾಶ್‌ಬೋರ್ಡ್',
+        sahayakBot: 'ಸಹಾಯಕ್ ಬಾಟ್',
         contentGeneration: 'ವಿಷಯ ರಚನೆ',
         worksheets: 'ವರ್ಕ್‌ಶೀಟ್‌ಗಳು',
         knowledgeBase: 'ಜ್ಞಾನದ ಮೂಲ',
@@ -192,6 +205,7 @@ const translations = {
     Telugu: {
         shikshaAI: 'శిక్షాఏఐ',
         dashboard: 'డాష్‌బోర్డ్',
+        sahayakBot: 'సహాయక్ బాట్',
         contentGeneration: 'విషయ సృష్టి',
         worksheets: 'వర్క్‌షీట్లు',
         knowledgeBase: 'జ్ఞాన ఆధారం',
@@ -215,6 +229,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   const navItems = [
     { href: '/', label: t.dashboard, icon: LayoutDashboard },
+    { href: '/sahayak-bot', label: t.sahayakBot, icon: MessageCircleQuestion },
     { href: '/content-generation', label: t.contentGeneration, icon: BookText },
     { href: '/worksheets', label: t.worksheets, icon: Layers },
     { href: '/knowledge-base', label: t.knowledgeBase, icon: BrainCircuit },
