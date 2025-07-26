@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -94,7 +95,8 @@ export function EditNotesForm({ student, onUpdate }: EditNotesFormProps) {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    if (!values.notes) {
+    const noteText = values.notes;
+    if (!noteText) {
       const updatedStudent = {
         ...student,
         notes: {},
@@ -108,16 +110,33 @@ export function EditNotesForm({ student, onUpdate }: EditNotesFormProps) {
 
     setIsTranslating(true);
     try {
-      const languageCodes = languages.map(l => l.value);
-      const { translations } = await translateText({
-        text: values.notes,
-        targetLanguages: languageCodes,
+      // Step 1: Translate the input text to English to get a canonical version.
+      const englishTranslationResult = await translateText({
+        text: noteText,
+        targetLanguages: ['English'],
       });
-      translations['English'] = values.notes;
+      const canonicalEnglishNote = englishTranslationResult.translations['English'];
+      
+      if (!canonicalEnglishNote) {
+        throw new Error("Failed to get canonical English translation.");
+      }
+
+      // Step 2: Translate the canonical English text to all other languages.
+      const otherLanguageCodes = languages.map(l => l.value).filter(l => l !== 'English');
+      const allTranslationsResult = await translateText({
+        text: canonicalEnglishNote,
+        targetLanguages: otherLanguageCodes,
+      });
+
+      // Combine all translations
+      const finalTranslations = {
+        ...allTranslationsResult.translations,
+        'English': canonicalEnglishNote,
+      };
 
       const updatedStudent = {
         ...student,
-        notes: translations,
+        notes: finalTranslations,
       };
 
       onUpdate(updatedStudent);
@@ -132,7 +151,12 @@ export function EditNotesForm({ student, onUpdate }: EditNotesFormProps) {
     } finally {
         setIsTranslating(false);
         setIsDialogOpen(false);
-        form.reset({ notes: values.notes });
+        // We update the form with the canonical english note if the user's language is english,
+        // or keep the original input otherwise to avoid jarring changes.
+        const updatedNoteForForm = language === 'English' 
+            ? (student.notes?.['English'] || noteText) 
+            : noteText;
+        form.reset({ notes: updatedNoteForForm });
     }
   }
 
