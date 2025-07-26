@@ -21,6 +21,8 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Textarea } from '@/components/ui/textarea';
 import { Pencil } from 'lucide-react';
 import { useLanguage } from '@/context/language-context';
+import { translateText } from '@/ai/flows/translate-text';
+import { languages } from '@/lib/data';
 
 const translations = {
   English: {
@@ -31,8 +33,11 @@ const translations = {
     notesPlaceholder: 'Enter observations...',
     cancel: 'Cancel',
     save: 'Save',
+    saving: 'Saving...',
     toastTitle: 'Notes Updated',
     toastDescription: (name: string) => `Notes for ${name} have been updated.`,
+    toastError: 'Translation Failed',
+    toastErrorDesc: 'Could not translate notes. Please try again.',
   },
   Hindi: {
     editNotes: 'नोट्स संपादित करें',
@@ -42,8 +47,11 @@ const translations = {
     notesPlaceholder: 'अवलोकन दर्ज करें...',
     cancel: 'रद्द करें',
     save: 'सहेजें',
+    saving: 'सहेज रहा है...',
     toastTitle: 'नोट्स अपडेट किए गए',
     toastDescription: (name: string) => `${name} के लिए नोट्स अपडेट किए गए हैं।`,
+    toastError: 'अनुवाद विफल',
+    toastErrorDesc: 'नोट्स का अनुवाद नहीं हो सका। कृपया पुनः प्रयास करें।',
   },
   Marathi: {
     editNotes: 'नोंदी संपादित करा',
@@ -53,8 +61,11 @@ const translations = {
     notesPlaceholder: 'निरीक्षणे प्रविष्ट करा...',
     cancel: 'रद्द करा',
     save: 'जतन करा',
+    saving: 'जतन करत आहे...',
     toastTitle: 'नोंदी अद्यतनित केल्या',
     toastDescription: (name: string) => `${name} साठीच्या नोंदी अद्यतनित केल्या आहेत.`,
+    toastError: 'भाषांतर अयशस्वी',
+    toastErrorDesc: 'नोंदी भाषांतरित करू शकलो नाही. कृपया पुन्हा प्रयत्न करा.',
   },
 };
 
@@ -65,6 +76,7 @@ interface EditNotesFormProps {
 
 export function EditNotesForm({ student, onUpdate }: EditNotesFormProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isTranslating, setIsTranslating] = useState(false);
   const { toast } = useToast();
   const { language } = useLanguage();
   const typedLanguage = language as keyof typeof translations;
@@ -78,20 +90,50 @@ export function EditNotesForm({ student, onUpdate }: EditNotesFormProps) {
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: { notes: student.notes || '' },
+    defaultValues: { notes: student.notes?.[language] || student.notes?.['English'] || '' },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    const updatedStudent = {
-      ...student,
-      notes: values.notes,
-    };
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    if (!values.notes) {
+      const updatedStudent = {
+        ...student,
+        notes: {},
+      };
+      onUpdate(updatedStudent);
+      setIsDialogOpen(false);
+      toast({ title: t.toastTitle, description: t.toastDescription(studentName) });
+      return;
+    }
 
-    onUpdate(updatedStudent);
 
-    form.reset();
-    setIsDialogOpen(false);
-    toast({ title: t.toastTitle, description: t.toastDescription(studentName) });
+    setIsTranslating(true);
+    try {
+      const languageCodes = languages.map(l => l.value);
+      const { translations } = await translateText({
+        text: values.notes,
+        targetLanguages: languageCodes,
+      });
+      translations['English'] = values.notes;
+
+      const updatedStudent = {
+        ...student,
+        notes: translations,
+      };
+
+      onUpdate(updatedStudent);
+      toast({ title: t.toastTitle, description: t.toastDescription(studentName) });
+    } catch (error) {
+      console.error("Translation failed:", error);
+      toast({
+          variant: 'destructive',
+          title: t.toastError,
+          description: t.toastErrorDesc,
+      });
+    } finally {
+        setIsTranslating(false);
+        setIsDialogOpen(false);
+        form.reset({ notes: values.notes });
+    }
   }
 
   return (
@@ -124,11 +166,11 @@ export function EditNotesForm({ student, onUpdate }: EditNotesFormProps) {
             />
             <DialogFooter>
               <DialogClose asChild>
-                <Button type="button" variant="ghost">
+                <Button type="button" variant="ghost" disabled={isTranslating}>
                   {t.cancel}
                 </Button>
               </DialogClose>
-              <Button type="submit">{t.save}</Button>
+              <Button type="submit" disabled={isTranslating}>{isTranslating ? t.saving : t.save}</Button>
             </DialogFooter>
           </form>
         </Form>

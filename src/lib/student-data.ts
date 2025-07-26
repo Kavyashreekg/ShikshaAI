@@ -8,9 +8,9 @@ export type SubjectPerformance = z.infer<typeof subjectPerformanceSchema>;
 
 const formSchema = z.object({
   id: z.number(),
-  name: z.record(z.string()), // Changed to a record for localization
+  name: z.record(z.string()),
   grade: z.string().min(1, 'Please select a grade.'),
-  notes: z.string().optional(),
+  notes: z.record(z.string()).optional(),
   subjects: z.array(subjectPerformanceSchema).optional(),
 });
 
@@ -36,7 +36,9 @@ export const initialStudents: Student[] = [
       Telugu: 'ఆరవ్ శర్మ'
     },
     grade: '3', 
-    notes: 'Shows strong aptitude in Mathematics but needs practice with reading comprehension.',
+    notes: {
+      English: 'Shows strong aptitude in Mathematics but needs practice with reading comprehension.',
+    },
     subjects: [
       { subject: 'Mathematics', gpa: 3.8 },
       { subject: 'English', gpa: 2.9 },
@@ -61,7 +63,9 @@ export const initialStudents: Student[] = [
       Telugu: 'ప్రియా సింగ్'
     },
     grade: '4', 
-    notes: 'Excellent in Arts. Struggles with fractions. Consistently completes homework.',
+    notes: {
+      English: 'Excellent in Arts. Struggles with fractions. Consistently completes homework.',
+    },
     subjects: [
       { subject: 'Arts', gpa: 4.0 },
       { subject: 'Mathematics', gpa: 2.5 },
@@ -86,7 +90,9 @@ export const initialStudents: Student[] = [
       Telugu: 'రోహన్ మెహతా'
     },
     grade: '3', 
-    notes: 'Very active in physical education. Has difficulty staying focused during science lessons.',
+    notes: {
+      English: 'Very active in physical education. Has difficulty staying focused during science lessons.',
+    },
     subjects: [
       { subject: 'Physical Education', gpa: 4.0 },
       { subject: 'Science', gpa: 2.2 },

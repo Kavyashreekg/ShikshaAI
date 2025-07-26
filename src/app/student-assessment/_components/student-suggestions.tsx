@@ -155,6 +155,7 @@ export function StudentSuggestions({ student }: { student: Student }) {
   const t = translations[typedLanguage] || translations['English'];
 
   const studentName = student.name[language] || student.name['English'];
+  const studentNotes = student.notes?.[language] || student.notes?.['English'];
 
   const handleGenerate = async () => {
     setIsLoading(true);
@@ -165,6 +166,7 @@ export function StudentSuggestions({ student }: { student: Student }) {
         ...student,
         name: studentName,
         language: language,
+        notes: studentNotes,
       });
       setResult(suggestions);
     } catch (e: any) {

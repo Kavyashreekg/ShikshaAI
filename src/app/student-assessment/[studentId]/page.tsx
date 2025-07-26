@@ -202,24 +202,20 @@ export default function StudentDetailPage() {
   );
 
   useEffect(() => {
-    // When the student data from the context changes (e.g., after an edit),
-    // find the student again and update the local state to reflect the changes.
     const updatedStudent = students.find((s) => s.id.toString() === studentId);
     setStudent(updatedStudent);
   }, [students, studentId]);
 
   if (!student) {
-    // Return notFound() if the student isn't found, which will render the not-found page.
-    // This can happen if the user navigates to an invalid student ID.
     notFound();
   }
   
-  // This function is passed to the EditStudentForm to update the student data in the context.
   const handleUpdateStudent = (updatedStudent: Student) => {
     updateStudent(updatedStudent);
   }
 
   const studentName = student.name[language] || student.name['English'];
+  const studentNotes = student.notes?.[language] || student.notes?.['English'];
 
   return (
     <AppShell>
@@ -248,7 +244,7 @@ export default function StudentDetailPage() {
                         <EditNotesForm student={student} onUpdate={handleUpdateStudent} />
                     </CardHeader>
                     <CardContent>
-                        <p className="whitespace-pre-wrap">{student.notes || pageTranslation.noNotes}</p>
+                        <p className="whitespace-pre-wrap">{studentNotes || pageTranslation.noNotes}</p>
                     </CardContent>
                 </Card>
                 <StudentSuggestions student={student} />
