@@ -13,7 +13,7 @@ import {z} from 'genkit';
 import * as pdfjs from 'pdfjs-dist/legacy/build/pdf.mjs';
 
 // Set the workerSrc to ensure the worker script can be found.
-// This points to the version of the script that is copied to the public directory.
+// This points to the version of the script from a reliable CDN.
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/legacy/build/pdf.worker.mjs`;
 
 
@@ -89,7 +89,7 @@ const generateLessonPlanFlow = ai.defineFlow(
     
     const pdfUint8Array = new Uint8Array(pdfData);
 
-    // Use pdfjs-dist to extract text
+    // Use pdfjs-dist to extract text, passing all options directly.
     const loadingTask = pdfjs.getDocument({
         data: pdfUint8Array,
         isEvalSupported: false,
