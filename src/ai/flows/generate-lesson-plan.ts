@@ -87,11 +87,13 @@ const generateLessonPlanFlow = ai.defineFlow(
   async input => {
     const pdfData = Buffer.from(input.lessonPdfDataUri.split(',')[1], 'base64');
     
-    // Convert Buffer to Uint8Array
     const pdfUint8Array = new Uint8Array(pdfData);
 
     // Use pdfjs-dist to extract text
-    const loadingTask = pdfjs.getDocument({ data: pdfUint8Array, isEvalSupported: false, useSystemFonts: true });
+    const loadingTask = pdfjs.getDocument(pdfUint8Array);
+    loadingTask.options.isEvalSupported = false;
+    loadingTask.options.useSystemFonts = true;
+
     const pdf = await loadingTask.promise;
     let pdfText = '';
     for (let i = 1; i <= pdf.numPages; i++) {
