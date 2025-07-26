@@ -57,6 +57,7 @@ const translations = {
     videoGenerationProgress: 'Generating video, this may take a minute...',
     safetyErrorVideo: 'The generated video was blocked for safety reasons. The story might contain sensitive content. Please try generating a different story.',
     errorDescriptionVideo: 'Failed to generate the video. Please try again.',
+    billingErrorVideo: 'Video generation requires a Google Cloud Platform project with billing enabled. Please check your account settings.',
     clearButton: 'Clear',
     viewHistoryButton: 'View History',
     historyDialogTitle: 'Stored Stories',
@@ -91,6 +92,7 @@ const translations = {
     videoGenerationProgress: 'वीडियो उत्पन्न हो रहा है, इसमें एक मिनट लग सकता है...',
     safetyErrorVideo: 'सुरक्षा कारणों से उत्पन्न वीडियो को अवरुद्ध कर दिया गया था। कहानी में संवेदनशील सामग्री हो सकती है। कृपया एक अलग कहानी उत्पन्न करने का प्रयास करें।',
     errorDescriptionVideo: 'वीडियो उत्पन्न करने में विफल। कृपया पुनः प्रयास करें।',
+    billingErrorVideo: 'वीडियो बनाने के लिए बिलिंग सक्षम Google क्लाउड प्लेटफ़ॉर्म प्रोजेक्ट की आवश्यकता है। कृपया अपनी खाता सेटिंग जांचें।',
     clearButton: 'साफ़ करें',
     viewHistoryButton: 'इतिहास देखें',
     historyDialogTitle: 'संग्रहीत कहानियाँ',
@@ -125,6 +127,7 @@ const translations = {
     videoGenerationProgress: 'व्हिडिओ तयार होत आहे, यास एक मिनिट लागू शकतो...',
     safetyErrorVideo: 'सुरक्षेच्या कारणास्तव तयार केलेला व्हिडिओ अवरोधित केला गेला. कथेत संवेदनशील सामग्री असू शकते. कृपया वेगळी कथा तयार करण्याचा प्रयत्न करा.',
     errorDescriptionVideo: 'व्हिडिओ तयार करण्यात अयशस्वी. कृपया पुन्हा प्रयत्न करा.',
+    billingErrorVideo: 'व्हिडिओ निर्मितीसाठी बिलिंग सक्षम असलेले Google क्लाउड प्लॅटफॉर्म प्रकल्प आवश्यक आहे. कृपया तुमची खाते सेटिंग्ज तपासा.',
     clearButton: 'साफ करा',
     viewHistoryButton: 'इतिहास पहा',
     historyDialogTitle: 'साठवलेल्या कथा',
@@ -248,7 +251,9 @@ export function ContentGenerationClient() {
       setVideoUrl(videoResult.video);
     } catch (e: any) {
       console.error(e);
-      if (e.message.includes('SAFETY')) {
+       if (e.message.includes('billing enabled')) {
+        setVideoError(t.billingErrorVideo);
+      } else if (e.message.includes('SAFETY')) {
         setVideoError(t.safetyErrorVideo);
       } else {
         setVideoError(e.message || t.errorDescriptionVideo);
