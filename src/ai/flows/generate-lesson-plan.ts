@@ -10,7 +10,7 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
-import * as pdfjs from 'pdfjs-dist/legacy/build/pdf.js';
+import * as pdfjs from 'pdfjs-dist/legacy/build/pdf.mjs';
 
 const GenerateLessonPlanInputSchema = z.object({
   lessonPdfDataUri: z
@@ -96,3 +96,4 @@ const generateLessonPlanFlow = ai.defineFlow(
     return output!;
   }
 );
+
