@@ -90,10 +90,12 @@ const generateLessonPlanFlow = ai.defineFlow(
     const pdfUint8Array = new Uint8Array(pdfData);
 
     // Use pdfjs-dist to extract text
-    const loadingTask = pdfjs.getDocument(pdfUint8Array);
-    loadingTask.options.isEvalSupported = false;
-    loadingTask.options.useSystemFonts = true;
-
+    const loadingTask = pdfjs.getDocument({
+        data: pdfUint8Array,
+        isEvalSupported: false,
+        useSystemFonts: true,
+    });
+    
     const pdf = await loadingTask.promise;
     let pdfText = '';
     for (let i = 1; i <= pdf.numPages; i++) {
