@@ -68,32 +68,6 @@ const pageTranslations = {
 
 const features = [
   {
-    href: '/sahayak-bot',
-    icon: <MessageCircleQuestion className="h-8 w-8 text-primary" />,
-    translations: {
-      English: {
-        title: 'Sahayak AI Bot',
-        description: 'Your versatile AI teaching assistant.',
-      },
-      Hindi: {
-        title: 'सहायक एआई बॉट',
-        description: 'आपका बहुमुखी एआई शिक्षण सहायक।',
-      },
-      Marathi: {
-        title: 'सहायक एआय बॉट',
-        description: 'तुमचा बहुमुखी एआय शिक्षण सहाय्यक.',
-      },
-       Kannada: {
-        title: 'ಸಹಾಯಕ್ ಎಐ ಬಾಟ್',
-        description: 'ನಿಮ್ಮ ಬಹುಮುಖಿ ಎಐ ಬೋಧನಾ ಸಹಾಯಕ.',
-      },
-      Telugu: {
-        title: 'సహాయక్ AI బాట్',
-        description: 'మీ బహుముఖ AI బోధన సహాయకుడు.',
-      },
-    },
-  },
-  {
     href: '/content-generation',
     icon: <BookText className="h-8 w-8 text-primary" />,
     translations: {
