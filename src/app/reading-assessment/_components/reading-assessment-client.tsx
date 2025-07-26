@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -9,7 +9,9 @@ import {
   generateReadingAssessment,
   GenerateReadingAssessmentOutput,
 } from '@/ai/flows/generate-reading-assessment';
+import { speechToText } from '@/ai/flows/speech-to-text';
 import { textToSpeech } from '@/ai/flows/text-to-speech';
+import { generateReadingFeedback, GenerateReadingFeedbackOutput } from '@/ai/flows/generate-reading-feedback';
 import { grades } from '@/lib/data';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
@@ -18,7 +20,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
-import { BookOpen, Sparkles, Volume2, ShieldAlert, FileText, Languages, XCircle } from 'lucide-react';
+import { BookOpen, Sparkles, Volume2, ShieldAlert, FileText, Languages, XCircle, Mic, StopCircle, RefreshCw, MessageSquareQuote } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useLanguage } from '@/context/language-context';
 
@@ -49,6 +51,15 @@ const translations = {
       topicMin: 'Please enter a topic.',
       gradeMin: 'Please select a grade level.',
     },
+    recordNow: 'Record Now',
+    stopRecording: 'Stop Recording',
+    replayRecording: 'Replay Recording',
+    getFeedback: 'Get Feedback',
+    gettingFeedback: 'Getting Feedback...',
+    feedbackTitle: 'Instant Feedback',
+    feedbackDescription: 'AI-powered suggestions for the student.',
+    micError: 'Microphone access denied. Please enable it in your browser settings.',
+    sttError: 'Could not understand the audio. Please try recording again.',
   },
   Hindi: {
     formCardTitle: 'मूल्यांकन विवरण',
@@ -76,6 +87,15 @@ const translations = {
       topicMin: 'कृपया एक विषय दर्ज करें।',
       gradeMin: 'कृपया एक ग्रेड स्तर चुनें।',
     },
+    recordNow: 'अभी रिकॉर्ड करें',
+    stopRecording: 'रिकॉर्डिंग बंद करें',
+    replayRecording: 'रिकॉर्डिंग फिर से चलाएं',
+    getFeedback: 'प्रतिक्रिया प्राप्त करें',
+    gettingFeedback: 'प्रतिक्रिया मिल रही है...',
+    feedbackTitle: 'तुरंत प्रतिक्रिया',
+    feedbackDescription: 'छात्र के लिए एआई-संचालित सुझाव।',
+    micError: 'माइक्रोफोन एक्सेस अस्वीकृत। कृपया अपनी ब्राउज़र सेटिंग्स में इसे सक्षम करें।',
+    sttError: 'ऑडियो समझ में नहीं आया। कृपया फिर से रिकॉर्ड करने का प्रयास करें।',
   },
   Marathi: {
     formCardTitle: 'मूल्यांकन तपशील',
@@ -92,7 +112,7 @@ const translations = {
     vocabCardDescription: 'उताऱ्यातील महत्त्वाचे शब्द.',
     emptyState: 'तुमचा तयार केलेला उतारा आणि शब्दसंग्रह येथे दिसेल.',
     listenButton: 'उतारा ऐका',
-    generatingAudioButton: 'ऑडिओ तयार करत आहे...',
+    generatingButton: 'ऑडिओ तयार करत आहे...',
     clearButton: 'साफ करा',
     contentBlockedTitle: 'सामग्री अवरोधित',
     safetyError: 'सुरक्षेच्या कारणास्तव तयार केलेली सामग्री अवरोधित केली गेली. कृपया वेगळा विषय वापरून पहा.',
@@ -103,6 +123,15 @@ const translations = {
       topicMin: 'कृपया एक विषय प्रविष्ट करा.',
       gradeMin: 'कृपया एक श्रेणी स्तर निवडा.',
     },
+    recordNow: 'आता रेकॉर्ड करा',
+    stopRecording: 'रेकॉर्डिंग थांबवा',
+    replayRecording: 'रेकॉर्डिंग पुन्हा प्ले करा',
+    getFeedback: 'अभिप्राय मिळवा',
+    gettingFeedback: 'अभिप्राय मिळत आहे...',
+    feedbackTitle: 'झटपट अभिप्राय',
+    feedbackDescription: 'विद्यार्थ्यासाठी AI-चालित सूचना.',
+    micError: 'मायक्रोफोन प्रवेश नाकारला. कृपया तुमच्या ब्राउझर सेटिंग्जमध्ये तो सक्षम करा.',
+    sttError: 'ऑडिओ समजू शकला नाही. कृपया पुन्हा रेकॉर्ड करण्याचा प्रयत्न करा.',
   },
 };
 
@@ -112,6 +141,15 @@ export function ReadingAssessmentClient() {
   const [isSynthesizing, setIsSynthesizing] = useState(false);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  
+  const [isRecording, setIsRecording] = useState(false);
+  const [studentAudioUrl, setStudentAudioUrl] = useState<string | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [feedback, setFeedback] = useState<GenerateReadingFeedbackOutput | null>(null);
+
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
+
   const { toast } = useToast();
   const { language } = useLanguage();
   const t = translations[language as keyof typeof translations] || translations['English'];
@@ -129,11 +167,24 @@ export function ReadingAssessmentClient() {
     },
   });
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    setIsLoading(true);
+  const resetAll = () => {
+    form.reset();
+    setIsLoading(false);
     setResult(null);
     setAudioUrl(null);
     setError(null);
+    setIsRecording(false);
+    setStudentAudioUrl(null);
+    setIsProcessing(false);
+    setFeedback(null);
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+        mediaRecorderRef.current.stop();
+    }
+  };
+
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    resetAll();
+    setIsLoading(true);
     try {
       const assessmentResult = await generateReadingAssessment({ ...values, language });
       setResult(assessmentResult);
@@ -172,12 +223,76 @@ export function ReadingAssessmentClient() {
     }
   };
 
-  const handleClear = () => {
-    form.reset();
-    setResult(null);
-    setAudioUrl(null);
-    setError(null);
+  const handleStartRecording = async () => {
+    setStudentAudioUrl(null);
+    setFeedback(null);
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaRecorderRef.current = new MediaRecorder(stream);
+      audioChunksRef.current = [];
+
+      mediaRecorderRef.current.ondataavailable = (event) => {
+        audioChunksRef.current.push(event.data);
+      };
+
+      mediaRecorderRef.current.onstop = () => {
+        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        const audioUrl = URL.createObjectURL(audioBlob);
+        setStudentAudioUrl(audioUrl);
+      };
+
+      mediaRecorderRef.current.start();
+      setIsRecording(true);
+    } catch (error) {
+      console.error('Mic error:', error);
+      toast({ variant: 'destructive', title: 'Error', description: t.micError });
+    }
   };
+
+  const handleStopRecording = () => {
+    if (mediaRecorderRef.current) {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+    }
+  };
+
+  const handleGetFeedback = async () => {
+    if (!studentAudioUrl || !result?.passage) return;
+    setIsProcessing(true);
+    setFeedback(null);
+    try {
+        const audioBlob = await fetch(studentAudioUrl).then(r => r.blob());
+        const reader = new FileReader();
+        reader.readAsDataURL(audioBlob);
+        reader.onloadend = async () => {
+            const base64Audio = reader.result as string;
+            const { text: studentTranscript } = await speechToText({ audioDataUri: base64Audio });
+            
+            if (!studentTranscript) {
+                toast({ variant: 'destructive', title: 'Error', description: t.sttError });
+                setIsProcessing(false);
+                return;
+            }
+
+            const feedbackResult = await generateReadingFeedback({
+                passage: result.passage,
+                studentTranscript: studentTranscript,
+                language: language
+            });
+            setFeedback(feedbackResult);
+        }
+    } catch (e: any) {
+        console.error("Feedback error", e);
+        if (e.message.includes('SAFETY')) {
+            setError(t.safetyError);
+        } else {
+            toast({ variant: 'destructive', title: t.errorTitle, description: 'Could not get feedback.' });
+        }
+    } finally {
+        setIsProcessing(false);
+    }
+  };
+
 
   return (
     <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
@@ -242,7 +357,7 @@ export function ReadingAssessmentClient() {
                     <Volume2 className="mr-2 h-4 w-4" />
                     {isSynthesizing ? t.generatingAudioButton : t.listenButton}
                 </Button>
-                <Button onClick={handleClear} variant="outline">
+                <Button onClick={resetAll} variant="outline">
                     <XCircle className="mr-2 h-4 w-4" />
                     {t.clearButton}
                 </Button>
@@ -289,7 +404,41 @@ export function ReadingAssessmentClient() {
                         </div>
                     )}
                 </CardContent>
+                 {result && (
+                    <CardFooter className="flex flex-col items-start gap-4">
+                        <div className="flex items-center gap-2">
+                            <Button onClick={isRecording ? handleStopRecording : handleStartRecording} disabled={isProcessing}>
+                                {isRecording ? <StopCircle className="mr-2 h-4 w-4 animate-pulse" /> : <Mic className="mr-2 h-4 w-4" />}
+                                {isRecording ? t.stopRecording : t.recordNow}
+                            </Button>
+                            {studentAudioUrl && (
+                                <>
+                                    <audio src={studentAudioUrl} controls className="h-10"/>
+                                    <Button onClick={handleGetFeedback} disabled={isProcessing}>
+                                        {isProcessing ? <RefreshCw className="mr-2 h-4 w-4 animate-spin" /> : <MessageSquareQuote className="mr-2 h-4 w-4" />}
+                                        {isProcessing ? t.gettingFeedback : t.getFeedback}
+                                    </Button>
+                                </>
+                            )}
+                        </div>
+                    </CardFooter>
+                 )}
             </Card>
+
+            {feedback && (
+                <Card>
+                    <CardHeader>
+                        <div className="flex items-center gap-2">
+                            <Sparkles className="h-6 w-6 text-accent" />
+                            <CardTitle>{t.feedbackTitle}</CardTitle>
+                        </div>
+                        <CardDescription>{t.feedbackDescription}</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                       <div className="prose prose-sm max-w-none whitespace-pre-wrap rounded-md bg-muted/50 p-4" dangerouslySetInnerHTML={{ __html: feedback.feedback.replace(/\n/g, '<br />') }} />
+                    </CardContent>
+                </Card>
+            )}
 
             {result && result.vocabulary.length > 0 && (
                  <Card>

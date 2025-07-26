@@ -12,3 +12,4 @@ import '@/ai/flows/generate-student-suggestions.ts';
 import '@/ai/flows/translate-text.ts';
 import '@/ai/flows/manage-student-flow.ts';
 import '@/ai/flows/generate-reading-assessment.ts';
+import '@/ai/flows/generate-reading-feedback.ts';
