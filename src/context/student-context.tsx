@@ -6,6 +6,7 @@ import { Student, initialStudents } from '@/lib/student-data';
 type StudentContextType = {
   students: Student[];
   addStudent: (student: Student) => void;
+  addStudents: (newStudents: Student[]) => void;
   updateStudent: (student: Student) => void;
   removeStudent: (studentId: number) => void;
 };
@@ -46,6 +47,10 @@ export function StudentProvider({ children }: { children: ReactNode }) {
   const addStudent = (student: Student) => {
     setStudents((prevStudents) => [...prevStudents, student]);
   };
+
+  const addStudents = (newStudents: Student[]) => {
+    setStudents((prevStudents) => [...prevStudents, ...newStudents]);
+  };
     
   const updateStudent = (updatedStudent: Student) => {
     setStudents((prevStudents) => 
@@ -62,7 +67,7 @@ export function StudentProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <StudentContext.Provider value={{ students, addStudent, updateStudent, removeStudent }}>
+    <StudentContext.Provider value={{ students, addStudent, addStudents, updateStudent, removeStudent }}>
       {children}
     </StudentContext.Provider>
   );

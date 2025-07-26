@@ -1,10 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import Link from 'next/link';
+import * as XLSX from 'xlsx';
+import Papa from 'papaparse';
+
 
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
@@ -27,10 +30,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Textarea } from '@/components/ui/textarea';
 import { grades, languages } from '@/lib/data';
-import { UserPlus, Trash2 } from 'lucide-react';
+import { UserPlus, Trash2, Upload, Download } from 'lucide-react';
 import { useStudent } from '@/context/student-context';
 import { useLanguage } from '@/context/language-context';
 import { translateText } from '@/ai/flows/translate-text';
+import { Student } from '@/lib/student-data';
 
 
 const translations = {
@@ -62,6 +66,13 @@ const translations = {
         nameMin: 'Name must be at least 2 characters.',
         gradeMin: 'Please select a grade.',
     },
+    import: 'Import',
+    export: 'Export',
+    importing: 'Importing...',
+    toastImportSuccess: 'Import Successful',
+    toastImportSuccessDesc: (count: number) => `Successfully imported ${count} students.`,
+    toastImportError: 'Import Failed',
+    toastImportErrorDesc: 'Could not import students. Please check the file format and try again.',
   },
   Hindi: {
     rosterTitle: 'छात्र रोस्टर',
@@ -91,6 +102,13 @@ const translations = {
         nameMin: 'नाम कम से कम 2 अक्षरों का होना चाहिए।',
         gradeMin: 'कृपया एक ग्रेड चुनें।',
     },
+    import: 'आयात',
+    export: 'निर्यात',
+    importing: 'आयात हो रहा है...',
+    toastImportSuccess: 'आयात सफल',
+    toastImportSuccessDesc: (count: number) => `सफलतापूर्वक ${count} छात्रों का आयात किया गया।`,
+    toastImportError: 'आयात विफल',
+    toastImportErrorDesc: 'छात्रों का आयात नहीं हो सका। कृपया फ़ाइल प्रारूप की जाँच करें और पुनः प्रयास करें।',
   },
   Marathi: {
     rosterTitle: 'विद्यार्थी रोस्टर',
@@ -120,307 +138,26 @@ const translations = {
         nameMin: 'नाव किमान २ अक्षरांचे असावे.',
         gradeMin: 'कृपया एक श्रेणी निवडा.',
     },
-  },
-  Kashmiri: {
-    rosterTitle: 'طالب علمٕک روٗسٹر',
-    rosterDescription: 'پننٮ۪ن طالب علمن ہنٛد انتظام کریو تہٕ تِمن ہنٛز پیش رفتس پؠٹھ نظر تھاو۔',
-    addStudent: 'طالب علم شٲمِل کریو',
-    addNewStudent: 'نوٚو طالب علم شٲمِل کریو',
-    newStudentDescription: 'نوٚنِس طالب علم خٲطرٕ تفصیلات دِیُت۔',
-    fullName: 'بوٗر ناو',
-    namePlaceholder: 'مثلن، انیکا گپتا',
-    grade: 'گریڈ',
-    gradePlaceholder: 'اکھ گریڈ ژارٕو',
-    initialNotes: 'اِبتدٲیی نوٹس',
-    notesPlaceholder: 'کاہِنہ تہِ ابتدٲیی مشاہدات...',
-    cancel: 'منسوخ',
-    toastTitle: 'طالب علم شٲمِل کرنہٕ آو',
-    toastDescription: (name: string) => `${name} آو توٚہنٛدِس روٗسٹرس مَنٛز شٲمِل کرنہٕ۔`,
-    tableName: 'ناو',
-    tableActions: 'کاروٲیی',
-    details: 'تفصیلات',
-    remove: 'ہٹاو',
-    removeStudentConfirmation: 'کیاہ توہہِ پکہٕ چھِو؟',
-    removeStudentDescription: (name: string) => `یہِ کرِ ${name} توٚہنٛدِس روسٹر پؠٹھ مستقل طور پٲٹھؠ ختم۔`,
-    toastStudentRemoved: 'طالب علم ہٹاونہٕ آو',
-    noStudents: 'وُنی تام چھُ نہٕ کانٛہہ طالب علم شٲمِل کرنہٕ آمُت۔',
-    translating: 'ترجمہٕ کران...',
-    formErrors: {
-      nameMin: 'ناو گژھہِ کم از کم 2 اَक्षरَن ہُنٛد ٲسُن۔',
-      gradeMin: 'مہربانی کرِتھ اکھ گریڈ ژارٕو۔',
-    },
-  },
-  Bengali: {
-    rosterTitle: 'ছাত্র তালিকা',
-    rosterDescription: 'আপনার ছাত্রদের পরিচালনা করুন এবং তাদের অগ্রগতি ট্র্যাক করুন।',
-    addStudent: 'ছাত্র যোগ করুন',
-    addNewStudent: 'নতুন ছাত্র যোগ করুন',
-    newStudentDescription: 'নতুন ছাত্রের জন্য বিবরণ লিখুন।',
-    fullName: 'পুরো নাম',
-    namePlaceholder: 'যেমন, অনিকা গুপ্তা',
-    grade: 'গ্রেড',
-    gradePlaceholder: 'একটি গ্রেড নির্বাচন করুন',
-    initialNotes: 'প্রাথমিক নোট',
-    notesPlaceholder: 'যেকোনো প্রাথমিক পর্যবেক্ষণ...',
-    cancel: 'বাতিল করুন',
-    toastTitle: 'ছাত্র যোগ করা হয়েছে',
-    toastDescription: (name: string) => `${name} আপনার তালিকায় যোগ করা হয়েছে।`,
-    tableName: 'নাম',
-    tableActions: 'ক্রিয়া',
-    details: 'বিবরণ',
-    remove: 'সরান',
-    removeStudentConfirmation: 'আপনি কি নিশ্চিত?',
-    removeStudentDescription: (name: string) => `এটি আপনার তালিকা থেকে স্থায়ীভাবে ${name} কে মুছে ফেলবে।`,
-    toastStudentRemoved: 'ছাত্র সরানো হয়েছে',
-    noStudents: 'এখনও কোনো ছাত্র যোগ করা হয়নি।',
-    translating: 'অনুবাদ করা হচ্ছে...',
-    formErrors: {
-      nameMin: 'নাম কমপক্ষে ২ অক্ষরের হতে হবে।',
-      gradeMin: 'অনুগ্রহ করে একটি গ্রেড নির্বাচন করুন।',
-    },
-  },
-  Tamil: {
-    rosterTitle: 'மாணவர் பட்டியல்',
-    rosterDescription: 'உங்கள் மாணவர்களை நிர்வகிக்கவும் மற்றும் அவர்களின் முன்னேற்றத்தைக் கண்காணிக்கவும்।',
-    addStudent: 'மாணவரைச் சேர்',
-    addNewStudent: 'புதிய மாணவரைச் சேர்',
-    newStudentDescription: 'புதிய மாணவருக்கான விவரங்களை உள்ளிடவும்।',
-    fullName: 'முழு பெயர்',
-    namePlaceholder: 'எ.கா., அனிகா குப்தா',
-    grade: 'தரம்',
-    gradePlaceholder: 'ஒரு தரத்தைத் தேர்ந்தெடுக்கவும்',
-    initialNotes: 'ஆரம்ப குறிப்புகள்',
-    notesPlaceholder: 'ஏதேனும் ஆரம்ப அவதானிப்புகள்...',
-    cancel: 'ரத்துசெய்',
-    toastTitle: 'மாணவர் சேர்க்கப்பட்டார்',
-    toastDescription: (name: string) => `${name} உங்கள் பட்டியலில் சேர்க்கப்பட்டுள்ளார்।`,
-    tableName: 'பெயர்',
-    tableActions: 'செயல்கள்',
-    details: 'விவரங்கள்',
-    remove: 'நீக்கு',
-    removeStudentConfirmation: 'நீங்கள் உறுதியாக இருக்கிறீர்களா?',
-    removeStudentDescription: (name: string) => `இது உங்கள் பட்டியலில் இருந்து ${name} ஐ நிரந்தரமாக நீக்கும்.`,
-    toastStudentRemoved: 'மாணவர் நீக்கப்பட்டார்',
-    noStudents: 'இன்னும் மாணவர்கள் சேர்க்கப்படவில்லை।',
-    translating: 'மொழிபெயர்க்கிறது...',
-    formErrors: {
-      nameMin: 'பெயர் குறைந்தது 2 எழுத்துகளாக இருக்க வேண்டும்.',
-      gradeMin: 'தயவுசெய்து ஒரு தரத்தைத் தேர்ந்தெடுக்கவும்।',
-    },
-  },
-  Gujarati: {
-    rosterTitle: 'વિદ્યાર્થી રોસ્ટર',
-    rosterDescription: 'તમારા વિદ્યાર્થીઓનું સંચાલન કરો અને તેમની પ્રગતિને ટ્રૅક કરો.',
-    addStudent: 'વિદ્યાર્થી ઉમેરો',
-    addNewStudent: 'નવો વિદ્યાર્થી ઉમેરો',
-    newStudentDescription: 'નવા વિદ્યાર્થી માટે વિગતો દાખલ કરો.',
-    fullName: 'પૂરું નામ',
-    namePlaceholder: 'દા.ત., અનિકા ગુપ્તા',
-    grade: 'ગ્રેડ',
-    gradePlaceholder: 'એક ગ્રેડ પસંદ કરો',
-    initialNotes: 'પ્રારંભિક નોંધો',
-    notesPlaceholder: 'કોઈપણ પ્રારંભિક અવલોકનો...',
-    cancel: 'રદ કરો',
-    toastTitle: 'વિદ્યાર્થી ઉમેરવામાં આવ્યો',
-    toastDescription: (name: string) => `${name} તમારા રોસ્ટરમાં ઉમેરવામાં આવ્યો છે.`,
-    tableName: 'નામ',
-    tableActions: 'ક્રિયાઓ',
-    details: 'વિગતો',
-    remove: 'દૂર કરો',
-    removeStudentConfirmation: 'શું તમે ચોક્કસ છો?',
-    removeStudentDescription: (name: string) => `આ તમારા રોસ્ટરમાંથી ${name} ને કાયમ માટે કાઢી નાખશે.`,
-    toastStudentRemoved: 'વિદ્યાર્થી દૂર કરવામાં આવ્યો',
-    noStudents: 'હજી સુધી કોઈ વિદ્યાર્થી ઉમેરવામાં આવ્યો નથી.',
-    translating: 'અનુવાદ કરી રહ્યું છે...',
-    formErrors: {
-      nameMin: 'નામ ઓછામાં ઓછું 2 અક્ષરોનું હોવું જોઈએ.',
-      gradeMin: 'કૃપા કરીને એક ગ્રેડ પસંદ કરો.',
-    },
-  },
-  Malayalam: {
-    rosterTitle: 'വിദ്യാർത്ഥി പട്ടിക',
-    rosterDescription: 'നിങ്ങളുടെ വിദ്യാർത്ഥികളെ നിയന്ത്രിക്കുകയും അവരുടെ പുരോഗതി നിരീക്ഷിക്കുകയും ചെയ്യുക.',
-    addStudent: 'വിദ്യാർത്ഥിയെ ചേർക്കുക',
-    addNewStudent: 'പുതിയ വിദ്യാർത്ഥിയെ ചേർക്കുക',
-    newStudentDescription: 'പുതിയ വിദ്യാർത്ഥിയുടെ വിവരങ്ങൾ നൽകുക.',
-    fullName: 'മുഴുവൻ പേര്',
-    namePlaceholder: 'ഉദാ., അനിക ഗുപ്ത',
-    grade: 'ഗ്രേഡ്',
-    gradePlaceholder: 'ഒരു ഗ്രേഡ് തിരഞ്ഞെടുക്കുക',
-    initialNotes: 'പ്രാരംഭ കുറിപ്പുകൾ',
-    notesPlaceholder: 'ഏതെങ്കിലും പ്രാരംഭ നിരീക്ഷണങ്ങൾ...',
-    cancel: 'റദ്ദാക്കുക',
-    toastTitle: 'വിദ്യാർത്ഥിയെ ചേർത്തു',
-    toastDescription: (name: string) => `${name} നിങ്ങളുടെ പട്ടികയിൽ ചേർത്തു.`,
-    tableName: 'പേര്',
-    tableActions: 'പ്രവർത്തനങ്ങൾ',
-    details: 'വിവരങ്ങൾ',
-    remove: 'നീക്കം ചെയ്യുക',
-    removeStudentConfirmation: 'നിങ്ങൾക്ക് ഉറപ്പാണോ?',
-    removeStudentDescription: (name: string) => `ഇത് നിങ്ങളുടെ പട്ടികയിൽ നിന്ന് ${name} നെ ശാശ്വതമായി ഇല്ലാതാക്കും.`,
-    toastStudentRemoved: 'വിദ്യാർത്ഥിയെ നീക്കം ചെയ്തു',
-    noStudents: 'ഇതുവരെ വിദ്യാർത്ഥികളൊന്നും ചേർത്തിട്ടില്ല.',
-    translating: 'വിവർത്തനം ചെയ്യുന്നു...',
-    formErrors: {
-      nameMin: 'പേര് കുറഞ്ഞത് 2 അക്ഷരങ്ങളെങ്കിലും ആയിരിക്കണം.',
-      gradeMin: 'ദയവായി ഒരു ഗ്രേഡ് തിരഞ്ഞെടുക്കുക.',
-    },
-  },
-  Punjabi: {
-    rosterTitle: 'ਵਿਦਿਆਰਥੀ ਰੋਸਟਰ',
-    rosterDescription: 'ਆਪਣੇ ਵਿਦਿਆਰਥੀਆਂ ਦਾ ਪ੍ਰਬੰਧਨ ਕਰੋ ਅਤੇ ਉਹਨਾਂ ਦੀ ਤਰੱਕੀ ਨੂੰ ਟਰੈਕ ਕਰੋ।',
-    addStudent: 'ਵਿਦਿਆਰਥੀ ਸ਼ਾਮਲ ਕਰੋ',
-    addNewStudent: 'ਨਵਾਂ ਵਿਦਿਆਰਥੀ ਸ਼ਾਮਲ ਕਰੋ',
-    newStudentDescription: 'ਨਵੇਂ ਵਿਦਿਆਰਥੀ ਲਈ ਵੇਰਵੇ ਦਰਜ ਕਰੋ।',
-    fullName: 'ਪੂਰਾ ਨਾਮ',
-    namePlaceholder: 'ਜਿਵੇਂ, ਅਨਿਕਾ ਗੁਪਤਾ',
-    grade: 'ਗ੍ਰੇਡ',
-    gradePlaceholder: 'ਇੱਕ ਗ੍ਰੇਡ ਚੁਣੋ',
-    initialNotes: 'ਸ਼ੁਰੂਆਤੀ ਨੋਟਸ',
-    notesPlaceholder: 'ਕੋਈ ਵੀ ਸ਼ੁਰੂਆਤੀ ਨਿਰੀਖਣ...',
-    cancel: 'ਰੱਦ ਕਰੋ',
-    toastTitle: 'ਵਿਦਿਆਰਥੀ ਸ਼ਾਮਲ ਕੀਤਾ ਗਿਆ',
-    toastDescription: (name: string) => `${name} ਨੂੰ ਤੁਹਾਡੇ ਰੋਸਟਰ ਵਿੱਚ ਸ਼ਾਮਲ ਕੀਤਾ ਗਿਆ ਹੈ।`,
-    tableName: 'ਨਾਮ',
-    tableActions: 'ਕਾਰਵਾਈਆਂ',
-    details: 'ਵੇਰਵੇ',
-    remove: 'ਹਟਾਓ',
-    removeStudentConfirmation: 'ਕੀ ਤੁਸੀਂ ਯਕੀਨੀ ਹੋ?',
-    removeStudentDescription: (name: string) => `ਇਹ ਤੁਹਾਡੇ ਰੋਸਟਰ ਤੋਂ ${name} ਨੂੰ ਪੱਕੇ ਤੌਰ 'ਤੇ ਹਟਾ ਦੇਵੇਗਾ।`,
-    toastStudentRemoved: 'ਵਿਦਿਆਰਥੀ ਹਟਾ ਦਿੱਤਾ ਗਿਆ',
-    noStudents: 'ਅਜੇ ਤੱਕ ਕੋਈ ਵਿਦਿਆਰਥੀ ਸ਼ਾਮਲ ਨਹੀਂ ਕੀਤਾ ਗਿਆ ਹੈ।',
-    translating: 'ਅਨੁਵਾਦ ਕੀਤਾ ਜਾ ਰਿਹਾ ਹੈ...',
-    formErrors: {
-      nameMin: 'ਨਾਮ ਘੱਟੋ-ਘੱਟ 2 ਅੱਖਰਾਂ ਦਾ ਹੋਣਾ ਚਾਹੀਦਾ ਹੈ।',
-      gradeMin: 'ਕਿਰਪਾ ਕਰਕੇ ਇੱਕ ਗ੍ਰੇਡ ਚੁਣੋ।',
-    },
-  },
-  Odia: {
-    rosterTitle: 'ଛାତ୍ର ରୋଷ୍ଟର',
-    rosterDescription: 'ଆପଣଙ୍କର ଛାତ୍ରମାନଙ୍କୁ ପରିଚାଳନା କରନ୍ତୁ ଏବଂ ସେମାନଙ୍କର ପ୍ରଗତି ଟ୍ରାକ୍ କରନ୍ତୁ।',
-    addStudent: 'ଛାତ୍ର ଯୋଗ କରନ୍ତୁ',
-    addNewStudent: 'ନୂତନ ଛାତ୍ର ଯୋଗ କରନ୍ତୁ',
-    newStudentDescription: 'ନୂତନ ଛାତ୍ର ପାଇଁ ବିବରଣୀ ପ୍ରବେଶ କରନ୍ତୁ।',
-    fullName: 'ପୂରା ନାମ',
-    namePlaceholder: 'ଉଦାହରଣ, ଅନିକା ଗୁପ୍ତା',
-    grade: 'ଗ୍ରେଡ୍',
-    gradePlaceholder: 'ଏକ ଗ୍ରେଡ୍ ଚୟନ କରନ୍ତୁ',
-    initialNotes: 'ପ୍ରାରମ୍ଭିକ ନୋଟ୍',
-    notesPlaceholder: 'ଯେକୌଣସି ପ୍ରାରମ୍ଭିକ ପର୍ଯ୍ୟବେକ୍ଷଣ...',
-    cancel: 'ବାତିଲ କରନ୍ତୁ',
-    toastTitle: 'ଛାତ୍ର ଯୋଗ କରାଗଲା',
-    toastDescription: (name: string) => `${name} ଆପଣଙ୍କ ରୋଷ୍ଟରରେ ଯୋଗ କରାଯାଇଛି।`,
-    tableName: 'ନାମ',
-    tableActions: 'କାର୍ଯ୍ୟାନୁଷ୍ଠାନ',
-    details: 'ବିବରଣୀ',
-    remove: 'ଅପସାରଣ କରନ୍ତୁ',
-    removeStudentConfirmation: 'ଆପଣ ନିଶ୍ଚିତ କି?',
-    removeStudentDescription: (name: string) => `ଏହା ଆପଣଙ୍କ ରୋଷ୍ଟରରୁ ${name}କୁ ସ୍ଥାୟୀ ଭାବରେ ଡିଲିଟ୍ କରିବ।`,
-    toastStudentRemoved: 'ଛାତ୍ର ଅପସାରିତ ହେଲା',
-    noStudents: 'ଏପର୍ଯ୍ୟନ୍ତ କୌଣସି ଛାତ୍ର ଯୋଡି ହୋଇନାହାଁନ୍ତି।',
-    translating: 'ଅନୁବାଦ କରୁଛି...',
-    formErrors: {
-      nameMin: 'ନାମ ଅତିକମରେ ୨ଟି ଅକ୍ଷର ହେବା ଆବଶ୍ୟକ।',
-      gradeMin: 'ଦୟାକରି ଏକ ଗ୍ରେଡ୍ ଚୟନ କରନ୍ତୁ।',
-    },
-  },
-  Assamese: {
-    rosterTitle: 'ছাত্র তালিকা',
-    rosterDescription: 'আপোনাৰ শিক্ষাৰ্থীসকলক পৰিচালনা কৰক আৰু তেওঁলোকৰ প্ৰগতি ট্ৰেক কৰক।',
-    addStudent: 'ছাত্র যোগ কৰক',
-    addNewStudent: 'নতুন ছাত্র যোগ কৰক',
-    newStudentDescription: 'নতুন শিক্ষাৰ্থীৰ বাবে বিৱৰণ প্ৰবিষ্ট কৰক।',
-    fullName: 'সম্পূৰ্ণ নাম',
-    namePlaceholder: 'যেনে, অনিকা গুপ্তা',
-    grade: 'গ্ৰেড',
-    gradePlaceholder: 'এটা গ্ৰেড বাছনি কৰক',
-    initialNotes: 'প্ৰাৰম্ভিক টোকা',
-    notesPlaceholder: 'যিকোনো প্ৰাৰম্ভিক পৰ্যবেক্ষণ...',
-    cancel: 'বাতিল কৰক',
-    toastTitle: 'ছাত্র যোগ কৰা হ’ল',
-    toastDescription: (name: string) => `${name}ক আপোনাৰ তালিকাত যোগ কৰা হৈছে।`,
-    tableName: 'নাম',
-    tableActions: 'কাৰ্য্য',
-    details: 'বিৱৰণ',
-    remove: 'আঁতৰাওক',
-    removeStudentConfirmation: 'আপুনি নিশ্চিতনে?',
-    removeStudentDescription: (name: string) => `ই আপোনাৰ তালিকাৰ পৰা ${name}ক স্থায়ীভাৱে মচি পেলাব।`,
-    toastStudentRemoved: 'শিক্ষাৰ্থী আঁতৰোৱা হ’ল',
-    noStudents: 'এতিয়ালৈকে কোনো শিক্ষাৰ্থী যোগ কৰা হোৱা নাই।',
-    translating: 'অনুবাদ কৰি আছে...',
-    formErrors: {
-      nameMin: 'নামটো কমেও ২টা আখৰৰ হ’ব লাগিব।',
-      gradeMin: 'অনুগ্ৰহ কৰি এটা গ্ৰেড বাছনি কৰক।',
-    },
-  },
-  Kannada: {
-    rosterTitle: 'ವಿದ್ಯಾರ್ಥಿ ರೋಸ್ಟರ್',
-    rosterDescription: 'ನಿಮ್ಮ ವಿದ್ಯಾರ್ಥಿಗಳನ್ನು ನಿರ್ವಹಿಸಿ ಮತ್ತು ಅವರ ಪ್ರಗತಿಯನ್ನು ಟ್ರ್ಯಾಕ್ ಮಾಡಿ.',
-    addStudent: 'ವಿದ್ಯಾರ್ಥಿಯನ್ನು ಸೇರಿಸಿ',
-    addNewStudent: 'ಹೊಸ ವಿದ್ಯಾರ್ಥಿಯನ್ನು ಸೇರಿಸಿ',
-    newStudentDescription: 'ಹೊಸ ವಿದ್ಯಾರ್ಥಿಗಾಗಿ ವಿವರಗಳನ್ನು ನಮೂದಿಸಿ.',
-    fullName: 'ಪೂರ್ಣ ಹೆಸರು',
-    namePlaceholder: 'ಉದಾ., ಅನಿಕಾ ಗುಪ್ತಾ',
-    grade: 'ದರ್ಜೆ',
-    gradePlaceholder: 'ಒಂದು ದರ್ಜೆಯನ್ನು ಆಯ್ಕೆಮಾಡಿ',
-    initialNotes: 'ಆರಂಭಿಕ ಟಿಪ್ಪಣಿಗಳು',
-    notesPlaceholder: 'ಯಾವುದೇ ಆರಂಭಿಕ ಅವಲೋಕನಗಳು...',
-    cancel: 'ರದ್ದುಮಾಡಿ',
-    toastTitle: 'ವಿದ್ಯಾರ್ಥಿಯನ್ನು ಸೇರಿಸಲಾಗಿದೆ',
-    toastDescription: (name: string) => `${name} ನಿಮ್ಮ ರೋಸ್ಟರ್‌ಗೆ ಸೇರಿಸಲಾಗಿದೆ.`,
-    tableName: 'ಹೆಸರು',
-    tableActions: 'ಕ್ರಿಯೆಗಳು',
-    details: 'ವಿವರಗಳು',
-    remove: 'ತೆಗೆದುಹಾಕಿ',
-    removeStudentConfirmation: 'ನೀವು ಖಚಿತವಾಗಿರುವಿರಾ?',
-    removeStudentDescription: (name: string) => `ಇದು ನಿಮ್ಮ ರೋಸ್ಟರ್‌ನಿಂದ ${name} ಅನ್ನು ಶಾಶ್ವತವಾಗಿ ಅಳಿಸುತ್ತದೆ.`,
-    toastStudentRemoved: 'ವಿದ್ಯಾರ್ಥಿಯನ್ನು ತೆಗೆದುಹಾಕಲಾಗಿದೆ',
-    noStudents: 'ಇನ್ನೂ ಯಾವುದೇ ವಿದ್ಯಾರ್ಥಿಗಳನ್ನು ಸೇರಿಸಲಾಗಿಲ್ಲ.',
-    translating: 'ಅನುವಾದಿಸಲಾಗುತ್ತಿದೆ...',
-    formErrors: {
-      nameMin: 'ಹೆಸರು ಕನಿಷ್ಠ 2 ಅಕ್ಷರಗಳನ್ನು ಹೊಂದಿರಬೇಕು.',
-      gradeMin: 'ದಯವಿಟ್ಟು ಒಂದು ದರ್ಜೆಯನ್ನು ಆಯ್ಕೆಮಾಡಿ.',
-    },
-  },
-  Telugu: {
-    rosterTitle: 'విద్యార్థి రోస్టర్',
-    rosterDescription: 'మీ విద్యార్థులను నిర్వహించండి మరియు వారి పురోగతిని ట్రాక్ చేయండి.',
-    addStudent: 'విద్యార్థిని జోడించు',
-    addNewStudent: 'కొత్త విద్యార్థిని జోడించు',
-    newStudentDescription: 'కొత్త విద్యార్థి కోసం వివరాలను నమోదు చేయండి.',
-    fullName: 'పూర్తి పేరు',
-    namePlaceholder: 'ఉదా., అనికా గుప్తా',
-    grade: 'గ్రేడ్',
-    gradePlaceholder: 'గ్రేడ్‌ను ఎంచుకోండి',
-    initialNotes: 'ప్రారంభ గమనికలు',
-    notesPlaceholder: 'ఏవైనా ప్రారంభ పరిశీలనలు...',
-    cancel: 'రద్దు చేయి',
-    toastTitle: 'విద్యార్థి జోడించబడ్డారు',
-    toastDescription: (name: string) => `${name} మీ రోస్టర్‌కు జోడించబడ్డారు.`,
-    tableName: 'పేరు',
-    tableActions: 'చర్యలు',
-    details: 'వివరాలు',
-    remove: 'తొలగించు',
-    removeStudentConfirmation: 'మీరు ఖచ్చితంగా ఉన్నారా?',
-    removeStudentDescription: (name: string) => `ఇది మీ రోస్టర్ నుండి ${name}ని శాశ్వతంగా తొలగిస్తుంది.`,
-    toastStudentRemoved: 'విద్యార్థిని తొలగించారు',
-    noStudents: 'ఇంకా విద్యార్థులు ఎవరూ జోడించబడలేదు.',
-    translating: 'అనువదిస్తోంది...',
-    formErrors: {
-      nameMin: 'పేరు కనీసం 2 అక్షరాలు ఉండాలి.',
-      gradeMin: 'దయచేసి గ్రేడ్‌ను ఎంచుకోండి.',
-    },
+    import: 'आयात',
+    export: 'निर्यात',
+    importing: 'आयात करत आहे...',
+    toastImportSuccess: 'आयात यशस्वी',
+    toastImportSuccessDesc: (count: number) => `यशस्वीरित्या ${count} विद्यार्थी आयात केले.`,
+    toastImportError: 'आयात अयशस्वी',
+    toastImportErrorDesc: 'विद्यार्थी आयात करू शकलो नाही. कृपया फाइल स्वरूप तपासा आणि पुन्हा प्रयत्न करा.',
   },
 };
 
 export function StudentAssessmentClient() {
-  const { students, addStudent, removeStudent } = useStudent();
+  const { students, addStudent, addStudents, removeStudent } = useStudent();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isTranslating, setIsTranslating] = useState(false);
+  const [isImporting, setIsImporting] = useState(false);
   const { toast } = useToast();
   const { language } = useLanguage();
   const typedLanguage = language as keyof typeof translations;
   const t = translations[typedLanguage] || translations['English'];
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const formSchema = z.object({
     name: z.string().min(2, t.formErrors.nameMin),
@@ -442,7 +179,6 @@ export function StudentAssessmentClient() {
         targetLanguages: languageCodes,
       });
 
-      // Ensure the original English name is also included
       translations['English'] = values.name;
 
       addStudent({ ...values, id: Date.now(), name: translations });
@@ -451,7 +187,6 @@ export function StudentAssessmentClient() {
       toast({ title: t.toastTitle, description: t.toastDescription(values.name) });
     } catch (error) {
         console.error("Translation failed:", error);
-        // Fallback: Add student with English name only
         const newNameRecord = languages.reduce((acc, lang) => {
             acc[lang.value] = values.name;
             return acc;
@@ -474,6 +209,89 @@ export function StudentAssessmentClient() {
     toast({ title: t.toastStudentRemoved, description: `${studentName} has been removed from your roster.` });
   };
 
+  const handleExport = () => {
+    const dataToExport = students.map(student => ({
+      Name: student.name['English'] || '',
+      Grade: student.grade,
+      Notes: student.notes || '',
+      ...(student.subjects || []).reduce((acc, subject) => {
+        acc[`GPA - ${subject.subject}`] = subject.gpa;
+        return acc;
+      }, {} as Record<string, any>),
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Students');
+    XLSX.writeFile(workbook, 'student_roster.xlsx');
+  };
+
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setIsImporting(true);
+      const reader = new FileReader();
+      
+      const processData = async (data: any[]) => {
+        try {
+            const newStudents: Student[] = [];
+            for (const row of data) {
+                const name = row.Name || row.name;
+                const grade = row.Grade || row.grade;
+                if (name && grade) {
+                    const languageCodes = languages.map(l => l.value);
+                    const { translations } = await translateText({
+                        text: name,
+                        targetLanguages: languageCodes,
+                    });
+                    translations['English'] = name;
+                    
+                    newStudents.push({
+                        id: Date.now() + Math.random(),
+                        name: translations,
+                        grade: String(grade),
+                        notes: row.Notes || row.notes || '',
+                        subjects: [],
+                    });
+                }
+            }
+            addStudents(newStudents);
+            toast({ title: t.toastImportSuccess, description: t.toastImportSuccessDesc(newStudents.length) });
+        } catch (error) {
+            console.error("Import processing error:", error);
+            toast({ variant: 'destructive', title: t.toastImportError, description: 'Error during translation step.' });
+        } finally {
+            setIsImporting(false);
+        }
+      };
+
+      if (file.name.endsWith('.csv')) {
+        reader.onload = (e) => {
+            const csv = e.target?.result as string;
+            Papa.parse(csv, {
+                header: true,
+                skipEmptyLines: true,
+                complete: (results) => processData(results.data),
+            });
+        };
+        reader.readAsText(file);
+      } else if (file.name.endsWith('.xlsx')) {
+        reader.onload = (e) => {
+            const data = e.target?.result;
+            const workbook = XLSX.read(data, { type: 'array' });
+            const sheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[sheetName];
+            const json = XLSX.utils.sheet_to_json(worksheet);
+            processData(json);
+        };
+        reader.readAsArrayBuffer(file);
+      } else {
+        setIsImporting(false);
+        toast({ variant: 'destructive', title: t.toastImportError, description: 'Unsupported file type.' });
+      }
+    }
+  };
+
 
   return (
     <Card>
@@ -482,70 +300,87 @@ export function StudentAssessmentClient() {
           <CardTitle>{t.rosterTitle}</CardTitle>
           <CardDescription>{t.rosterDescription}</CardDescription>
         </div>
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              <UserPlus className="mr-2 h-4 w-4" />
-              {t.addStudent}
+        <div className="flex gap-2">
+            <input
+                type="file"
+                ref={fileInputRef}
+                className="hidden"
+                accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                onChange={handleFileSelect}
+            />
+            <Button variant="outline" onClick={() => fileInputRef.current?.click()} disabled={isImporting}>
+                <Upload className="mr-2 h-4 w-4" />
+                {isImporting ? t.importing : t.import}
             </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>{t.addNewStudent}</DialogTitle>
-              <DialogDescription>{t.newStudentDescription}</DialogDescription>
-            </DialogHeader>
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t.fullName}</FormLabel>
-                      <FormControl><Input placeholder={t.namePlaceholder} {...field} /></FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="grade"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t.grade}</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl><SelectTrigger><SelectValue placeholder={t.gradePlaceholder} /></SelectTrigger></FormControl>
-                        <SelectContent>
-                          {grades.map((g) => <SelectItem key={g.value} value={g.value}>{g.label}</SelectItem>)}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="notes"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t.initialNotes}</FormLabel>
-                      <FormControl><Textarea placeholder={t.notesPlaceholder} {...field} /></FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <DialogFooter>
-                  <DialogClose asChild>
-                    <Button type="button" variant="ghost" disabled={isTranslating}>{t.cancel}</Button>
-                  </DialogClose>
-                  <Button type="submit" disabled={isTranslating}>
-                    {isTranslating ? t.translating : t.addStudent}
-                  </Button>
-                </DialogFooter>
-              </form>
-            </Form>
-          </DialogContent>
-        </Dialog>
+            <Button variant="outline" onClick={handleExport}>
+                <Download className="mr-2 h-4 w-4" />
+                {t.export}
+            </Button>
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <DialogTrigger asChild>
+                <Button>
+                  <UserPlus className="mr-2 h-4 w-4" />
+                  {t.addStudent}
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>{t.addNewStudent}</DialogTitle>
+                  <DialogDescription>{t.newStudentDescription}</DialogDescription>
+                </DialogHeader>
+                <Form {...form}>
+                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                    <FormField
+                      control={form.control}
+                      name="name"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{t.fullName}</FormLabel>
+                          <FormControl><Input placeholder={t.namePlaceholder} {...field} /></FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="grade"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{t.grade}</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl><SelectTrigger><SelectValue placeholder={t.gradePlaceholder} /></SelectTrigger></FormControl>
+                            <SelectContent>
+                              {grades.map((g) => <SelectItem key={g.value} value={g.value}>{g.label}</SelectItem>)}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="notes"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{t.initialNotes}</FormLabel>
+                          <FormControl><Textarea placeholder={t.notesPlaceholder} {...field} /></FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <DialogFooter>
+                      <DialogClose asChild>
+                        <Button type="button" variant="ghost" disabled={isTranslating}>{t.cancel}</Button>
+                      </DialogClose>
+                      <Button type="submit" disabled={isTranslating}>
+                        {isTranslating ? t.translating : t.addStudent}
+                      </Button>
+                    </DialogFooter>
+                  </form>
+                </Form>
+              </DialogContent>
+            </Dialog>
+        </div>
       </CardHeader>
       <CardContent>
         <div className="rounded-md border">
