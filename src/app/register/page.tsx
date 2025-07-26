@@ -11,19 +11,12 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Calendar } from '@/components/ui/calendar';
-import { BotMessageSquare, CalendarIcon, Eye, EyeOff } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { format } from 'date-fns';
+import { BotMessageSquare, Eye, EyeOff } from 'lucide-react';
 import { useState } from 'react';
 
 
 const formSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters.'),
-  dob: z.date({
-    required_error: "A date of birth is required.",
-  }),
   school: z.string().min(2, 'School name is required.'),
   contact: z.string().regex(/^\d{10}$/, 'Please enter a valid 10-digit contact number.'),
   email: z.string().email('Please enter a valid email address.'),
@@ -34,7 +27,6 @@ export default function RegisterPage() {
   const router = useRouter();
   const { register } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
-  const currentYear = new Date().getFullYear();
   
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -44,8 +36,7 @@ export default function RegisterPage() {
   const { formState: { isSubmitting }, setError } = form;
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    const userData = { ...values, dob: values.dob.toISOString() };
-    const success = await register(userData);
+    const success = await register(values);
     if (success) {
       router.push('/');
     } else {
@@ -77,50 +68,6 @@ export default function RegisterPage() {
                   </FormItem>
                 )}
               />
-               <FormField
-                  control={form.control}
-                  name="dob"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-col">
-                      <FormLabel>Date of Birth</FormLabel>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <FormControl>
-                            <Button
-                              variant={"outline"}
-                              className={cn(
-                                "w-full pl-3 text-left font-normal",
-                                !field.value && "text-muted-foreground"
-                              )}
-                            >
-                              {field.value ? (
-                                format(field.value, "PPP")
-                              ) : (
-                                <span>Pick a date</span>
-                              )}
-                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                            </Button>
-                          </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar
-                            mode="single"
-                            captionLayout="dropdown-buttons"
-                            fromYear={currentYear - 100}
-                            toYear={currentYear}
-                            selected={field.value}
-                            onSelect={field.onChange}
-                            disabled={(date) =>
-                              date > new Date() || date < new Date("1900-01-01")
-                            }
-                            initialFocus
-                          />
-                        </PopoverContent>
-                      </Popover>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
               <FormField
                 control={form.control}
                 name="school"
@@ -171,7 +118,7 @@ export default function RegisterPage() {
                             className="absolute right-1 top-1/2 h-7 w-7 -translate-y-1/2 text-muted-foreground"
                             onClick={() => setShowPassword((prev) => !prev)}
                           >
-                            {showPassword ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+                            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                           </Button>
                     </div>
                     <FormMessage />
