@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -59,7 +60,7 @@ const pageTranslations = {
     Kashmiri: {
         description: (name: string) => `${name} خٲطرٕ تفصیلات تہٕ پیش رفت۔`,
         backToRoster: 'روسٹرس پؠٹھ واپس گژھُن',
-        teachersNotes: 'وۄستاد سُنٛد نوٹس',
+        teachersNotes: 'استاد سُند نوٹس',
         notesDescription: 'طالب علم سٕنٛدِس بارس مَنٛز مشاہدات تہٕ نوٹس۔',
         noNotes: 'اَتھ طالب علم خٲطرٕ چھُ نہٕ وُنی تام کانٛہہ نوٹس شٲمِل کرنہٕ آمُت۔',
         studentInfo: 'طالب علم سٕنٛز معلومات',
