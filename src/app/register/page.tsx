@@ -15,7 +15,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Calendar } from '@/components/ui/calendar';
 import { BotMessageSquare, CalendarIcon, Eye, EyeOff } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { format, parse, isValid } from 'date-fns';
+import { format } from 'date-fns';
 import { useState } from 'react';
 
 
@@ -171,7 +171,7 @@ export default function RegisterPage() {
                             className="absolute right-1 top-1/2 h-7 w-7 -translate-y-1/2 text-muted-foreground"
                             onClick={() => setShowPassword((prev) => !prev)}
                           >
-                            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                            {showPassword ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
                           </Button>
                     </div>
                     <FormMessage />
