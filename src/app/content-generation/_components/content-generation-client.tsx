@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -18,7 +18,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Sparkles, Video, ShieldAlert } from 'lucide-react';
+import { Sparkles, Video, ShieldAlert, XCircle } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useLanguage } from '@/context/language-context';
 
@@ -45,6 +45,7 @@ const translations = {
     videoGenerationProgress: 'Generating video, this may take a minute...',
     safetyErrorVideo: 'The generated video was blocked for safety reasons. The story might contain sensitive content. Please try generating a different story.',
     errorDescriptionVideo: 'Failed to generate the video. Please try again.',
+    clearButton: 'Clear',
     formErrors: {
         languageMin: 'Please select a language.',
         topicMin: 'Please describe the topic in at least 10 characters.',
@@ -72,6 +73,7 @@ const translations = {
     videoGenerationProgress: 'वीडियो उत्पन्न हो रहा है, इसमें एक मिनट लग सकता है...',
     safetyErrorVideo: 'सुरक्षा कारणों से उत्पन्न वीडियो को अवरुद्ध कर दिया गया था। कहानी में संवेदनशील सामग्री हो सकती है। कृपया एक अलग कहानी उत्पन्न करने का प्रयास करें।',
     errorDescriptionVideo: 'वीडियो उत्पन्न करने में विफल। कृपया पुनः प्रयास करें।',
+    clearButton: 'साफ़ करें',
      formErrors: {
         languageMin: 'कृपया एक भाषा चुनें।',
         topicMin: 'कृपया विषय का कम से कम 10 अक्षरों में वर्णन करें।',
@@ -99,6 +101,7 @@ const translations = {
     videoGenerationProgress: 'व्हिडिओ तयार होत आहे, यास एक मिनिट लागू शकतो...',
     safetyErrorVideo: 'सुरक्षेच्या कारणास्तव तयार केलेला व्हिडिओ अवरोधित केला गेला. कथेत संवेदनशील सामग्री असू शकते. कृपया वेगळी कथा तयार करण्याचा प्रयत्न करा.',
     errorDescriptionVideo: 'व्हिडिओ तयार करण्यात अयशस्वी. कृपया पुन्हा प्रयत्न करा.',
+    clearButton: 'साफ करा',
      formErrors: {
         languageMin: 'कृपया एक भाषा निवडा.',
         topicMin: 'कृपया विषयाचे किमान १० अक्षरांमध्ये वर्णन करा.',
@@ -126,6 +129,7 @@ const translations = {
     videoGenerationProgress: 'ویڈیو تیار کران چھُ، اَتھ ہیٚکہِ اکھ مِنَٹ لگِتھ۔',
     safetyErrorVideo: 'تیار کرنہٕ آمت ویڈیو آو حفاظتی وجوہاتن ہِنٛدِ بنا پؠٹھ بلاک کرنہٕ۔ کہانی مَنٛز ہیٚکہِ حساس مواد ٲسِتھ۔ مہربانی کرِتھ اَکھ بیٛاکھ کہانی تیار کریو۔',
     errorDescriptionVideo: 'ویڈیو تیار کرنس مَنٛز ناکام۔ مہربانی کرِتھ دوبارٕ کوشش کریو۔',
+    clearButton: 'صاف کریو',
      formErrors: {
         languageMin: 'مہربانی کرِتھ اکھ زبان ژارٕو۔',
         topicMin: 'مہربانی کرِتھ موضوعس کم از کم 10 اَक्षरَن مَنٛز بیان کریو۔',
@@ -153,6 +157,7 @@ const translations = {
     videoGenerationProgress: 'ভিডিও তৈরি হচ্ছে, এতে এক মিনিট সময় লাগতে পারে...',
     safetyErrorVideo: 'নিরাপত্তার কারণে উত্পন্ন ভিডিওটি অবরুদ্ধ করা হয়েছিল। গল্পে সংবেদনশীল বিষয়বস্তু থাকতে পারে। অনুগ্রহ করে একটি ভিন্ন গল্প তৈরি করার চেষ্টা করুন।',
     errorDescriptionVideo: 'ভিডিও তৈরি করতে ব্যর্থ। অনুগ্রহ করে আবার চেষ্টা করুন।',
+    clearButton: 'পরিষ্কার করুন',
      formErrors: {
         languageMin: 'অনুগ্রহ করে একটি ভাষা নির্বাচন করুন।',
         topicMin: 'অনুগ্রহ করে বিষয়টি কমপক্ষে ১০টি অক্ষরে বর্ণনা করুন।',
@@ -180,9 +185,10 @@ const translations = {
     videoGenerationProgress: 'வீடியோ உருவாக்கப்படுகிறது, இதற்கு ஒரு நிமிடம் ஆகலாம்...',
     safetyErrorVideo: 'பாதுகாப்பு காரணங்களுக்காக உருவாக்கப்பட்ட வீடியோ தடுக்கப்பட்டது। கதையில் உணர்ச்சிகரமான உள்ளடக்கம் இருக்கலாம்। தயவுசெய்து வேறு கதையை உருவாக்க முயற்சிக்கவும்।',
     errorDescriptionVideo: 'வீடியோவை உருவாக்கத் தவறிவிட்டது। தயவுசெய்து மீண்டும் முயற்சிக்கவும்।',
+    clearButton: 'அழிக்கவும்',
      formErrors: {
         languageMin: 'தயவுசெய்து ஒரு மொழியைத் தேர்ந்தெடுக்கவும்.',
-        topicMin: 'தயவுசெய்து தலைப்பை குறைந்தது 10 எழுத்துக்களில் விவரிக்கவும்.',
+        topicMin: 'தயவுசெய்து தலைப்பை குறைந்தது 10 எழுத்துக்களில் விவரிக்கவும்।',
     },
   },
   Gujarati: {
@@ -207,6 +213,7 @@ const translations = {
     videoGenerationProgress: 'વિડિઓ બનાવી રહ્યું છે, આમાં એક મિનિટ લાગી શકે છે...',
     safetyErrorVideo: 'સુરક્ષા કારણોસર બનાવેલી વિડિઓને અવરોધિત કરવામાં આવી હતી. વાર્તામાં સંવેદનશીલ સામગ્રી હોઈ શકે છે. કૃપા કરીને એક અલગ વાર્તા બનાવવાનો પ્રયાસ કરો.',
     errorDescriptionVideo: 'વિડિઓ બનાવવામાં નિષ્ફળ. કૃપા કરીને ફરીથી પ્રયાસ કરો.',
+    clearButton: 'સાફ કરો',
      formErrors: {
         languageMin: 'કૃપા કરીને એક ભાષા પસંદ કરો.',
         topicMin: 'કૃપા કરીને વિષયનું ઓછામાં ઓછું 10 અક્ષરોમાં વર્ણન કરો.',
@@ -234,6 +241,7 @@ const translations = {
     videoGenerationProgress: 'വീഡിയോ സൃഷ്ടിക്കുന്നു, ഇതിന് ഒരു മിനിറ്റ് എടുത്തേക്കാം...',
     safetyErrorVideo: 'സുരക്ഷാ കാരണങ്ങളാൽ സൃഷ്ടിച്ച വീഡിയോ തടഞ്ഞിരിക്കുന്നു. കഥയിൽ സെൻസിറ്റീവായ ഉള്ളടക്കം അടങ്ങിയിരിക്കാം. ദയവായി മറ്റൊരു കഥ സൃഷ്ടിക്കാൻ ശ്രമിക്കുക.',
     errorDescriptionVideo: 'വീഡിയോ സൃഷ്ടിക്കുന്നതിൽ പരാജയപ്പെട്ടു. ദയവായി വീണ്ടും ശ്രമിക്കുക.',
+    clearButton: 'മായ്ക്കുക',
      formErrors: {
         languageMin: 'ദയവായി ഒരു ഭാഷ തിരഞ്ഞെടുക്കുക.',
         topicMin: 'ദയവായി വിഷയം കുറഞ്ഞത് 10 അക്ഷരങ്ങളിൽ വിവരിക്കുക.',
@@ -261,6 +269,7 @@ const translations = {
     videoGenerationProgress: 'ਵੀਡੀਓ ਤਿਆਰ ਕੀਤਾ ਜਾ ਰਿਹਾ ਹੈ, ਇਸ ਵਿੱਚ ਇੱਕ ਮਿੰਟ ਲੱਗ ਸਕਦਾ ਹੈ...',
     safetyErrorVideo: 'ਸੁਰੱਖਿਆ ਕਾਰਨਾਂ ਕਰਕੇ ਤਿਆਰ ਕੀਤੇ ਗਏ ਵੀਡੀਓ ਨੂੰ ਬਲੌਕ ਕੀਤਾ ਗਿਆ ਸੀ। ਕਹਾਣੀ ਵਿੱਚ ਸੰਵੇਦਨਸ਼ੀਲ ਸਮੱਗਰੀ ਹੋ ਸਕਦੀ ਹੈ। ਕਿਰਪਾ ਕਰਕੇ ਇੱਕ ਵੱਖਰੀ ਕਹਾਣੀ ਤਿਆਰ ਕਰਨ ਦੀ ਕੋਸ਼ਿਸ਼ ਕਰੋ।',
     errorDescriptionVideo: 'ਵੀਡੀਓ ਤਿਆਰ ਕਰਨ ਵਿੱਚ ਅਸਫਲ। ਕਿਰਪਾ ਕਰਕੇ ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ।',
+    clearButton: 'ਸਾਫ਼ ਕਰੋ',
      formErrors: {
         languageMin: 'ਕਿਰਪਾ ਕਰਕੇ ਇੱਕ ਭਾਸ਼ਾ ਚੁਣੋ।',
         topicMin: 'ਕਿਰਪਾ ਕਰਕੇ ਵਿਸ਼ੇ ਦਾ ਘੱਟੋ-ਘੱਟ 10 ਅੱਖਰਾਂ ਵਿੱਚ ਵਰਣਨ ਕਰੋ।',
@@ -288,6 +297,7 @@ const translations = {
     videoGenerationProgress: 'ଭିଡିଓ ସୃଷ୍ଟି କରୁଛି, ଏଥିରେ ଏକ ମିନିଟ୍ ଲାଗିପାରେ...',
     safetyErrorVideo: 'ସୁରକ୍ଷା କାରଣରୁ ସୃଷ୍ଟି ହୋଇଥିବା ଭିଡିଓକୁ ଅବରୋଧ କରାଯାଇଥିଲା। କାହାଣୀରେ ସମ୍ବେଦନଶୀଳ ବିଷୟବସ୍ତୁ ଥାଇପାରେ। ଦୟାକରି ଏକ ଭିନ୍ନ କାହାଣୀ ସୃଷ୍ଟି କରିବାକୁ ଚେଷ୍ଟା କରନ୍ତୁ।',
     errorDescriptionVideo: 'ଭିଡିଓ ସୃଷ୍ଟି କରିବାରେ ବିଫଳ। ଦୟାକରି ପୁଣି ଚେଷ୍ଟା କରନ୍ତୁ।',
+    clearButton: 'ସଫା କରନ୍ତୁ',
      formErrors: {
         languageMin: 'ଦୟାକରି ଏକ ଭାଷା ବାଛନ୍ତୁ।',
         topicMin: 'ଦୟାକରି ବିଷୟକୁ ଅତିକମରେ ୧୦ଟି ଅକ୍ଷରରେ ବର୍ଣ୍ଣନା କରନ୍ତୁ।',
@@ -315,6 +325,7 @@ const translations = {
     videoGenerationProgress: 'ভিডিঅ’ সৃষ্টি কৰি আছে, ইয়াত এক মিনিট সময় লাগিব পাৰে...',
     safetyErrorVideo: 'সুৰক্ষাৰ কাৰণত সৃষ্ট ভিডিঅ’টো অৱৰোধ কৰা হৈছিল। কাহিনীত সংবেদনশীল বিষয়বস্তু থাকিব পাৰে। অনুগ্ৰহ কৰি এটা বেলেগ কাহিনী সৃষ্টি কৰিবলৈ চেষ্টা কৰক।',
     errorDescriptionVideo: 'ভিডিঅ’ সৃষ্টি কৰাত విఫಲ হৈছে। অনুগ্ৰহ কৰি পুনৰ চেষ্টা কৰك।',
+    clearButton: 'পৰিষ্কাৰ কৰক',
      formErrors: {
         languageMin: 'অনুগ্ৰহ কৰি এটা ভাষা বাছনি কৰক।',
         topicMin: 'অনুগ্ৰহ কৰি বিষয়টো কমেও ১০টা আখৰত বৰ্ণনা কৰক।',
@@ -342,6 +353,7 @@ const translations = {
     videoGenerationProgress: 'ವೀಡಿಯೊವನ್ನು ರಚಿಸಲಾಗುತ್ತಿದೆ, ಇದಕ್ಕೆ ಒಂದು ನಿಮಿಷ ತೆಗೆದುಕೊಳ್ಳಬಹುದು...',
     safetyErrorVideo: 'ಸುರಕ್ಷತಾ ಕಾರಣಗಳಿಗಾಗಿ ರಚಿಸಲಾದ ವೀಡಿಯೊವನ್ನು ನಿರ್ಬಂಧಿಸಲಾಗಿದೆ. ಕಥೆಯು ಸೂಕ್ಷ್ಮ ವಿಷಯವನ್ನು ಹೊಂದಿರಬಹುದು. ದಯವಿಟ್ಟು ಬೇರೆ ಕಥೆಯನ್ನು ರಚಿಸಲು ಪ್ರಯತ್ನಿಸಿ.',
     errorDescriptionVideo: 'ವೀಡಿಯೊವನ್ನು ರಚಿಸಲು ವಿಫಲವಾಗಿದೆ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.',
+    clearButton: 'ಅಳಿಸಿ',
      formErrors: {
         languageMin: 'ದಯವಿಟ್ಟು ಒಂದು ಭಾಷೆಯನ್ನು ಆಯ್ಕೆಮಾಡಿ.',
         topicMin: 'ದಯವಿಟ್ಟು ವಿಷಯವನ್ನು ಕನಿಷ್ಠ 10 ಅಕ್ಷರಗಳಲ್ಲಿ ವಿವರಿಸಿ.',
@@ -369,6 +381,7 @@ const translations = {
     videoGenerationProgress: 'వీడియోను సృష్టిస్తోంది, దీనికి ఒక నిమిషం పట్టవచ్చు...',
     safetyErrorVideo: 'భద్రతా కారణాల వల్ల సృష్టించబడిన వీడియో బ్లాక్ చేయబడింది. కథలో సున్నితమైన కంటెంట్ ఉండవచ్చు. దయచేసి వేరే కథను సృష్టించడానికి ప్రయత్నించండి.',
     errorDescriptionVideo: 'వీడియోను సృష్టించడంలో విఫలమైంది. దయచేసి మళ్లీ ప్రయత్నించండి.',
+    clearButton: 'తొలగించు',
      formErrors: {
         languageMin: 'దయచేసి ఒక భాషను ఎంచుకోండి.',
         topicMin: 'దయచేసి అంశాన్ని కనీసం 10 అక్షరాలలో వివరించండి.',
@@ -387,6 +400,35 @@ export function ContentGenerationClient() {
   const { language } = useLanguage();
   const typedLanguage = language as keyof typeof translations;
   const t = translations[typedLanguage] || translations['English'];
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  useEffect(() => {
+    if (isClient) {
+      try {
+        const storedResult = localStorage.getItem('generatedStory');
+        if (storedResult) {
+          setResult(JSON.parse(storedResult));
+        }
+      } catch (error) {
+        console.error('Failed to parse generatedStory from localStorage', error);
+        localStorage.removeItem('generatedStory');
+      }
+    }
+  }, [isClient]);
+
+  useEffect(() => {
+    if (isClient) {
+      if (result) {
+        localStorage.setItem('generatedStory', JSON.stringify(result));
+      } else {
+        localStorage.removeItem('generatedStory');
+      }
+    }
+  }, [result, isClient]);
 
   const formSchema = z.object({
     language: z.string().min(1, t.formErrors.languageMin),
@@ -444,6 +486,14 @@ export function ContentGenerationClient() {
     } finally {
       setIsGeneratingVideo(false);
     }
+  }
+  
+  function handleClear() {
+    form.reset();
+    setResult(null);
+    setVideoUrl(null);
+    setError(null);
+    setVideoError(null);
   }
 
   return (
@@ -512,7 +562,15 @@ export function ContentGenerationClient() {
               <CardTitle>{t.generatedStoryTitle}</CardTitle>
               <CardDescription>{t.generatedStoryDescription}</CardDescription>
             </div>
-            <Sparkles className="h-6 w-6 text-accent" />
+             <div className="flex items-center gap-2">
+                {result && (
+                  <Button onClick={handleClear} variant="ghost" size="icon">
+                    <XCircle className="h-5 w-5" />
+                    <span className="sr-only">{t.clearButton}</span>
+                  </Button>
+                )}
+                <Sparkles className="h-6 w-6 text-accent" />
+            </div>
           </CardHeader>
           <CardContent>
             {isLoading && (

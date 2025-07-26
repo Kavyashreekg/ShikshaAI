@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -19,7 +19,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { UploadCloud, Layers, ShieldAlert, Check, ChevronsUpDown } from 'lucide-react';
+import { UploadCloud, Layers, ShieldAlert, Check, ChevronsUpDown, XCircle } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useLanguage } from '@/context/language-context';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -57,6 +57,7 @@ const translations = {
     safetyError: 'The generated content was blocked for safety reasons. Please try again with a different textbook page.',
     errorTitle: 'An error occurred.',
     errorDescription: 'Failed to generate worksheets. Please try again.',
+    clearButton: 'Clear',
     formErrors: {
       photo: 'Please upload an image file.',
       gradeLevels: 'Please select at least one grade level.',
@@ -93,6 +94,7 @@ const translations = {
     safetyError: 'उत्पन्न सामग्री को सुरक्षा कारणों से अवरुद्ध कर दिया गया था। कृपया एक अलग पाठ्यपुस्तक पृष्ठ के साथ पुनः प्रयास करें।',
     errorTitle: 'एक त्रुटि हुई।',
     errorDescription: 'वर्कशीट उत्पन्न करने में विफल। कृपया पुनः प्रयास करें।',
+    clearButton: 'साफ़ करें',
      formErrors: {
       photo: 'कृपया एक छवि फ़ाइल अपलोड करें।',
       gradeLevels: 'कृपया कम से-कम एक ग्रेड स्तर चुनें।',
@@ -129,6 +131,7 @@ const translations = {
     safetyError: 'सुरक्षेच्या कारणास्तव तयार केलेली सामग्री अवरोधित केली गेली. कृपया वेगळ्या पाठ्यपुस्तक पृष्ठासह पुन्हा प्रयत्न करा.',
     errorTitle: 'एक त्रुटी आली.',
     errorDescription: 'कार्यपत्रके तयार करण्यात अयशस्वी. कृपया पुन्हा प्रयत्न करा.',
+    clearButton: 'साफ करा',
     formErrors: {
       photo: 'कृपया एक प्रतिमा फाइल अपलोड करा.',
       gradeLevels: 'कृपया किमान एक इयत्ता स्तर निवडा.',
@@ -165,6 +168,7 @@ const translations = {
     safetyError: 'تیار کرنہٕ آمت مواد آو حفاظتی وجوہاتن ہِنٛدِ بنا پؠٹھ بلاک کرنہٕ۔ مہربانی کرِتھ اَکھ بیٛاکھ درسی کتابچہِ صفحہٕ سٟتؠ دوبارٕ کوشش کریو۔',
     errorTitle: 'اکھ خرٲبی گیہِ۔',
     errorDescription: 'ورک شیٹس تیار کرنس مَنٛز ناکام۔ مہربانی کرِتھ دوبارٕ کوشش کریو۔',
+    clearButton: 'صاف کریو',
      formErrors: {
       photo: 'مہربانی کرِتھ اَکھ تصویر فائل اپلوڈ کریو۔',
       gradeLevels: 'مہربانی کرِتھ کم از کم اَکھ گریڈ سطح ژارٕو۔',
@@ -201,6 +205,7 @@ const translations = {
     safetyError: 'উত্পন্ন বিষয়বস্তু নিরাপত্তার কারণে অবরুদ্ধ করা হয়েছে। অনুগ্রহ করে একটি ভিন্ন পাঠ্যপুস্তক পৃষ্ঠা দিয়ে আবার চেষ্টা করুন।',
     errorTitle: 'একটি ত্রুটি ঘটেছে।',
     errorDescription: 'ওয়ার্কশিট তৈরি করতে ব্যর্থ। অনুগ্রহ করে আবার চেষ্টা করুন।',
+    clearButton: 'পরিষ্কার করুন',
     formErrors: {
       photo: 'অনুগ্রহ করে একটি ছবি ফাইল আপলোড করুন।',
       gradeLevels: 'অনুগ্রহ করে কমপক্ষে একটি গ্রেড স্তর নির্বাচন করুন।',
@@ -237,6 +242,7 @@ const translations = {
     safetyError: 'பாதுகாப்பு காரணங்களுக்காக உருவாக்கப்பட்ட உள்ளடக்கம் தடுக்கப்பட்டது। வேறு பாடநூல் பக்கத்துடன் மீண்டும் முயற்சிக்கவும்।',
     errorTitle: 'ஒரு பிழை ஏற்பட்டது.',
     errorDescription: 'பணித்தாள்களை உருவாக்கத் தவறிவிட்டது। தயவுசெய்து மீண்டும் முயற்சிக்கவும்।',
+    clearButton: 'அழிக்கவும்',
      formErrors: {
       photo: 'தயவுசெய்து ஒரு படக் கோப்பை பதிவேற்றவும்.',
       gradeLevels: 'தயவுசெய்து குறைந்தது ஒரு வகுப்பு நிலையையாவது தேர்ந்தெடுக்கவும்.',
@@ -273,6 +279,7 @@ const translations = {
     safetyError: 'બનાવેલી સામગ્રીને સુરક્ષા કારણોસર અવરોધિત કરવામાં આવી હતી. કૃપા કરીને અલગ પાઠ્યપુસ્તક પૃષ્ઠ સાથે ફરીથી પ્રયાસ કરો.',
     errorTitle: 'એક ભૂલ થઈ.',
     errorDescription: 'વર્કશીટ બનાવવામાં નિષ્ફળ. કૃપા કરીને ફરીથી પ્રયાસ કરો.',
+    clearButton: 'સાફ કરો',
      formErrors: {
       photo: 'કૃપા કરીને એક છબી ફાઇલ અપલોડ કરો.',
       gradeLevels: 'કૃપા કરીને ઓછામાં ઓછું એક ગ્રેડ સ્તર પસંદ કરો.',
@@ -309,6 +316,7 @@ const translations = {
     safetyError: 'ഉണ്ടാക്കിയ ഉള്ളടക്കം സുരക്ഷാ കാരണങ്ങളാൽ തടഞ്ഞിരിക്കുന്നു. ദയവായി മറ്റൊരു പാഠപുസ്തക പേജ് ഉപയോഗിച്ച് വീണ്ടും ശ്രമിക്കുക.',
     errorTitle: 'ഒരു പിശക് സംഭവിച്ചു.',
     errorDescription: 'വർക്ക്ഷീറ്റുകൾ ഉണ്ടാക്കുന്നതിൽ പരാജയപ്പെട്ടു. ദയവായി വീണ്ടും ശ്രമിക്കുക.',
+    clearButton: 'മായ്ക്കുക',
      formErrors: {
       photo: 'ദയവായി ഒരു ചിത്ര ഫയൽ അപ്‌ലോഡ് ചെയ്യുക.',
       gradeLevels: 'ദയവായി കുറഞ്ഞത് ഒരു ഗ്രേഡ് നിലയെങ്കിലും തിരഞ്ഞെടുക്കുക.',
@@ -345,6 +353,7 @@ const translations = {
     safetyError: 'ਬਣਾਈ ਗਈ ਸਮੱਗਰੀ ਨੂੰ ਸੁਰੱਖਿਆ ਕਾਰਨਾਂ ਕਰਕੇ ਬਲੌਕ ਕੀਤਾ ਗਿਆ ਸੀ। ਕਿਰਪਾ ਕਰਕੇ ਇੱਕ ਵੱਖਰੇ ਪਾਠ ਪੁਸਤਕ ਪੰਨੇ ਨਾਲ ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ।',
     errorTitle: 'ਇੱਕ ਗਲਤੀ ਹੋਈ।',
     errorDescription: 'ਵਰਕਸ਼ੀਟਾਂ ਬਣਾਉਣ ਵਿੱਚ ਅਸਫਲ। ਕਿਰਪਾ ਕਰਕੇ ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ।',
+    clearButton: 'ਸਾਫ਼ ਕਰੋ',
      formErrors: {
       photo: 'ਕਿਰਪਾ ਕਰਕੇ ਇੱਕ ਚਿੱਤਰ ਫਾਈਲ ਅੱਪਲੋਡ ਕਰੋ।',
       gradeLevels: 'ਕਿਰਪਾ ਕਰਕੇ ਘੱਟੋ-ਘੱਟ ਇੱਕ ਗ੍ਰੇਡ ਪੱਧਰ ਚੁਣੋ।',
@@ -381,6 +390,7 @@ const translations = {
     safetyError: 'ସୃଷ୍ଟି ହୋଇଥିବା ବିଷୟବସ୍ତୁକୁ ସୁରକ୍ଷା କାରଣରୁ ଅବରୋଧ କରାଯାଇଥିଲା। ଦୟାକରି ଏକ ଭିନ୍ନ ପାଠ୍ୟପୁସ୍ତକ ପୃଷ୍ଠା ସହିତ ପୁଣି ଚେଷ୍ଟା କରନ୍ତୁ।',
     errorTitle: 'ଏକ ତ୍ରୁଟି ଘଟିଛି।',
     errorDescription: 'କାର୍ଯ୍ୟପତ୍ର ସୃଷ୍ଟି କରିବାରେ ବିଫଳ। ଦୟାକରି ପୁଣି ଚେଷ୍ଟା କରନ୍ତୁ।',
+    clearButton: 'ସଫା କରନ୍ତୁ',
     formErrors: {
       photo: 'ଦୟାକରି ଏକ ପ୍ରତିଛବି ଫାଇଲ୍ ଅପଲୋଡ୍ କରନ୍ତୁ।',
       gradeLevels: 'ଦୟାକରି ଅତିକମରେ ଗୋଟିଏ ଗ୍ରେଡ୍ ସ୍ତର ଚୟନ କରନ୍ତୁ।',
@@ -417,6 +427,7 @@ const translations = {
     safetyError: 'সৃষ্ট বিষয়বস্তু সুৰক্ষাৰ কাৰণত অৱৰোধ কৰা হৈছিল। অনুগ্ৰহ কৰি এখন বেলেগ পাঠ্যপুথিৰ পৃষ্ঠাৰে পুনৰ চেষ্টা কৰক।',
     errorTitle: 'এটা ত্ৰুটি হৈছে।',
     errorDescription: 'কাৰ্যপত্ৰ সৃষ্টি কৰাত విఫಲ হৈছে। অনুগ্ৰহ কৰি পুনৰ চেষ্টা কৰক।',
+    clearButton: 'পৰিষ্কাৰ কৰক',
     formErrors: {
       photo: 'অনুগ্ৰহ কৰি এখন ছবি ফাইল আপলোড কৰক।',
       gradeLevels: 'অনুগ্ৰহ কৰি কমেও এটা গ্ৰেড স্তৰ বাছনি কৰক।',
@@ -453,6 +464,7 @@ const translations = {
     safetyError: 'ರಚಿಸಲಾದ ವಿಷಯವನ್ನು ಸುರಕ್ಷತಾ ಕಾರಣಗಳಿಗಾಗಿ ನಿರ್ಬಂಧಿಸಲಾಗಿದೆ. ದಯವಿಟ್ಟು ಬೇರೆ ಪಠ್ಯಪುಸ್ತಕ ಪುಟದೊಂದಿಗೆ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.',
     errorTitle: 'ಒಂದು ದೋಷ ಸಂಭವಿಸಿದೆ.',
     errorDescription: 'ವರ್ಕ್‌ಶೀಟ್‌ಗಳನ್ನು ರಚಿಸಲು ವಿಫಲವಾಗಿದೆ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.',
+    clearButton: 'ಅಳಿಸಿ',
     formErrors: {
       photo: 'ದಯವಿಟ್ಟು ಚಿತ್ರದ ಫೈಲ್ ಅನ್ನು ಅಪ್‌ಲೋಡ್ ಮಾಡಿ.',
       gradeLevels: 'ದಯವಿಟ್ಟು ಕನಿಷ್ಠ ಒಂದು ದರ್ಜೆ ಮಟ್ಟವನ್ನು ಆಯ್ಕೆಮಾಡಿ.',
@@ -489,6 +501,7 @@ const translations = {
     safetyError: 'భద్రతా కారణాల వల్ల సృష్టించబడిన కంటెంట్ బ్లాక్ చేయబడింది. దయచేసి వేరే పాఠ్యపుస్తక పేజీతో మళ్లీ ప్రయత్నించండి.',
     errorTitle: 'ఒక లోపం సంభవించింది.',
     errorDescription: 'వర్క్‌షీట్‌లను రూపొందించడంలో విఫలమైంది. దయచేసి మళ్లీ ప్రయత్నించండి.',
+    clearButton: 'తొలగించు',
     formErrors: {
       photo: 'దయచేసి ఒక చిత్ర ఫైల్‌ను అప్‌లోడ్ చేయండి.',
       gradeLevels: 'దయచేసి కనీసం ఒక గ్రేడ్ స్థాయిని ఎంచుకోండి.',
@@ -516,6 +529,36 @@ export function WorksheetClient() {
   const { language } = useLanguage();
   const typedLanguage = language as keyof typeof translations;
   const t = translations[typedLanguage] || translations['English'];
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  useEffect(() => {
+    if (isClient) {
+      try {
+        const storedResult = localStorage.getItem('generatedWorksheets');
+        if (storedResult) {
+          setResult(JSON.parse(storedResult));
+        }
+      } catch (error) {
+        console.error('Failed to parse generatedWorksheets from localStorage', error);
+        localStorage.removeItem('generatedWorksheets');
+      }
+    }
+  }, [isClient]);
+
+  useEffect(() => {
+    if (isClient) {
+      if (result) {
+        localStorage.setItem('generatedWorksheets', JSON.stringify(result));
+      } else {
+        localStorage.removeItem('generatedWorksheets');
+      }
+    }
+  }, [result, isClient]);
+
 
   const formSchema = z.object({
     photoDataUri: z.string().refine((val) => val.startsWith('data:image/'), {
@@ -586,6 +629,14 @@ export function WorksheetClient() {
       setIsLoading(false);
     }
   }
+
+  const handleClear = () => {
+    form.reset();
+    setResult(null);
+    setError(null);
+    setPreview(null);
+    setSelectedGrades([]);
+  };
 
   const chaptersForSelectedSubject = subjects.find(s => s.value === selectedSubject)?.chapters || [];
   const typedGradeTranslations = t.grades as Record<string, string>;
@@ -721,9 +772,17 @@ export function WorksheetClient() {
 
       <div className="lg:col-span-2">
         <Card className="min-h-[400px]">
-          <CardHeader>
-            <CardTitle>{t.resultsTitle}</CardTitle>
-            <CardDescription>{t.resultsDescription}</CardDescription>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <div>
+              <CardTitle>{t.resultsTitle}</CardTitle>
+              <CardDescription>{t.resultsDescription}</CardDescription>
+            </div>
+             {result && (
+              <Button onClick={handleClear} variant="ghost" size="icon">
+                <XCircle className="h-5 w-5" />
+                <span className="sr-only">{t.clearButton}</span>
+              </Button>
+            )}
           </CardHeader>
           <CardContent>
             {isLoading && <div className="space-y-4"><Skeleton className="h-10 w-1/2" /><Skeleton className="h-48 w-full" /></div>}
