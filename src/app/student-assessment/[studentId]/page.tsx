@@ -30,6 +30,15 @@ const pageTranslations = {
       subjectGpa: 'Subject GPA',
       subject: 'Subject',
       gpa: 'GPA',
+      subjects: {
+        'Mathematics': 'Mathematics',
+        'English': 'English',
+        'Science': 'Science',
+        'Arts': 'Arts',
+        'Social Science': 'Social Science',
+        'Physical Education': 'Physical Education',
+        'Hindi': 'Hindi'
+      }
     },
     Hindi: {
       description: (name: string) => `${name} के लिए विवरण और प्रगति।`,
@@ -43,6 +52,15 @@ const pageTranslations = {
       subjectGpa: 'विषय GPA',
       subject: 'विषय',
       gpa: 'GPA',
+      subjects: {
+        'Mathematics': 'गणित',
+        'English': 'अंग्रेज़ी',
+        'Science': 'विज्ञान',
+        'Arts': 'कला',
+        'Social Science': 'सामाजिक विज्ञान',
+        'Physical Education': 'शारीरिक शिक्षा',
+        'Hindi': 'हिंदी'
+      }
     },
     Marathi: {
       description: (name: string) => `${name} साठी तपशील आणि प्रगती.`,
@@ -56,11 +74,20 @@ const pageTranslations = {
       subjectGpa: 'विषय GPA',
       subject: 'विषय',
       gpa: 'GPA',
+       subjects: {
+        'Mathematics': 'गणित',
+        'English': 'इंग्रजी',
+        'Science': 'विज्ञान',
+        'Arts': 'कला',
+        'Social Science': 'सामाजिक विज्ञान',
+        'Physical Education': 'शारीरिक शिक्षण',
+        'Hindi': 'हिंदी'
+      }
     },
     Kashmiri: {
         description: (name: string) => `${name} خٲطرٕ تفصیلات تہٕ پیش رفت۔`,
         backToRoster: 'روسٹرس پؠٹھ واپس گژھُن',
-        teachersNotes: 'استاد سُند نوٹس',
+        teachersNotes: 'استاد سُنٛد نوٹس',
         notesDescription: 'طالب علم سٕنٛدِس بارس مَنٛز مشاہدات تہٕ نوٹس۔',
         noNotes: 'اَتھ طالب علم خٲطرٕ چھُ نہٕ وُنی تام کانٛہہ نوٹس شٲمِل کرنہٕ آمُت۔',
         studentInfo: 'طالب علم سٕنٛز معلومات',
@@ -69,6 +96,15 @@ const pageTranslations = {
         subjectGpa: 'مضمون GPA',
         subject: 'مضمون',
         gpa: 'GPA',
+        subjects: {
+            'Mathematics': 'ریاضی',
+            'English': 'اَنٛگریٖزی',
+            'Science': 'سایِنس',
+            'Arts': 'فَن',
+            'Social Science': 'سَمأجی سایِنس',
+            'Physical Education': 'جِسمٲنی تٲلیٖم',
+            'Hindi': 'ہِندی'
+        }
     },
     Bengali: {
         description: (name: string) => `${name} এর জন্য বিবরণ এবং অগ্রগতি।`,
@@ -82,6 +118,15 @@ const pageTranslations = {
         subjectGpa: 'বিষয় GPA',
         subject: 'বিষয়',
         gpa: 'GPA',
+        subjects: {
+            'Mathematics': 'গণিত',
+            'English': 'ইংরেজি',
+            'Science': 'বিজ্ঞান',
+            'Arts': 'শিল্পকলা',
+            'Social Science': 'সমাজ বিজ্ঞান',
+            'Physical Education': 'শারীরিক শিক্ষা',
+            'Hindi': 'হিন্দি'
+        }
     },
     Tamil: {
         description: (name: string) => `${name} க்கான விவரங்கள் மற்றும் முன்னேற்றம்.`,
@@ -95,6 +140,15 @@ const pageTranslations = {
         subjectGpa: 'பாடம் GPA',
         subject: 'பாடம்',
         gpa: 'GPA',
+        subjects: {
+            'Mathematics': 'கணிதம்',
+            'English': 'ஆங்கிலம்',
+            'Science': 'அறிவியல்',
+            'Arts': 'கலை',
+            'Social Science': 'சமூக அறிவியல்',
+            'Physical Education': 'உடல் கல்வி',
+            'Hindi': 'இந்தி'
+        }
     },
     Gujarati: {
         description: (name: string) => `${name} માટે વિગતો અને પ્રગતિ.`,
@@ -108,6 +162,15 @@ const pageTranslations = {
         subjectGpa: 'વિષય GPA',
         subject: 'વિષય',
         gpa: 'GPA',
+        subjects: {
+            'Mathematics': 'ગણિત',
+            'English': 'અંગ્રેજી',
+            'Science': 'વિજ્ઞાન',
+            'Arts': 'કળા',
+            'Social Science': 'સામાજિક વિજ્ઞાન',
+            'Physical Education': 'શારીરિક શિક્ષણ',
+            'Hindi': 'હિન્દી'
+        }
     },
     Malayalam: {
         description: (name: string) => `${name} നുള്ള വിവരങ്ങളും പുരോഗതിയും.`,
@@ -121,6 +184,15 @@ const pageTranslations = {
         subjectGpa: 'വിഷയം GPA',
         subject: 'വിഷയം',
         gpa: 'GPA',
+        subjects: {
+            'Mathematics': 'ഗണിതം',
+            'English': 'ഇംഗ്ലീഷ്',
+            'Science': 'ശാസ്ത്രം',
+            'Arts': 'കല',
+            'Social Science': 'സോഷ്യൽ സയൻസ്',
+            'Physical Education': 'ഫിസിക്കൽ എഡ്യൂക്കേഷൻ',
+            'Hindi': 'ഹിന്ദി'
+        }
     },
     Punjabi: {
         description: (name: string) => `${name} ਲਈ ਵੇਰਵੇ ਅਤੇ ਤਰੱਕੀ।`,
@@ -134,6 +206,15 @@ const pageTranslations = {
         subjectGpa: 'ਵਿਸ਼ਾ GPA',
         subject: 'ਵਿਸ਼ਾ',
         gpa: 'GPA',
+        subjects: {
+            'Mathematics': 'ਗਣਿਤ',
+            'English': 'ਅੰਗਰੇਜ਼ੀ',
+            'Science': 'ਵਿਗਿਆਨ',
+            'Arts': 'ਕਲਾ',
+            'Social Science': 'ਸਮਾਜਿਕ ਵਿਗਿਆਨ',
+            'Physical Education': 'ਸਰੀਰਕ ਸਿੱਖਿਆ',
+            'Hindi': 'ਹਿੰਦੀ'
+        }
     },
     Odia: {
         description: (name: string) => `${name} ପାଇଁ ବିବରଣୀ ଏବଂ ପ୍ରଗତି।`,
@@ -147,6 +228,15 @@ const pageTranslations = {
         subjectGpa: 'ବିଷୟ GPA',
         subject: 'ବିଷୟ',
         gpa: 'GPA',
+        subjects: {
+            'Mathematics': 'ଗଣିତ',
+            'English': 'ଇଂରାଜୀ',
+            'Science': 'ବିଜ୍ଞାନ',
+            'Arts': 'କଳା',
+            'Social Science': 'ସାମାଜିକ ବିଜ୍ଞାନ',
+            'Physical Education': 'ଶାରୀରିକ ଶିକ୍ଷା',
+            'Hindi': 'ହିନ୍ଦୀ'
+        }
     },
     Assamese: {
         description: (name: string) => `${name}ৰ বাবে বিৱৰণ আৰু প্ৰগতি।`,
@@ -160,6 +250,15 @@ const pageTranslations = {
         subjectGpa: 'বিষয় GPA',
         subject: 'বিষয়',
         gpa: 'GPA',
+        subjects: {
+            'Mathematics': 'গণিত',
+            'English': 'ইংৰাজী',
+            'Science': 'বিজ্ঞান',
+            'Arts': 'কলা',
+            'Social Science': 'সমাজ বিজ্ঞান',
+            'Physical Education': 'শাৰীৰিক শিক্ষা',
+            'Hindi': 'হিন্দী'
+        }
     },
     Kannada: {
         description: (name: string) => `${name}ಗಾಗಿ ವಿವರಗಳು ಮತ್ತು ಪ್ರಗತಿ.`,
@@ -173,6 +272,15 @@ const pageTranslations = {
         subjectGpa: 'ವಿಷಯ GPA',
         subject: 'ವಿಷಯ',
         gpa: 'GPA',
+        subjects: {
+            'Mathematics': 'ಗಣಿತ',
+            'English': 'ಇಂಗ್ಲಿಷ್',
+            'Science': 'ವಿಜ್ಞಾನ',
+            'Arts': 'ಕಲೆ',
+            'Social Science': 'ಸಮಾಜ ವಿಜ್ಞಾನ',
+            'Physical Education': 'ದೈಹಿಕ ಶಿಕ್ಷಣ',
+            'Hindi': 'ಹಿಂದಿ'
+        }
     },
     Telugu: {
         description: (name: string) => `${name} కోసం వివరాలు మరియు పురోగతి.`,
@@ -186,6 +294,15 @@ const pageTranslations = {
         subjectGpa: 'విషయం GPA',
         subject: 'విషయం',
         gpa: 'GPA',
+        subjects: {
+            'Mathematics': 'గణితం',
+            'English': 'ఇంగ్లీష్',
+            'Science': 'సైన్స్',
+            'Arts': 'కళలు',
+            'Social Science': 'సాంఘిక శాస్త్రం',
+            'Physical Education': 'శారీరక విద్య',
+            'Hindi': 'హిందీ'
+        }
     },
 };
 
@@ -196,6 +313,8 @@ export default function StudentDetailPage() {
   const { language } = useLanguage();
   const typedLanguage = language as keyof typeof pageTranslations;
   const pageTranslation = pageTranslations[typedLanguage] || pageTranslations['English'];
+  const subjectTranslations = pageTranslation.subjects as Record<string, string>;
+
 
   const [student, setStudent] = useState<Student | undefined>(
     students.find((s) => s.id.toString() === studentId)
@@ -281,7 +400,7 @@ export default function StudentDetailPage() {
                                 <TableBody>
                                     {student.subjects.map((item) => (
                                         <TableRow key={item.subject}>
-                                            <TableCell>{item.subject}</TableCell>
+                                            <TableCell>{subjectTranslations[item.subject] || item.subject}</TableCell>
                                             <TableCell className="text-right">{item.gpa.toFixed(1)}</TableCell>
                                         </TableRow>
                                     ))}
