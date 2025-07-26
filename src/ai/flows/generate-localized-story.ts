@@ -4,23 +4,10 @@
  * @fileOverview This file defines a Genkit flow for generating hyper-localized stories.
  *
  * - generateLocalizedStory - A function that generates a localized story based on user input.
- * - GenerateLocalizedStoryInput - The input type for the generateLocalizedStory function.
- * - GenerateLocalizedStoryOutput - The return type for the generateLocalizedStory function.
  */
 
 import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
-
-const GenerateLocalizedStoryInputSchema = z.object({
-  language: z.string().describe('The language in which to generate the story (e.g., Marathi).'),
-  topic: z.string().describe('The topic of the story (e.g., farmers and soil types).'),
-});
-export type GenerateLocalizedStoryInput = z.infer<typeof GenerateLocalizedStoryInputSchema>;
-
-const GenerateLocalizedStoryOutputSchema = z.object({
-  story: z.string().describe('The generated localized story.'),
-});
-export type GenerateLocalizedStoryOutput = z.infer<typeof GenerateLocalizedStoryOutputSchema>;
+import { GenerateLocalizedStoryInputSchema, GenerateLocalizedStoryOutputSchema, type GenerateLocalizedStoryInput, type GenerateLocalizedStoryOutput } from './schemas/generate-localized-story.schema';
 
 export async function generateLocalizedStory(
   input: GenerateLocalizedStoryInput

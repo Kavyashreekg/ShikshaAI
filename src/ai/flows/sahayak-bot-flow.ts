@@ -7,20 +7,18 @@
 import { ai } from '@/ai/genkit';
 import { z } from 'zod';
 import {
-  instantKnowledgeExplanation,
-  InstantKnowledgeExplanationInput,
-  InstantKnowledgeExplanationOutput,
+  instantKnowledgeExplanation
 } from './instant-knowledge-explanation';
 import {
   generateLocalizedStory,
-  GenerateLocalizedStoryInput,
-  GenerateLocalizedStoryOutput,
 } from './generate-localized-story';
 import {
   designVisualAid,
-  DesignVisualAidInput,
-  DesignVisualAidOutput,
 } from './design-visual-aid';
+
+import { InstantKnowledgeExplanationInputSchema, InstantKnowledgeExplanationOutputSchema, type InstantKnowledgeExplanationInput, type InstantKnowledgeExplanationOutput } from './schemas/instant-knowledge-explanation.schema';
+import { GenerateLocalizedStoryInputSchema, GenerateLocalizedStoryOutputSchema, type GenerateLocalizedStoryInput, type GenerateLocalizedStoryOutput } from './schemas/generate-localized-story.schema';
+import { DesignVisualAidInputSchema, DesignVisualAidOutputSchema, type DesignVisualAidInput, type DesignVisualAidOutput } from './schemas/design-visual-aid.schema';
 
 // Tool for explaining concepts
 const explainConceptTool = ai.defineTool(

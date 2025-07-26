@@ -15,10 +15,9 @@ import {
 } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
-  generateLocalizedStory,
-  GenerateLocalizedStoryOutput,
-  GenerateLocalizedStoryInput,
+  generateLocalizedStory
 } from '@/ai/flows/generate-localized-story';
+import { type GenerateLocalizedStoryOutput, type GenerateLocalizedStoryInput } from '@/ai/flows/schemas/generate-localized-story.schema';
 import { generateStoryVideo } from '@/ai/flows/generate-story-video';
 import { languages } from '@/lib/data';
 import { useToast } from '@/hooks/use-toast';

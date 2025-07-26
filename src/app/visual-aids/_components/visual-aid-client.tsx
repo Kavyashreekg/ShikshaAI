@@ -6,7 +6,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import Image from 'next/image';
 
-import { designVisualAid, DesignVisualAidOutput } from '@/ai/flows/design-visual-aid';
+import { designVisualAid } from '@/ai/flows/design-visual-aid';
+import { type DesignVisualAidOutput } from '@/ai/flows/schemas/design-visual-aid.schema';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';

@@ -7,8 +7,8 @@ import * as z from 'zod';
 
 import {
   instantKnowledgeExplanation,
-  InstantKnowledgeExplanationOutput,
 } from '@/ai/flows/instant-knowledge-explanation';
+import { type InstantKnowledgeExplanationOutput } from '@/ai/flows/schemas/instant-knowledge-explanation.schema';
 import { textToSpeech } from '@/ai/flows/text-to-speech';
 import { languages } from '@/lib/data';
 import { useToast } from '@/hooks/use-toast';

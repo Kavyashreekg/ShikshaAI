@@ -14,7 +14,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { sahayakBotFlow, SahayakBotOutput } from '@/ai/flows/sahayak-bot-flow';
+import { sahayakBotFlow, type SahayakBotOutput } from '@/ai/flows/sahayak-bot-flow';
 import { useLanguage } from '@/context/language-context';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
