@@ -14,6 +14,7 @@ import { StudentSuggestions } from '../_components/student-suggestions';
 import { EditStudentForm } from '../_components/edit-student-form';
 import { useLanguage } from '@/context/language-context';
 import { useStudent } from '@/context/student-context';
+import { EditNotesForm } from '../_components/edit-notes-form';
 
 const pageTranslations = {
     English: {
@@ -238,9 +239,12 @@ export default function StudentDetailPage() {
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
             <div className="lg:col-span-2 space-y-8">
                  <Card>
-                    <CardHeader>
-                        <CardTitle>{pageTranslation.teachersNotes}</CardTitle>
-                        <CardDescription>{pageTranslation.notesDescription}</CardDescription>
+                    <CardHeader className="flex flex-row items-center justify-between">
+                        <div>
+                            <CardTitle>{pageTranslation.teachersNotes}</CardTitle>
+                            <CardDescription>{pageTranslation.notesDescription}</CardDescription>
+                        </div>
+                        <EditNotesForm student={student} onUpdate={handleUpdateStudent} />
                     </CardHeader>
                     <CardContent>
                         <p className="whitespace-pre-wrap">{student.notes || pageTranslation.noNotes}</p>
