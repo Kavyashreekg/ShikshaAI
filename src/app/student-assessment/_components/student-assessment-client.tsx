@@ -35,7 +35,7 @@ import { UserPlus, Trash2, Upload, Download } from 'lucide-react';
 import { useStudent } from '@/context/student-context';
 import { useLanguage } from '@/context/language-context';
 import { translateText } from '@/ai/flows/translate-text';
-import { Student } from '@/lib/student-data';
+import { Student, SubjectPerformance } from '@/lib/student-data';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 
@@ -248,12 +248,23 @@ export function StudentAssessmentClient() {
                     });
                     translations['English'] = name;
                     
+                    const subjects: SubjectPerformance[] = [];
+                    for (const key in row) {
+                        if(key.startsWith('GPA - ')) {
+                            const subjectName = key.replace('GPA - ', '');
+                            const gpa = parseFloat(row[key]);
+                            if (subjectName && !isNaN(gpa)) {
+                                subjects.push({ subject: subjectName, gpa });
+                            }
+                        }
+                    }
+
                     newStudents.push({
                         id: Date.now() + Math.random(),
                         name: translations,
                         grade: String(grade),
                         notes: row.Notes || row.notes || '',
-                        subjects: [],
+                        subjects: subjects,
                     });
                 }
             }
@@ -464,4 +475,5 @@ export function StudentAssessmentClient() {
   );
 }
 
+    
     
