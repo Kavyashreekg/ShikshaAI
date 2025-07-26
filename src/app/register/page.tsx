@@ -15,7 +15,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Calendar } from '@/components/ui/calendar';
 import { BotMessageSquare, CalendarIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { format } from 'date-fns';
+import { format, parse } from 'date-fns';
 
 
 const formSchema = z.object({
@@ -78,33 +78,42 @@ export default function RegisterPage() {
                   control={form.control}
                   name="dob"
                   render={({ field }) => (
-                    <FormItem className="flex flex-col">
+                    <FormItem>
                       <FormLabel>Date of Birth</FormLabel>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <FormControl>
-                            <Button
-                              variant={"outline"}
-                              className={cn(
-                                "w-full pl-3 text-left font-normal",
-                                !field.value && "text-muted-foreground"
-                              )}
-                            >
-                              {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
-                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                            </Button>
-                          </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar
-                            mode="single"
-                            selected={field.value}
-                            onSelect={field.onChange}
-                            disabled={(date) => date > new Date() || date < new Date("1900-01-01")}
-                            initialFocus
-                          />
-                        </PopoverContent>
-                      </Popover>
+                        <div className="relative">
+                           <FormControl>
+                                <Input
+                                    placeholder="DD-MM-YYYY"
+                                    value={field.value ? format(field.value, "dd-MM-yyyy") : ""}
+                                    onChange={(e) => {
+                                        try {
+                                            const parsedDate = parse(e.target.value, "dd-MM-yyyy", new Date());
+                                            if (!isNaN(parsedDate.getTime())) {
+                                                field.onChange(parsedDate);
+                                            }
+                                        } catch (error) {
+                                            // Handle invalid date format if needed
+                                        }
+                                    }}
+                                />
+                            </FormControl>
+                            <Popover>
+                                <PopoverTrigger asChild>
+                                    <Button variant="ghost" size="icon" className="absolute right-1 top-1/2 h-7 w-7 -translate-y-1/2 text-muted-foreground">
+                                        <CalendarIcon className="h-4 w-4" />
+                                    </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-auto p-0" align="start">
+                                    <Calendar
+                                        mode="single"
+                                        selected={field.value}
+                                        onSelect={field.onChange}
+                                        disabled={(date) => date > new Date() || date < new Date("1900-01-01")}
+                                        initialFocus
+                                    />
+                                </PopoverContent>
+                            </Popover>
+                        </div>
                       <FormMessage />
                     </FormItem>
                   )}
