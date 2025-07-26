@@ -317,7 +317,7 @@ export function ContentGenerationClient() {
                   </FormItem>
                 )}
               />
-              <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row gap-2">
                 <Button type="submit" disabled={isLoading || isGeneratingVideo} className="w-full">
                   {isLoading ? t.generating : t.generateContent}
                 </Button>

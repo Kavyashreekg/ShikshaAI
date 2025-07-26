@@ -452,7 +452,7 @@ export function WorksheetClient() {
                   </FormItem>
                 )}
               />
-               <div className="flex gap-2">
+               <div className="flex flex-col sm:flex-row gap-2">
                 <Button type="submit" disabled={isLoading} className="w-full">
                   {isLoading ? t.generatingButton : t.generateButton}
                 </Button>
