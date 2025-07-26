@@ -3,6 +3,7 @@ import { Toaster } from '@/components/ui/toaster';
 import './globals.css';
 import { LanguageProvider } from '@/context/language-context';
 import { StudentProvider } from '@/context/student-context';
+import { AuthProvider } from '@/context/auth-context';
 
 export const metadata: Metadata = {
   title: 'ShikshaAI: Teaching Assistant',
@@ -22,12 +23,14 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&family=Space+Grotesk:wght@300..700&family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet" />
       </head>
       <body className="font-body antialiased" suppressHydrationWarning>
-        <LanguageProvider>
-            <StudentProvider>
-              {children}
-              <Toaster />
-            </StudentProvider>
-        </LanguageProvider>
+        <AuthProvider>
+          <LanguageProvider>
+              <StudentProvider>
+                {children}
+                <Toaster />
+              </StudentProvider>
+          </LanguageProvider>
+        </AuthProvider>
       </body>
     </html>
   );

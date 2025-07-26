@@ -1,11 +1,15 @@
 'use client';
 
-import Link from 'next/link';
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/context/auth-context';
 import { AppShell } from '@/components/app/app-shell';
 import { PageHeader } from '@/components/app/page-header';
 import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { BookText, Layers, BrainCircuit, Paintbrush, Users, CalendarCheck, FileSignature } from 'lucide-react';
 import { useLanguage } from '@/context/language-context';
+import Link from 'next/link';
+
 
 const pageTranslations = {
   English: {
@@ -249,8 +253,22 @@ const features = [
 
 export default function DashboardPage() {
   const { language } = useLanguage();
+  const { isAuthenticated, isAuthLoading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isAuthLoading && !isAuthenticated) {
+      router.push('/login');
+    }
+  }, [isAuthenticated, isAuthLoading, router]);
+
   const typedLanguage = language as keyof typeof pageTranslations;
   const pageTranslation = pageTranslations[typedLanguage] || pageTranslations['English'];
+
+  if (isAuthLoading || !isAuthenticated) {
+    // You can replace this with a proper loading spinner component
+    return <div>Loading...</div>;
+  }
 
   return (
     <AppShell>

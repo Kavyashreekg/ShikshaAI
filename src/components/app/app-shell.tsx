@@ -12,6 +12,7 @@ import {
   Users,
   BotMessageSquare,
   FileSignature,
+  LogOut,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -31,6 +32,17 @@ import { cn } from '@/lib/utils';
 import { GlobalVoiceQuery } from './global-voice-query';
 import { LanguageSwitcher } from './language-switcher';
 import { useLanguage } from '@/context/language-context';
+import { useAuth } from '@/context/auth-context';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+
 
 const translations = {
     English: {
@@ -43,6 +55,7 @@ const translations = {
       studentAssessment: 'Student Assessment',
       lessonPlanner: 'Lesson Planner',
       readingAssessment: 'Reading Assessment',
+      logout: 'Logout',
     },
     Hindi: {
       shikshaAI: 'शिक्षाएआई',
@@ -54,6 +67,7 @@ const translations = {
       studentAssessment: 'छात्र मूल्यांकन',
       lessonPlanner: 'पाठ योजनाकार',
       readingAssessment: 'पठन मूल्यांकन',
+      logout: 'लॉग आउट',
     },
     Marathi: {
       shikshaAI: 'शिक्षाएआय',
@@ -65,6 +79,7 @@ const translations = {
       studentAssessment: 'विद्यार्थी मूल्यांकन',
       lessonPlanner: 'पाठ नियोजक',
       readingAssessment: 'वाचन मूल्यांकन',
+      logout: 'लॉग आउट',
     },
     Kashmiri: {
       shikshaAI: 'شِکشا اے آی',
@@ -76,6 +91,7 @@ const translations = {
       studentAssessment: 'طالب علمٕک تشخیص',
       lessonPlanner: 'سبق منصوبہ ساز',
       readingAssessment: 'پَرنُک تَحقیٖق',
+      logout: 'لاگ آوٹ',
     },
     Bengali: {
         shikshaAI: 'শিক্ষাএআই',
@@ -87,6 +103,7 @@ const translations = {
         studentAssessment: 'ছাত্র মূল্যায়ন',
         lessonPlanner: 'পাঠ পরিকল্পনাকারী',
         readingAssessment: 'পড়া মূল্যায়ন',
+        logout: 'লগ আউট',
     },
     Tamil: {
         shikshaAI: 'ஷிக்ஷாஏஐ',
@@ -98,6 +115,7 @@ const translations = {
         studentAssessment: 'மாணவர் மதிப்பீடு',
         lessonPlanner: 'பாடம் திட்டமிடுபவர்',
         readingAssessment: 'வாசிப்பு மதிப்பீடு',
+        logout: 'வெளியேறு',
     },
     Gujarati: {
         shikshaAI: 'શિક્ષાએઆઈ',
@@ -109,6 +127,7 @@ const translations = {
         studentAssessment: 'વિદ્યાર્થી મૂલ્યાંકન',
         lessonPlanner: 'પાઠ યોજનાકાર',
         readingAssessment: 'વાંચન મૂલ્યાંકન',
+        logout: 'લૉગ આઉટ',
     },
     Malayalam: {
         shikshaAI: 'ശിക്ഷാഎഐ',
@@ -120,6 +139,7 @@ const translations = {
         studentAssessment: 'വിദ്യാർത്ഥി വിലയിരുത്തൽ',
         lessonPlanner: 'പാഠ ആസൂത്രകൻ',
         readingAssessment: 'വായന വിലയിരുത്തൽ',
+        logout: 'ലോഗ് ഔട്ട്',
     },
     Punjabi: {
         shikshaAI: 'ਸ਼ਿਕਸ਼ਾਏਆਈ',
@@ -131,6 +151,7 @@ const translations = {
         studentAssessment: 'ਵਿਦਿਆਰਥੀ ਮੁਲਾਂਕਣ',
         lessonPlanner: 'ਪਾਠ ਯੋਜਨਾਕਾਰ',
         readingAssessment: 'ਪੜ੍ਹਨ ਦਾ ਮੁਲਾਂਕਣ',
+        logout: 'ਲਾਗ ਆਊਟ',
     },
     Odia: {
         shikshaAI: 'ଶିକ୍ଷାଏଆଇ',
@@ -142,6 +163,7 @@ const translations = {
         studentAssessment: 'ଛାତ୍ର ମୂଲ୍ୟାୟନ',
         lessonPlanner: 'ପାଠ ଯୋଜନାକାରୀ',
         readingAssessment: 'ପଠନ ମୂଲ୍ୟାଙ୍କନ',
+        logout: 'ଲଗ୍ ଆଉଟ୍',
     },
     Assamese: {
         shikshaAI: 'শিক্ষাএআই',
@@ -153,6 +175,7 @@ const translations = {
         studentAssessment: 'ছাত্র মূল্যায়ন',
         lessonPlanner: 'পাঠ পৰিকল্পনাকাৰী',
         readingAssessment: 'পঠন মূল্যায়ন',
+        logout: 'লগ আউট',
     },
     Kannada: {
         shikshaAI: 'ಶಿಕ್ಷಾಎಐ',
@@ -164,6 +187,7 @@ const translations = {
         studentAssessment: 'ವಿದ್ಯಾರ್ಥಿ ಮೌಲ್ಯಮಾಪನ',
         lessonPlanner: 'ಪಾಠ ಯೋಜಕ',
         readingAssessment: 'ಓದುವಿಕೆ ಮೌಲ್ಯಮಾಪನ',
+        logout: 'ಲಾಗ್ ಔಟ್',
     },
     Telugu: {
         shikshaAI: 'శిక్షాఏఐ',
@@ -175,6 +199,7 @@ const translations = {
         studentAssessment: 'విద్యార్థి మూల్యాంకనం',
         lessonPlanner: 'పాఠ ప్రణాళిక',
         readingAssessment: 'పఠన మూల్యాంకనం',
+        logout: 'లాగ్ అవుట్',
     },
 };
 
@@ -183,6 +208,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const isMobile = useIsMobile();
   const { language } = useLanguage();
+  const { user, logout } = useAuth();
+
   const typedLanguage = language as keyof typeof translations;
   const t = translations[typedLanguage] || translations['English'];
 
@@ -196,6 +223,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     { href: '/lesson-planner', label: t.lessonPlanner, icon: CalendarCheck },
     { href: '/reading-assessment', label: t.readingAssessment, icon: FileSignature },
   ];
+
+  const getInitials = (name: string) => {
+    const names = name.split(' ');
+    return names.map((n) => n[0]).join('').toUpperCase();
+  };
 
   return (
     <SidebarProvider>
@@ -228,8 +260,31 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               ))}
             </SidebarMenu>
           </SidebarContent>
-          <SidebarFooter>
-            {/* Can add user profile/logout button here */}
+          <SidebarFooter className="group-data-[collapsible=icon]:hidden">
+             <div className="w-full p-2">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="w-full justify-start p-2 h-auto">
+                        <div className="flex items-center gap-3">
+                            <Avatar className="h-8 w-8">
+                                <AvatarImage src={`https://placehold.co/40x40.png`} />
+                                <AvatarFallback>{user ? getInitials(user.name) : 'T'}</AvatarFallback>
+                            </Avatar>
+                            <div className="text-left">
+                                <div className="text-sm font-medium text-sidebar-foreground">{user?.name}</div>
+                                <div className="text-xs text-muted-foreground">{user?.email}</div>
+                            </div>
+                        </div>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-56 mb-2" side="top" align="start">
+                    <DropdownMenuItem onClick={logout}>
+                        <LogOut className="mr-2 h-4 w-4" />
+                        <span>{t.logout}</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+            </div>
           </SidebarFooter>
         </Sidebar>
         <SidebarInset className="flex flex-col">
