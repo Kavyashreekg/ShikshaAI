@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Send, Sparkles, User, BotMessageSquare, Lightbulb } from 'lucide-react';
-import {runFlow} from 'genkit/next/client';
+import {runFlow} from '@genkit-ai/next/client';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
