@@ -72,6 +72,7 @@ export default function WorksheetsPage() {
         <PageHeader
           title={pageTranslation.title}
           description={pageTranslation.description}
+          showCloseButton
         />
         <WorksheetClient />
       </div>

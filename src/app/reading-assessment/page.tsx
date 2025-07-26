@@ -1,3 +1,4 @@
+
 'use client';
 
 import { AppShell } from '@/components/app/app-shell';
@@ -24,11 +25,11 @@ const pageTranslations = {
   },
   Bengali: {
     title: 'পড়া মূল্যায়ন',
-    description: 'শব্দভান্ডার এবং বোধগম্যতা উন্নত করতে ছাত্র-বান্ধব পাঠ্য অনুচ্ছেদ তৈরি করুন।',
+    description: 'শব্দভান্ডার উন্নত করতে ছাত্র-বান্ধব পাঠ্য অনুচ্ছেদ তৈরি করুন।',
   },
   Tamil: {
     title: 'வாசிப்பு மதிப்பீடு',
-    description: 'சொற்களஞ்சியம் மற்றும் புரிதலை மேம்படுத்த மாணவர் நட்பு வாசிப்பு பத்திகளை உருவாக்கவும்.',
+    description: 'சொற்களஞ்சியத்தை மேம்படுத்த மாணவர் நட்பு வாசிப்பு பத்திகளை உருவாக்கவும்.',
   },
   Gujarati: {
     title: 'વાંચન મૂલ્યાંકન',
@@ -71,6 +72,7 @@ export default function ReadingAssessmentPage() {
         <PageHeader
           title={pageTranslation.title}
           description={pageTranslation.description}
+          showCloseButton
         />
         <ReadingAssessmentClient />
       </div>

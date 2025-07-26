@@ -72,6 +72,7 @@ export default function ContentGenerationPage() {
         <PageHeader
           title={pageTranslation.title}
           description={pageTranslation.description}
+          showCloseButton
         />
         <ContentGenerationClient />
       </div>

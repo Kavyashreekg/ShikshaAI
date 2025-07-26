@@ -1,3 +1,4 @@
+
 'use client';
 
 import { AppShell } from '@/components/app/app-shell';
@@ -71,6 +72,7 @@ export default function LessonPlannerPage() {
         <PageHeader
           title={pageTranslation.title}
           description={pageTranslation.description}
+          showCloseButton
         />
         <LessonPlannerClient />
       </div>

@@ -1,3 +1,4 @@
+
 'use client';
 
 import { AppShell } from '@/components/app/app-shell';
@@ -19,7 +20,7 @@ const pageTranslations = {
     description: 'गुंतागुंतीच्या विद्यार्थ्यांच्या प्रश्नांसाठी सोपी, अचूक स्पष्टीकरण मिळवा, समजण्यास सोप्या उपमांसह पूर्ण करा.',
   },
   Kashmiri: {
-    title: 'فوری علمٕک بنیاد',
+    title: 'फوری علمٕک بنیاد',
     description: 'طلبہ ہنٛد پیچیدٕ سوالاتن ہنٛدِ لٔٹِک، درست وضاحتھ، تہٕ آسان analogie ہیتھ مکمل کریو۔',
   },
   Bengali: {
@@ -71,6 +72,7 @@ export default function KnowledgeBasePage() {
         <PageHeader
           title={pageTranslation.title}
           description={pageTranslation.description}
+          showCloseButton
         />
         <KnowledgeBaseClient />
       </div>

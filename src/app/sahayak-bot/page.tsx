@@ -1,3 +1,4 @@
+
 'use client';
 
 import { AppShell } from '@/components/app/app-shell';
@@ -72,6 +73,7 @@ export default function SahayakBotPage() {
             <PageHeader
             title={pageTranslation.title}
             description={pageTranslation.description}
+            showCloseButton
             />
         </div>
         <SahayakBotClient />
