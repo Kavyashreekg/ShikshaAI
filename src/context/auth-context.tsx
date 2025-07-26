@@ -68,6 +68,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const register = async (newUser: Omit<User, 'id'>): Promise<boolean> => {
     try {
         const storedUsers = JSON.parse(localStorage.getItem('shiksha-users') || '[]') as User[];
+        const userExists = storedUsers.some(u => u.email === newUser.email || u.contact === newUser.contact);
+
+        if (userExists) {
+            return false; // Indicate that user already exists
+        }
+
         const userWithId = { ...newUser, id: new Date().toISOString() };
         
         storedUsers.push(userWithId);
