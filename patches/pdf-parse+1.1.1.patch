@@ -1,0 +1,14 @@
+diff --git a/node_modules/pdf-parse/lib/pdf-parse.js b/node_modules/pdf-parse/lib/pdf-parse.js
+index 791c53e..cce32a3 100644
+--- a/node_modules/pdf-parse/lib/pdf-parse.js
++++ b/node_modules/pdf-parse/lib/pdf-parse.js
+@@ -3,7 +3,7 @@
+ const path = require('path');
+ const {isNil, merge} = require('lodash');
+ 
+-const hummus = require('hummus');
++//const hummus = require('hummus');
+ 
+ const PDFPARSER_VERBOSITY = {
+ 	NONE: 0,
+

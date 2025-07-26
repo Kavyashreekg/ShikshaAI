@@ -48,8 +48,7 @@
     "next": "15.3.3",
     "node-fetch": "^3.3.2",
     "papaparse": "^5.4.1",
-    "patch-package": "^8.0.0",
-    "pdf-parse": "^1.1.1",
+    "pdfjs-dist": "4.5.136",
     "react": "^18.3.1",
     "react-day-picker": "^8.10.1",
     "react-dom": "^18.3.1",
@@ -64,7 +63,6 @@
   "devDependencies": {
     "@types/node": "^20",
     "@types/papaparse": "^5.3.14",
-    "@types/pdf-parse": "^1.1.4",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "@types/wav": "^1.0.3",

@@ -9,6 +9,7 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
+import * as pdfjs from 'pdfjs-dist';
 
 const GenerateLessonPlanInputSchema = z.object({
   lessonPdfDataUri: z
@@ -78,15 +79,18 @@ const generateLessonPlanFlow = ai.defineFlow(
     outputSchema: GenerateLessonPlanOutputSchema,
   },
   async input => {
-    // Dynamically import pdf-parse to avoid server-side bundling issues.
-    const pdfjs = (await import('pdf-parse')).default;
-
-    // 1. Extract text from the PDF Data URI
     const pdfBuffer = Buffer.from(input.lessonPdfDataUri.split(',')[1], 'base64');
-    const pdfData = await pdfjs(pdfBuffer);
-    const pdfText = pdfData.text;
+    
+    // Use pdfjs-dist to extract text
+    const loadingTask = pdfjs.getDocument({ data: pdfBuffer });
+    const pdf = await loadingTask.promise;
+    let pdfText = '';
+    for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const textContent = await page.getTextContent();
+        pdfText += textContent.items.map(item => item.str).join(' ');
+    }
 
-    // 2. Call the prompt with the extracted text
     const {output} = await generateLessonPlanPrompt({...input, pdfText});
     return output!;
   }
