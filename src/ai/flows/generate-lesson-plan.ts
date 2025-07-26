@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview This file defines a Genkit flow for generating a weekly lesson plan from a PDF.
@@ -82,7 +83,7 @@ const generateLessonPlanFlow = ai.defineFlow(
     const pdfBuffer = Buffer.from(input.lessonPdfDataUri.split(',')[1], 'base64');
     
     // Use pdfjs-dist to extract text
-    const loadingTask = pdfjs.getDocument({ data: pdfBuffer, isEvalSupported: false });
+    const loadingTask = pdfjs.getDocument({ data: pdfBuffer, isEvalSupported: false, useSystemFonts: true });
     const pdf = await loadingTask.promise;
     let pdfText = '';
     for (let i = 1; i <= pdf.numPages; i++) {
