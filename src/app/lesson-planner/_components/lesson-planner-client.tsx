@@ -196,6 +196,8 @@ export function LessonPlannerClient() {
 
   const watchedGrade = useWatch({ control: form.control, name: 'grade' });
   const watchedSubject = useWatch({ control: form.control, name: 'subject' });
+  const watchedLessonName = useWatch({ control: form.control, name: 'lessonName' });
+
 
   const handleClear = () => {
     form.reset();
@@ -228,34 +230,65 @@ export function LessonPlannerClient() {
   }
 
   const handleDownloadPDF = async () => {
-    if (!lessonPlanRef.current) return;
+    if (!result || !lessonPlanRef.current) return;
     setIsDownloading(true);
+
     try {
-      const canvas = await html2canvas(lessonPlanRef.current, { scale: 2 });
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = pdf.internal.pageSize.getHeight();
-      const imgWidth = canvas.width;
-      const imgHeight = canvas.height;
-      const ratio = imgWidth / imgHeight;
-      const widthInPdf = pdfWidth - 20;
-      const heightInPdf = widthInPdf / ratio;
-      
-      let position = 10;
-      let heightLeft = heightInPdf;
+        const pdf = new jsPDF('p', 'pt', 'a4');
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const margin = 40;
+        let y = 40;
 
-      pdf.addImage(imgData, 'PNG', 10, position, widthInPdf, heightInPdf);
-      heightLeft -= pdfHeight;
+        // Header
+        pdf.setFont('Arial', 'bold');
+        pdf.setFontSize(10);
+        pdf.text(watchedLessonName, pdfWidth / 2, y, { align: 'center' });
+        y += 15;
+        
+        // Grade
+        pdf.setFont('Arial', 'normal');
+        pdf.setFontSize(10);
+        const gradeLabel = grades.find(g => g.value === watchedGrade)?.label || `Grade ${watchedGrade}`;
+        pdf.text(gradeLabel, pdfWidth / 2, y, { align: 'center' });
+        y += 15;
+        
+        // Horizontal Line
+        pdf.setDrawColor(200, 200, 200);
+        pdf.line(margin, y, pdfWidth - margin, y);
+        y += 20;
 
-      while (heightLeft > 0) {
-        position = heightLeft - heightInPdf;
-        pdf.addPage();
-        pdf.addImage(imgData, 'PNG', 10, position, widthInPdf, heightInPdf);
-        heightLeft -= pdfHeight;
-      }
-      
-      pdf.save('lesson-plan.pdf');
+        // Content
+        const contentNode = lessonPlanRef.current;
+        const lines = result.lessonPlanContent.split('\n');
+
+        lines.forEach(line => {
+            const isDayHeading = /^Day \d/.test(line.trim());
+            const isOtherHeading = /^\d+\./.test(line.trim()) || /^\*{1,2}/.test(line.trim());
+
+            if (isDayHeading) {
+                pdf.setFont('Arial', 'bold');
+                pdf.setFontSize(8);
+            } else if (isOtherHeading) {
+                pdf.setFont('Arial', 'bold');
+                pdf.setFontSize(10);
+            } else {
+                pdf.setFont('Arial', 'normal');
+                pdf.setFontSize(10);
+            }
+            
+            const splitText = pdf.splitTextToSize(line, pdfWidth - margin * 2);
+
+            splitText.forEach((textLine: string) => {
+                 if (y > pdf.internal.pageSize.getHeight() - margin) {
+                    pdf.addPage();
+                    y = margin;
+                }
+                pdf.text(textLine, margin, y);
+                y += 12; // line height
+            });
+        });
+
+        pdf.save(`${watchedLessonName}.pdf`);
     } catch (error) {
         console.error('Error generating PDF:', error);
         toast({ variant: 'destructive', title: 'Error', description: 'Could not generate PDF.' });
@@ -263,6 +296,7 @@ export function LessonPlannerClient() {
         setIsDownloading(false);
     }
   };
+
 
   return (
     <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
