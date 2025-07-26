@@ -1,3 +1,4 @@
+
 'use server';
 
 /**
@@ -10,8 +11,6 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
-import * as fs from 'fs';
-import {Readable} from 'stream';
 import {MediaPart} from 'genkit';
 
 const GenerateStoryVideoInputSchema = z.object({
@@ -53,44 +52,50 @@ async function downloadVideo(video: MediaPart): Promise<string> {
   return Buffer.concat(chunks).toString('base64');
 }
 
-export async function generateStoryVideo(
-  input: GenerateStoryVideoInput
-): Promise<GenerateStoryVideoOutput> {
-  let {operation} = await ai.generate({
-    model: 'googleai/veo-2.0-generate-001',
-    prompt: `A video illustrating the following story: ${input.story}`,
-    config: {
-      durationSeconds: 5,
-      aspectRatio: '16:9',
-      safetySettings: [
-        { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_LOW_AND_ABOVE' },
-        { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_LOW_AND_ABOVE' },
-        { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_LOW_AND_ABOVE' },
-        { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_LOW_AND_ABOVE' },
-      ],
-    },
-  });
+export const generateStoryVideo = ai.defineFlow(
+  {
+    name: 'generateStoryVideo',
+    inputSchema: GenerateStoryVideoInputSchema,
+    outputSchema: GenerateStoryVideoOutputSchema,
+  },
+  async (input: GenerateStoryVideoInput): Promise<GenerateStoryVideoOutput> => {
+    let {operation} = await ai.generate({
+      model: 'googleai/veo-2.0-generate-001',
+      prompt: `A video illustrating the following story: ${input.story}`,
+      config: {
+        durationSeconds: 5,
+        aspectRatio: '16:9',
+        safetySettings: [
+          { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_ONLY_HIGH' },
+          { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_ONLY_HIGH' },
+          { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_ONLY_HIGH' },
+          { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_ONLY_HIGH' },
+        ],
+      },
+    });
 
-  if (!operation) {
-    throw new Error('Expected the model to return an operation');
+    if (!operation) {
+      throw new Error('Expected the model to return an operation');
+    }
+
+    // Wait until the operation completes. Note that this may take some time, maybe even up to a minute. Design the UI accordingly.
+    while (!operation.done) {
+      operation = await ai.checkOperation(operation);
+      // Sleep for 5 seconds before checking again.
+      await new Promise(resolve => setTimeout(resolve, 5000));
+    }
+
+    if (operation.error) {
+      throw new Error('failed to generate video: ' + operation.error.message);
+    }
+
+    const video = operation.output?.message?.content.find(p => !!p.media);
+    if (!video) {
+      throw new Error('Failed to find the generated video');
+    }
+
+    const videoBase64 = await downloadVideo(video);
+    return {video: `data:video/mp4;base64,${videoBase64}`};
   }
+);
 
-  // Wait until the operation completes. Note that this may take some time, maybe even up to a minute. Design the UI accordingly.
-  while (!operation.done) {
-    operation = await ai.checkOperation(operation);
-    // Sleep for 5 seconds before checking again.
-    await new Promise(resolve => setTimeout(resolve, 5000));
-  }
-
-  if (operation.error) {
-    throw new Error('failed to generate video: ' + operation.error.message);
-  }
-
-  const video = operation.output?.message?.content.find(p => !!p.media);
-  if (!video) {
-    throw new Error('Failed to find the generated video');
-  }
-
-  const videoBase64 = await downloadVideo(video);
-  return {video: `data:video/mp4;base64,${videoBase64}`};
-}
