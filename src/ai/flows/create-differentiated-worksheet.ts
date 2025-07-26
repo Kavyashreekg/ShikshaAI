@@ -11,6 +11,7 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
+import * as pdfjs from 'pdfjs-dist/legacy/build/pdf.mjs';
 
 const CreateDifferentiatedWorksheetInputSchema = z.object({
   photoDataUri: z
@@ -83,6 +84,14 @@ const createDifferentiatedWorksheetFlow = ai.defineFlow(
     outputSchema: CreateDifferentiatedWorksheetOutputSchema,
   },
   async input => {
+    // This is a workaround for NextJS environments where worker threads are problematic.
+    // It disables the worker and runs PDF processing on the main thread.
+    const loadingTask = pdfjs.getDocument({
+        data: Buffer.from(input.photoDataUri.split(',')[1], 'base64'),
+        isEvalSupported: false,
+        useSystemFonts: true,
+    });
+    
     const gradeLevelsArray = input.gradeLevels.split(',').map(s => s.trim()).filter(s => s);
     const {output} = await createDifferentiatedWorksheetPrompt({...input, gradeLevelsArray});
     return output!;
