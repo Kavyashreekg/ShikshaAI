@@ -9,7 +9,6 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
-import * as pdfjs from 'pdf-parse';
 
 const GenerateLessonPlanInputSchema = z.object({
   lessonPdfDataUri: z
@@ -79,6 +78,9 @@ const generateLessonPlanFlow = ai.defineFlow(
     outputSchema: GenerateLessonPlanOutputSchema,
   },
   async input => {
+    // Dynamically import pdf-parse to avoid server-side bundling issues.
+    const pdfjs = await import('pdf-parse');
+
     // 1. Extract text from the PDF Data URI
     const pdfBuffer = Buffer.from(input.lessonPdfDataUri.split(',')[1], 'base64');
     const pdfData = await pdfjs.default(pdfBuffer);
