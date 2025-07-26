@@ -4,7 +4,7 @@
  *
  * - generateLessonPlan - A function that generates a lesson plan.
  * - GenerateLessonPlanInput - The input type for the generateLessonPlan function.
- * - GenerateLessonPlanOutput - The return type for the generateLessonPlan function.
+ * - GenerateLessonPlanOutput - The return type for the generateLessonPlanOutput function.
  */
 
 import {ai} from '@/ai/genkit';
