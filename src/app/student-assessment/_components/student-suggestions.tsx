@@ -1,12 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Sparkles, ShieldAlert } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Student } from '@/lib/student-data';
 import { generateStudentSuggestions } from '@/ai/flows/generate-student-suggestions';
+import { translateText } from '@/ai/flows/translate-text';
 import type { GenerateStudentSuggestionsOutput } from '@/ai/flows/generate-student-suggestions';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -22,6 +23,8 @@ const translations = {
     errorTitle: 'Content Blocked',
     safetyError: 'The generated suggestions were blocked for safety reasons. Please review the student notes and try again.',
     generalError: 'Failed to generate suggestions. Please try again.',
+    translationError: 'Could not translate suggestions. Showing original text.',
+    translating: 'Translating...',
   },
   Hindi: {
     title: 'एआई-संचालित सुझाव',
@@ -32,6 +35,8 @@ const translations = {
     errorTitle: 'सामग्री अवरुद्ध',
     safetyError: 'उत्पन्न सुझावों को सुरक्षा कारणों से अवरुद्ध कर दिया गया था। कृपया छात्र नोट्स की समीक्षा करें और पुनः प्रयास करें।',
     generalError: 'सुझाव उत्पन्न करने में विफल। कृपया पुनः प्रयास करें।',
+    translationError: 'सुझावों का अनुवाद नहीं हो सका। मूल पाठ दिखाया जा रहा है।',
+    translating: 'अनुवाद हो रहा है...',
   },
   Marathi: {
     title: 'एआय-समर्थित सूचना',
@@ -42,6 +47,8 @@ const translations = {
     errorTitle: 'सामग्री अवरोधित',
     safetyError: 'तयार केलेल्या सूचना सुरक्षिततेच्या कारणास्तव अवरोधित केल्या गेल्या. कृपया विद्यार्थ्यांच्या नोंदींचे पुनरावलोकन करा आणि पुन्हा प्रयत्न करा.',
     generalError: 'सूचना तयार करण्यात अयशस्वी. कृपया पुन्हा प्रयत्न करा.',
+    translationError: 'सूचना अनुवादित करू शकलो नाही. मूळ मजकूर दर्शवत आहे.',
+    translating: 'भाषांतर होत आहे...',
   },
   Kashmiri: {
     title: 'AI سٟتؠ تجاویز',
@@ -52,6 +59,8 @@ const translations = {
     errorTitle: 'مواد بلاک کرنہٕ آمت',
     safetyError: 'تیار کرنہٕ آمٕتہ تجاویز آیہِ حفاظتی وجوہاتن ہِنٛدِ بنا پؠٹھ بلاک کرنہٕ۔ مہربانی کرِتھ طالب علم سٕنٛد نوٹسن ہُنٛد جٲیزٕ نِیو تہٕ دوبارٕ کوشش کریو۔',
     generalError: 'تجاویز تیار کرنس مَنٛز ناکام۔ مہربانی کرِتھ دوبارٕ کوشش کریو۔',
+    translationError: 'تجاویز ترجمہٕ کرنس مَنٛز ناکام۔ اصلی متن وُچھاو۔',
+    translating: 'ترجمہٕ کران...',
   },
   Bengali: {
     title: 'এআই-চালিত পরামর্শ',
@@ -62,6 +71,8 @@ const translations = {
     errorTitle: 'বিষয়বস্তু অবরুদ্ধ',
     safetyError: 'উত্পন্ন পরামর্শগুলি সুরক্ষার কারণে অবরুদ্ধ করা হয়েছিল। অনুগ্রহ করে ছাত্রের নোট পর্যালোচনা করুন এবং আবার চেষ্টা করুন।',
     generalError: 'পরামর্শ তৈরি করতে ব্যর্থ। অনুগ্রহ করে আবার চেষ্টা করুন।',
+    translationError: 'পরামর্শ অনুবাদ করা যায়নি। মূল পাঠ্য দেখানো হচ্ছে।',
+    translating: 'অনুবাদ করা হচ্ছে...',
   },
   Tamil: {
     title: 'AI-ஆதரவு பரிந்துரைகள்',
@@ -72,6 +83,8 @@ const translations = {
     errorTitle: 'உள்ளடக்கம் தடுக்கப்பட்டது',
     safetyError: 'உருவாக்கப்பட்ட பரிந்துரைகள் பாதுகாப்பு காரணங்களுக்காக தடுக்கப்பட்டன। தயவுசெய்து மாணவர் குறிப்புகளை மதிப்பாய்வு செய்து மீண்டும் முயற்சிக்கவும்।',
     generalError: 'பரிந்துரைகளை உருவாக்கத் தவறிவிட்டது। தயவுசெய்து மீண்டும் முயற்சிக்கவும்।',
+    translationError: 'பரிந்துரைகளை மொழிபெயர்க்க முடியவில்லை। அசல் உரையைக் காட்டுகிறது।',
+    translating: 'மொழிபெயர்க்கிறது...',
   },
   Gujarati: {
     title: 'AI-સંચાલિત સૂચનો',
@@ -82,6 +95,8 @@ const translations = {
     errorTitle: 'સામગ્રી અવરોધિત',
     safetyError: 'બનાવેલા સૂચનો સુરક્ષા કારણોસર અવરોધિત કરવામાં આવ્યા હતા. કૃપા કરીને વિદ્યાર્થીની નોંધોની સમીક્ષા કરો અને ફરીથી પ્રયાસ કરો.',
     generalError: 'સૂચનો બનાવવામાં નિષ્ફળ. કૃપા કરીને ફરીથી પ્રયાસ કરો.',
+    translationError: 'સૂચનોનું ભાષાંતર કરી શકાયું નથી. મૂળ લખાણ બતાવી રહ્યું છે.',
+    translating: 'ભાષાંતર કરી રહ્યું છે...',
   },
   Malayalam: {
     title: 'AI-പവർഡ് നിർദ്ദേശങ്ങൾ',
@@ -92,6 +107,8 @@ const translations = {
     errorTitle: 'ഉള്ളടക്കം തടഞ്ഞു',
     safetyError: 'സൃഷ്ടിച്ച നിർദ്ദേശങ്ങൾ സുരക്ഷാ കാരണങ്ങളാൽ തടഞ്ഞിരിക്കുന്നു. ദയവായി വിദ്യാർത്ഥിയുടെ കുറിപ്പുകൾ അവലോകനം ചെയ്ത് വീണ്ടും ശ്രമിക്കുക.',
     generalError: 'നിർദ്ദേശങ്ങൾ സൃഷ്ടിക്കുന്നതിൽ പരാജയപ്പെട്ടു. ദയവായി വീണ്ടും ശ്രമിക്കുക.',
+    translationError: 'നിർദ്ദേശങ്ങൾ വിവർത്തനം ചെയ്യാൻ കഴിഞ്ഞില്ല. യഥാർത്ഥ വാചകം കാണിക്കുന്നു.',
+    translating: 'വിവർത്തനം ചെയ്യുന്നു...',
   },
   Punjabi: {
     title: 'AI-ਸੰਚਾਲਿਤ ਸੁਝਾਅ',
@@ -102,6 +119,8 @@ const translations = {
     errorTitle: 'ਸਮੱਗਰੀ ਬਲੌਕ ਕੀਤੀ ਗਈ',
     safetyError: 'ਤਿਆਰ ਕੀਤੇ ਗਏ ਸੁਝਾਵਾਂ ਨੂੰ ਸੁਰੱਖਿਆ ਕਾਰਨਾਂ ਕਰਕੇ ਬਲੌਕ ਕੀਤਾ ਗਿਆ ਸੀ। ਕਿਰਪਾ ਕਰਕੇ ਵਿਦਿਆਰਥੀ ਨੋਟਸ ਦੀ ਸਮੀਖਿਆ ਕਰੋ ਅਤੇ ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ।',
     generalError: 'ਸੁਝਾਅ ਤਿਆਰ ਕਰਨ ਵਿੱਚ ਅਸਫਲ। ਕਿਰਪਾ ਕਰਕੇ ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ।',
+    translationError: 'ਸੁਝਾਵਾਂ ਦਾ ਅਨੁਵਾਦ ਨਹੀਂ ਕੀਤਾ ਜਾ ਸਕਿਆ। ਅਸਲ ਪਾਠ ਦਿਖਾਇਆ ਜਾ ਰਿਹਾ ਹੈ।',
+    translating: 'ਅਨੁਵਾਦ ਕੀਤਾ ਜਾ ਰਿਹਾ ਹੈ...',
   },
   Odia: {
     title: 'AI-ଚାଳିତ ପରାମର୍ଶ',
@@ -112,6 +131,8 @@ const translations = {
     errorTitle: 'ବିଷୟବସ୍ତୁ ଅବରୋଧିତ',
     safetyError: 'ସୃଷ୍ଟି ହୋଇଥିବା ପରାମର୍ଶଗୁଡିକ ସୁରକ୍ଷା କାରଣରୁ ଅବରୋଧ କରାଯାଇଥିଲା। ଦୟାକରି ଛାତ୍ର ନୋଟ୍ସ ସମୀକ୍ଷା କରନ୍ତୁ ଏବଂ ପୁଣି ଚେଷ୍ଟା କରନ୍ତୁ।',
     generalError: 'ପରାମର୍ଶ ସୃଷ୍ଟି କରିବାରେ ବିଫଳ। ଦୟାକରି ପୁଣି ଚେଷ୍ଟା କରନ୍ତୁ।',
+    translationError: 'ପରାମର୍ଶଗୁଡ଼ିକ ଅନୁବାଦ ହୋଇପାରିଲା ନାହିଁ। ମୂଳ ପାଠ୍ୟ ପ୍ରଦର୍ଶିତ ହେଉଛି।',
+    translating: 'ଅନୁବାଦ କରୁଛି...',
   },
   Assamese: {
     title: 'AI-চালিত পৰামৰ্শ',
@@ -122,6 +143,8 @@ const translations = {
     errorTitle: 'বিষয়বস্তু অৱৰোধিত',
     safetyError: 'সৃষ্টি কৰা পৰামৰ্শসমূহ সুৰক্ষাৰ কাৰণত অৱৰোধ কৰা হৈছিল। অনুগ্ৰহ কৰি শিক্ষাৰ্থীৰ টোকাসমূহ পুনৰীক্ষণ কৰক আৰু পুনৰ চেষ্টা কৰক।',
     generalError: 'পৰামৰ্শ সৃষ্টি কৰাত విఫಲ হৈছে। অনুগ্ৰহ কৰি পুনৰ চেষ্টা কৰক।',
+    translationError: 'পৰামৰ্শসমূহ অনুবাদ কৰিব পৰা নগ\'ল। মূল পাঠ দেখুওৱা হৈছে।',
+    translating: 'অনুবাদ কৰি আছে...',
   },
   Kannada: {
     title: 'AI-ಚಾಲಿತ ಸಲಹೆಗಳು',
@@ -132,6 +155,8 @@ const translations = {
     errorTitle: 'ವಿಷಯವನ್ನು ನಿರ್ಬಂಧಿಸಲಾಗಿದೆ',
     safetyError: 'ರಚಿಸಲಾದ ಸಲಹೆಗಳನ್ನು ಸುರಕ್ಷತಾ ಕಾರಣಗಳಿಗಾಗಿ ನಿರ್ಬಂಧಿಸಲಾಗಿದೆ. ದಯವಿಟ್ಟು ವಿದ್ಯಾರ್ಥಿ ಟಿಪ್ಪಣಿಗಳನ್ನು ಪರಿಶೀಲಿಸಿ ಮತ್ತು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.',
     generalError: 'ಸಲಹೆಗಳನ್ನು ರಚಿಸಲು ವಿಫಲವಾಗಿದೆ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.',
+    translationError: 'ಸಲಹೆಗಳನ್ನು ಭಾಷಾಂತರಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ. ಮೂಲ ಪಠ್ಯವನ್ನು ತೋರಿಸಲಾಗುತ್ತಿದೆ.',
+    translating: 'ಭಾಷಾಂತರಿಸಲಾಗುತ್ತಿದೆ...',
   },
   Telugu: {
     title: 'AI-ఆధారిత సూచనలు',
@@ -142,12 +167,15 @@ const translations = {
     errorTitle: 'కంటెంట్ బ్లాక్ చేయబడింది',
     safetyError: 'రూపొందించిన సూచనలు భద్రతా కారణాల వల్ల బ్లాక్ చేయబడ్డాయి. దయచేసి విద్యార్థి గమనికలను సమీక్షించి, మళ్లీ ప్రయత్నించండి.',
     generalError: 'సూచనలను రూపొందించడంలో విఫలమైంది. దయచేసి మళ్లీ ప్రయత్నించండి.',
+    translationError: 'సూచనలను అనువదించడం సాధ్యం కాలేదు. అసలు వచనాన్ని చూపుతోంది.',
+    translating: 'అనువదిస్తోంది...',
   },
 };
 
 export function StudentSuggestions({ student }: { student: Student }) {
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<GenerateStudentSuggestionsOutput | null>(null);
+  const [originalSuggestions, setOriginalSuggestions] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
   const { language } = useLanguage();
@@ -157,18 +185,58 @@ export function StudentSuggestions({ student }: { student: Student }) {
   const studentName = student.name[language] || student.name['English'];
   const studentNotes = student.notes?.[language] || student.notes?.['English'];
 
+  useEffect(() => {
+    if (originalSuggestions && language !== 'English') {
+      const translateSuggestions = async () => {
+        setIsLoading(true);
+        try {
+          const { translations } = await translateText({ text: originalSuggestions, targetLanguages: [language] });
+          if (translations[language]) {
+            setResult({ suggestions: translations[language] });
+          }
+        } catch (e) {
+          console.error("Translation error", e);
+          toast({ variant: 'destructive', title: 'Error', description: t.translationError });
+          setResult({ suggestions: originalSuggestions });
+        } finally {
+          setIsLoading(false);
+        }
+      };
+      translateSuggestions();
+    } else if (originalSuggestions && language === 'English') {
+        setResult({ suggestions: originalSuggestions });
+    }
+  }, [language, originalSuggestions, t.translationError, toast]);
+
   const handleGenerate = async () => {
     setIsLoading(true);
     setResult(null);
+    setOriginalSuggestions(null);
     setError(null);
     try {
+      // Always generate in English first to have a source for translations
       const suggestions = await generateStudentSuggestions({
         ...student,
-        name: studentName,
-        language: language,
-        notes: studentNotes,
+        name: student.name['English'],
+        language: 'English',
+        notes: student.notes?.['English'],
       });
-      setResult(suggestions);
+      
+      setOriginalSuggestions(suggestions.suggestions);
+
+      if (language === 'English') {
+        setResult(suggestions);
+      } else {
+        // Trigger translation effect
+        const { translations } = await translateText({ text: suggestions.suggestions, targetLanguages: [language] });
+        if (translations[language]) {
+          setResult({ suggestions: translations[language] });
+        } else {
+            // Fallback if translation fails
+             setResult(suggestions);
+        }
+      }
+
     } catch (e: any) {
       console.error(e);
       if (e.message.includes('SAFETY')) {
@@ -218,7 +286,7 @@ export function StudentSuggestions({ student }: { student: Student }) {
       </CardContent>
       <CardContent>
         <Button onClick={handleGenerate} disabled={isLoading} className="w-full">
-            {isLoading ? t.generatingButton : t.generateButton}
+            {isLoading ? (result ? t.translating : t.generatingButton) : t.generateButton}
         </Button>
       </CardContent>
     </Card>
