@@ -12,6 +12,11 @@ import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 import * as pdfjs from 'pdfjs-dist/legacy/build/pdf.mjs';
 
+// Set the workerSrc to ensure the worker script can be found.
+// This points to the version of the script that is copied to the public directory.
+pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/legacy/build/pdf.worker.mjs`;
+
+
 const GenerateLessonPlanInputSchema = z.object({
   lessonPdfDataUri: z
     .string()
@@ -99,5 +104,3 @@ const generateLessonPlanFlow = ai.defineFlow(
     return output!;
   }
 );
-
-
