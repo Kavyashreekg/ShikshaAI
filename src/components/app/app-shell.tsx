@@ -11,6 +11,7 @@ import {
   Layers,
   Users,
   BotMessageSquare,
+  FileSignature,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -38,6 +39,7 @@ const navItems = [
   { href: '/visual-aids', label: 'Visual Aids', icon: ImageIcon },
   { href: '/student-assessment', label: 'Student Assessment', icon: Users },
   { href: '/lesson-planner', label: 'Lesson Planner', icon: CalendarCheck },
+  { href: '/reading-assessment', label: 'Reading Assessment', icon: FileSignature },
 ];
 
 export function AppShell({ children }: { children: React.ReactNode }) {

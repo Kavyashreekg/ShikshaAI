@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { AppShell } from '@/components/app/app-shell';
 import { PageHeader } from '@/components/app/page-header';
 import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { BookText, Layers, BrainCircuit, Paintbrush, Users, CalendarCheck } from 'lucide-react';
+import { BookText, Layers, BrainCircuit, Paintbrush, Users, CalendarCheck, FileSignature } from 'lucide-react';
 import { useLanguage } from '@/context/language-context';
 
 const pageTranslations = {
@@ -216,6 +216,32 @@ const features = [
       Telugu: {
         title: 'ఏఐ పాఠ ప్రణాళిక',
         description: 'సమయం ఆదా చేయడానికి వారపు పాఠ ప్రణాళికలను రూపొందించండి.',
+      },
+    },
+  },
+   {
+    href: '/reading-assessment',
+    icon: <FileSignature className="h-8 w-8 text-primary" />,
+    translations: {
+      English: {
+        title: 'Reading Assessment',
+        description: 'Generate passages to improve vocabulary.',
+      },
+      Hindi: {
+        title: 'पठन मूल्यांकन',
+        description: 'शब्दावली में सुधार के लिए अनुच्छेद उत्पन्न करें।',
+      },
+      Marathi: {
+        title: 'वाचन मूल्यांकन',
+        description: 'शब्दसंग्रह सुधारण्यासाठी परिच्छेद तयार करा.',
+      },
+       Kannada: {
+        title: 'ಓದುವಿಕೆ ಮೌಲ್ಯಮಾಪನ',
+        description: 'ಶಬ್ದಕೋಶವನ್ನು ಸುಧಾರಿಸಲು ಭಾಗಗಳನ್ನು ರಚಿಸಿ.',
+      },
+      Telugu: {
+        title: 'పఠన మూల్యాంకనం',
+        description: 'పదజాలం మెరుగుపరచడానికి భాగాలను రూపొందించండి.',
       },
     },
   },
