@@ -19,7 +19,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { UploadCloud, Layers, ShieldAlert, ChevronDown } from 'lucide-react';
+import { UploadCloud, Layers, ShieldAlert, Check, ChevronsUpDown } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useLanguage } from '@/context/language-context';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -31,14 +31,8 @@ import {
   CommandItem,
   CommandList,
 } from '@/components/ui/command';
-import { Checkbox } from '@/components/ui/checkbox';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuCheckboxItem,
-} from '@/components/ui/dropdown-menu';
+import { cn } from '@/lib/utils';
+
 
 const translations = {
   English: {
@@ -47,8 +41,7 @@ const translations = {
     photoLabel: 'Textbook Page Photo',
     uploadPrompt: 'Click to upload image',
     gradeLevelsLabel: 'Grade Levels',
-    gradeLevelsPlaceholder: 'e.g., 2, 3, 4',
-    selectGrades: 'Select grades',
+    selectGrades: 'Select grades...',
     subjectLabel: 'Subject',
     subjectPlaceholder: 'Select a subject',
     chapterLabel: 'Chapter',
@@ -66,9 +59,16 @@ const translations = {
     errorDescription: 'Failed to generate worksheets. Please try again.',
     formErrors: {
       photo: 'Please upload an image file.',
-      gradeLevels: 'Please enter at least one grade level (e.g., 3, 4, 5).',
+      gradeLevels: 'Please select at least one grade level.',
       subject: 'Please select a subject.',
       chapter: 'Please select a chapter.',
+    },
+    grades: {
+      'Grade 1': 'Grade 1', 'Grade 2': 'Grade 2', 'Grade 3': 'Grade 3', 'Grade 4': 'Grade 4', 'Grade 5': 'Grade 5', 'Grade 6': 'Grade 6', 'Grade 7': 'Grade 7', 'Grade 8': 'Grade 8', 'Grade 9': 'Grade 9', 'Grade 10': 'Grade 10', 'Grade 11': 'Grade 11', 'Grade 12': 'Grade 12',
+    },
+    command: {
+        empty: 'No grades found.',
+        placeholder: 'Search grades...',
     }
   },
   Hindi: {
@@ -77,8 +77,7 @@ const translations = {
     photoLabel: 'पाठ्यपुस्तक पृष्ठ फोटो',
     uploadPrompt: 'छवि अपलोड करने के लिए क्लिक करें',
     gradeLevelsLabel: 'ग्रेड स्तर',
-    gradeLevelsPlaceholder: 'जैसे, 2, 3, 4',
-    selectGrades: 'ग्रेड चुनें',
+    selectGrades: 'ग्रेड चुनें...',
     subjectLabel: 'विषय',
     subjectPlaceholder: 'एक विषय चुनें',
     chapterLabel: 'अध्याय',
@@ -96,9 +95,16 @@ const translations = {
     errorDescription: 'वर्कशीट उत्पन्न करने में विफल। कृपया पुनः प्रयास करें।',
      formErrors: {
       photo: 'कृपया एक छवि फ़ाइल अपलोड करें।',
-      gradeLevels: 'कृपया कम से-कम एक ग्रेड स्तर दर्ज करें (जैसे, 3, 4, 5)।',
+      gradeLevels: 'कृपया कम से-कम एक ग्रेड स्तर चुनें।',
       subject: 'कृपया एक विषय चुनें।',
       chapter: 'कृपया एक अध्याय चुनें।',
+    },
+    grades: {
+      'Grade 1': 'ग्रेड 1', 'Grade 2': 'ग्रेड 2', 'Grade 3': 'ग्रेड 3', 'Grade 4': 'ग्रेड 4', 'Grade 5': 'ग्रेड 5', 'Grade 6': 'ग्रेड 6', 'Grade 7': 'ग्रेड 7', 'Grade 8': 'ग्रेड 8', 'Grade 9': 'ग्रेड 9', 'Grade 10': 'ग्रेड 10', 'Grade 11': 'ग्रेड 11', 'Grade 12': 'ग्रेड 12',
+    },
+    command: {
+        empty: 'कोई ग्रेड नहीं मिला।',
+        placeholder: 'ग्रेड खोजें...',
     }
   },
   Marathi: {
@@ -107,8 +113,7 @@ const translations = {
     photoLabel: 'पाठ्यपुस्तक पृष्ठ फोटो',
     uploadPrompt: 'प्रतिमा अपलोड करण्यासाठी क्लिक करा',
     gradeLevelsLabel: 'इयत्ता स्तर',
-    gradeLevelsPlaceholder: 'उदा., 2, 3, 4',
-    selectGrades: 'इयत्ता निवडा',
+    selectGrades: 'इयत्ता निवडा...',
     subjectLabel: 'विषय',
     subjectPlaceholder: 'एक विषय निवडा',
     chapterLabel: 'धडा',
@@ -126,9 +131,16 @@ const translations = {
     errorDescription: 'कार्यपत्रके तयार करण्यात अयशस्वी. कृपया पुन्हा प्रयत्न करा.',
     formErrors: {
       photo: 'कृपया एक प्रतिमा फाइल अपलोड करा.',
-      gradeLevels: 'कृपया किमान एक इयत्ता स्तर प्रविष्ट करा (उदा., 3, 4, 5).',
+      gradeLevels: 'कृपया किमान एक इयत्ता स्तर निवडा.',
       subject: 'कृपया एक विषय निवडा.',
       chapter: 'कृपया एक धडा निवडा.',
+    },
+    grades: {
+      'Grade 1': 'इयत्ता १', 'Grade 2': 'इयत्ता २', 'Grade 3': 'इयत्ता ३', 'Grade 4': 'इयत्ता ४', 'Grade 5': 'इयत्ता ५', 'Grade 6': 'इयत्ता ६', 'Grade 7': 'इयत्ता ७', 'Grade 8': 'इयत्ता ८', 'Grade 9': 'इयत्ता ९', 'Grade 10': 'इयत्ता १०', 'Grade 11': 'इयत्ता ११', 'Grade 12': 'इयत्ता १२',
+    },
+    command: {
+        empty: 'कोणतीही श्रेणी आढळली नाही.',
+        placeholder: 'श्रेणी शोधा...',
     }
   },
   Kashmiri: {
@@ -137,8 +149,7 @@ const translations = {
     photoLabel: 'درسی کتابچہِ ہُنٛد تصویر',
     uploadPrompt: 'تصویر اپلوڈ کرنہٕ خٲطرٕ کلک کریو',
     gradeLevelsLabel: 'گریڈ سطح',
-    gradeLevelsPlaceholder: 'مثلن، 2، 3، 4',
-    selectGrades: 'گریڈ ژارٕو',
+    selectGrades: 'گریڈ ژارٕو...',
     subjectLabel: 'مضمون',
     subjectPlaceholder: 'اکھ مضمون ژارٕو',
     chapterLabel: 'باب',
@@ -156,9 +167,16 @@ const translations = {
     errorDescription: 'ورک شیٹس تیار کرنس مَنٛز ناکام۔ مہربانی کرِتھ دوبارٕ کوشش کریو۔',
      formErrors: {
       photo: 'مہربانی کرِتھ اَکھ تصویر فائل اپلوڈ کریو۔',
-      gradeLevels: 'مہربانی کرِتھ کم از کم اَکھ گریڈ سطح دِیو (مثلن، 3، 4، 5)۔',
+      gradeLevels: 'مہربانی کرِتھ کم از کم اَکھ گریڈ سطح ژارٕو۔',
       subject: 'مہربانی کرِتھ اَکھ مضمون ژارٕو۔',
       chapter: 'مہربانی کرِتھ اَکھ باب ژارٕو۔',
+    },
+    grades: {
+      'Grade 1': 'گریڈ ۱', 'Grade 2': 'گریڈ ۲', 'Grade 3': 'گریڈ ۳', 'Grade 4': 'گریڈ ۴', 'Grade 5': 'گریڈ ۵', 'Grade 6': 'گریڈ ۶', 'Grade 7': 'گریڈ ۷', 'Grade 8': 'گریڈ ۸', 'Grade 9': 'گریڈ ۹', 'Grade 10': 'گریڈ ۱۰', 'Grade 11': 'گریڈ ۱۱', 'Grade 12': 'گریڈ ۱۲',
+    },
+    command: {
+        empty: 'کانٛہہ گریڈ نہٕ ملیو۔',
+        placeholder: 'گریڈ ژھارٕو...',
     }
   },
   Bengali: {
@@ -167,8 +185,7 @@ const translations = {
     photoLabel: 'পাঠ্যপুস্তকের পৃষ্ঠার ছবি',
     uploadPrompt: 'ছবি আপলোড করতে ক্লিক করুন',
     gradeLevelsLabel: 'গ্রেড স্তর',
-    gradeLevelsPlaceholder: 'যেমন, ২, ৩, ৪',
-    selectGrades: 'গ্রেড নির্বাচন করুন',
+    selectGrades: 'গ্রেড নির্বাচন করুন...',
     subjectLabel: 'বিষয়',
     subjectPlaceholder: 'একটি বিষয় নির্বাচন করুন',
     chapterLabel: 'অধ্যায়',
@@ -186,9 +203,16 @@ const translations = {
     errorDescription: 'ওয়ার্কশিট তৈরি করতে ব্যর্থ। অনুগ্রহ করে আবার চেষ্টা করুন।',
     formErrors: {
       photo: 'অনুগ্রহ করে একটি ছবি ফাইল আপলোড করুন।',
-      gradeLevels: 'অনুগ্রহ করে কমপক্ষে একটি গ্রেড স্তর লিখুন (যেমন, 3, 4, 5)।',
+      gradeLevels: 'অনুগ্রহ করে কমপক্ষে একটি গ্রেড স্তর নির্বাচন করুন।',
       subject: 'অনুগ্রহ করে একটি বিষয় নির্বাচন করুন।',
       chapter: 'অনুগ্রহ করে একটি অধ্যায় নির্বাচন করুন।',
+    },
+    grades: {
+      'Grade 1': 'গ্রেড ১', 'Grade 2': 'গ্রেড ২', 'Grade 3': 'গ্রেড ৩', 'Grade 4': 'গ্রেড ৪', 'Grade 5': 'গ্রেড ৫', 'Grade 6': 'গ্রেড ৬', 'Grade 7': 'গ্রেড ৭', 'Grade 8': 'গ্রেড ৮', 'Grade 9': 'গ্রেড ৯', 'Grade 10': 'গ্রেড ১০', 'Grade 11': 'গ্রেড ১১', 'Grade 12': 'গ্রেড ১২',
+    },
+    command: {
+        empty: 'কোন গ্রেড পাওয়া যায়নি।',
+        placeholder: 'গ্রেড অনুসন্ধান করুন...',
     }
   },
   Tamil: {
@@ -197,8 +221,7 @@ const translations = {
     photoLabel: 'பாடநூல் பக்க புகைப்படம்',
     uploadPrompt: 'படத்தை பதிவேற்ற கிளிக் செய்யவும்',
     gradeLevelsLabel: 'வகுப்பு நிலைகள்',
-    gradeLevelsPlaceholder: 'எ.கா., 2, 3, 4',
-    selectGrades: 'வகுப்புகளைத் தேர்ந்தெடுக்கவும்',
+    selectGrades: 'வகுப்புகளைத் தேர்ந்தெடுக்கவும்...',
     subjectLabel: 'பாடம்',
     subjectPlaceholder: 'ஒரு பாடத்தைத் தேர்ந்தெடுக்கவும்',
     chapterLabel: 'அத்தியாயம்',
@@ -216,9 +239,16 @@ const translations = {
     errorDescription: 'பணித்தாள்களை உருவாக்கத் தவறிவிட்டது। தயவுசெய்து மீண்டும் முயற்சிக்கவும்।',
      formErrors: {
       photo: 'தயவுசெய்து ஒரு படக் கோப்பை பதிவேற்றவும்.',
-      gradeLevels: 'தயவுசெய்து குறைந்தது ஒரு வகுப்பு நிலையையாவது உள்ளிடவும் (எ.கா., 3, 4, 5).',
+      gradeLevels: 'தயவுசெய்து குறைந்தது ஒரு வகுப்பு நிலையையாவது தேர்ந்தெடுக்கவும்.',
       subject: 'தயவுசெய்து ஒரு பாடத்தைத் தேர்ந்தெடுக்கவும்.',
       chapter: 'தயவுசெய்து ஒரு அத்தியாயத்தைத் தேர்ந்தெடுக்கவும்.',
+    },
+    grades: {
+      'Grade 1': 'வகுப்பு 1', 'Grade 2': 'வகுப்பு 2', 'Grade 3': 'வகுப்பு 3', 'Grade 4': 'வகுப்பு 4', 'Grade 5': 'வகுப்பு 5', 'Grade 6': 'வகுப்பு 6', 'Grade 7': 'வகுப்பு 7', 'Grade 8': 'வகுப்பு 8', 'Grade 9': 'வகுப்பு 9', 'Grade 10': 'வகுப்பு 10', 'Grade 11': 'வகுப்பு 11', 'Grade 12': 'வகுப்பு 12',
+    },
+    command: {
+        empty: 'வகுப்புகள் எதுவும் கிடைக்கவில்லை.',
+        placeholder: 'வகுப்புகளைத் தேடு...',
     }
   },
   Gujarati: {
@@ -227,8 +257,7 @@ const translations = {
     photoLabel: 'પાઠ્યપુસ્તક પૃષ્ઠ ફોટો',
     uploadPrompt: 'છબી અપલોડ કરવા માટે ક્લિક કરો',
     gradeLevelsLabel: 'ગ્રેડ સ્તર',
-    gradeLevelsPlaceholder: 'દા.ત., 2, 3, 4',
-    selectGrades: 'ગ્રેડ પસંદ કરો',
+    selectGrades: 'ગ્રેડ પસંદ કરો...',
     subjectLabel: 'વિષય',
     subjectPlaceholder: 'એક વિષય પસંદ કરો',
     chapterLabel: 'પ્રકરણ',
@@ -246,9 +275,16 @@ const translations = {
     errorDescription: 'વર્કશીટ બનાવવામાં નિષ્ફળ. કૃપા કરીને ફરીથી પ્રયાસ કરો.',
      formErrors: {
       photo: 'કૃપા કરીને એક છબી ફાઇલ અપલોડ કરો.',
-      gradeLevels: 'કૃપા કરીને ઓછામાં ઓછું એક ગ્રેડ સ્તર દાખલ કરો (દા.ત., 3, 4, 5).',
+      gradeLevels: 'કૃપા કરીને ઓછામાં ઓછું એક ગ્રેડ સ્તર પસંદ કરો.',
       subject: 'કૃપા કરીને એક વિષય પસંદ કરો.',
       chapter: 'કૃપા કરીને એક પ્રકરણ પસંદ કરો.',
+    },
+    grades: {
+      'Grade 1': 'ગ્રેડ 1', 'Grade 2': 'ગ્રેડ 2', 'Grade 3': 'ગ્રેડ 3', 'Grade 4': 'ગ્રેડ 4', 'Grade 5': 'ગ્રેડ 5', 'Grade 6': 'ગ્રેડ 6', 'Grade 7': 'ગ્રેડ 7', 'Grade 8': 'ગ્રેડ 8', 'Grade 9': 'ગ્રેડ 9', 'Grade 10': 'ગ્રેડ 10', 'Grade 11': 'ગ્રેડ 11', 'Grade 12': 'ગ્રેડ 12',
+    },
+    command: {
+        empty: 'કોઈ ગ્રેડ મળ્યો નથી.',
+        placeholder: 'ગ્રેડ શોધો...',
     }
   },
   Malayalam: {
@@ -257,8 +293,7 @@ const translations = {
     photoLabel: 'പാഠപുസ്തക പേജ് ഫോട്ടോ',
     uploadPrompt: 'ചിത്രം അപ്‌ലോഡ് ചെയ്യാൻ ക്ലിക്കുചെയ്യുക',
     gradeLevelsLabel: 'ഗ്രേഡ് നിലകൾ',
-    gradeLevelsPlaceholder: 'ഉദാഹരണത്തിന്, 2, 3, 4',
-    selectGrades: 'ഗ്രേഡുകൾ തിരഞ്ഞെടുക്കുക',
+    selectGrades: 'ഗ്രേഡുകൾ തിരഞ്ഞെടുക്കുക...',
     subjectLabel: 'വിഷയം',
     subjectPlaceholder: 'ഒരു വിഷയം തിരഞ്ഞെടുക്കുക',
     chapterLabel: 'അദ്ധ്യായം',
@@ -276,9 +311,16 @@ const translations = {
     errorDescription: 'വർക്ക്ഷീറ്റുകൾ ഉണ്ടാക്കുന്നതിൽ പരാജയപ്പെട്ടു. ദയവായി വീണ്ടും ശ്രമിക്കുക.',
      formErrors: {
       photo: 'ദയവായി ഒരു ചിത്ര ഫയൽ അപ്‌ലോഡ് ചെയ്യുക.',
-      gradeLevels: 'ദയവായി കുറഞ്ഞത് ഒരു ഗ്രേഡ് നിലയെങ്കിലും നൽകുക (ഉദാഹരണത്തിന്, 3, 4, 5).',
+      gradeLevels: 'ദയവായി കുറഞ്ഞത് ഒരു ഗ്രേഡ് നിലയെങ്കിലും തിരഞ്ഞെടുക്കുക.',
       subject: 'ദയവായി ഒരു വിഷയം തിരഞ്ഞെടുക്കുക.',
       chapter: 'ദയവായി ഒരു അദ്ധ്യായം തിരഞ്ഞെടുക്കുക.',
+    },
+    grades: {
+      'Grade 1': 'ഗ്രേഡ് 1', 'Grade 2': 'ഗ്രേഡ് 2', 'Grade 3': 'ഗ്രേഡ് 3', 'Grade 4': 'ഗ്രേഡ് 4', 'Grade 5': 'ഗ്രേഡ് 5', 'Grade 6': 'ഗ്രേഡ് 6', 'Grade 7': 'ഗ്രേഡ് 7', 'Grade 8': 'ഗ്രേഡ് 8', 'Grade 9': 'ഗ്രേഡ് 9', 'Grade 10': 'ഗ്രേഡ് 10', 'Grade 11': 'ഗ്രേഡ് 11', 'Grade 12': 'ഗ്രേഡ് 12',
+    },
+    command: {
+        empty: 'ഗ്രേഡുകളൊന്നും കണ്ടെത്തിയില്ല.',
+        placeholder: 'ഗ്രേഡുകൾ തിരയുക...',
     }
   },
   Punjabi: {
@@ -287,8 +329,7 @@ const translations = {
     photoLabel: 'ਪਾਠ ਪੁਸਤਕ ਪੰਨਾ ਫੋਟੋ',
     uploadPrompt: 'ਚਿੱਤਰ ਅੱਪਲੋਡ ਕਰਨ ਲਈ ਕਲਿੱਕ ਕਰੋ',
     gradeLevelsLabel: 'ਗ੍ਰੇਡ ਪੱਧਰ',
-    gradeLevelsPlaceholder: 'ਜਿਵੇਂ, 2, 3, 4',
-    selectGrades: 'ਗ੍ਰੇਡ ਚੁਣੋ',
+    selectGrades: 'ਗ੍ਰੇਡ ਚੁਣੋ...',
     subjectLabel: 'ਵਿਸ਼ਾ',
     subjectPlaceholder: 'ਇੱਕ ਵਿਸ਼ਾ ਚੁਣੋ',
     chapterLabel: 'ਅਧਿਆਇ',
@@ -306,9 +347,16 @@ const translations = {
     errorDescription: 'ਵਰਕਸ਼ੀਟਾਂ ਬਣਾਉਣ ਵਿੱਚ ਅਸਫਲ। ਕਿਰਪਾ ਕਰਕੇ ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ।',
      formErrors: {
       photo: 'ਕਿਰਪਾ ਕਰਕੇ ਇੱਕ ਚਿੱਤਰ ਫਾਈਲ ਅੱਪਲੋਡ ਕਰੋ।',
-      gradeLevels: 'ਕਿਰਪਾ ਕਰਕੇ ਘੱਟੋ-ਘੱਟ ਇੱਕ ਗ੍ਰੇਡ ਪੱਧਰ ਦਾਖਲ ਕਰੋ (ਜਿਵੇਂ, 3, 4, 5)।',
+      gradeLevels: 'ਕਿਰਪਾ ਕਰਕੇ ਘੱਟੋ-ਘੱਟ ਇੱਕ ਗ੍ਰੇਡ ਪੱਧਰ ਚੁਣੋ।',
       subject: 'ਕਿਰਪਾ ਕਰਕੇ ਇੱਕ ਵਿਸ਼ਾ ਚੁਣੋ।',
       chapter: 'ਕਿਰਪਾ ਕਰਕੇ ਇੱਕ ਅਧਿਆਇ ਚੁਣੋ।',
+    },
+    grades: {
+      'Grade 1': 'ਗ੍ਰੇਡ 1', 'Grade 2': 'ਗ੍ਰੇਡ 2', 'Grade 3': 'ਗ੍ਰੇਡ 3', 'Grade 4': 'ਗ੍ਰੇਡ 4', 'Grade 5': 'ਗ੍ਰੇਡ 5', 'Grade 6': 'ਗ੍ਰੇਡ 6', 'Grade 7': 'ਗ੍ਰੇਡ 7', 'Grade 8': 'ਗ੍ਰੇਡ 8', 'Grade 9': 'ਗ੍ਰੇਡ 9', 'Grade 10': 'ਗ੍ਰੇਡ 10', 'Grade 11': 'ਗ੍ਰੇਡ 11', 'Grade 12': 'ਗ੍ਰੇਡ 12',
+    },
+    command: {
+        empty: 'ਕੋਈ ਗ੍ਰੇਡ ਨਹੀਂ ਮਿਲਿਆ।',
+        placeholder: 'ਗ੍ਰੇਡ ਖੋਜੋ...',
     }
   },
   Odia: {
@@ -317,8 +365,7 @@ const translations = {
     photoLabel: 'ପାଠ୍ୟପୁସ୍ତକ ପୃଷ୍ଠା ଫଟୋ',
     uploadPrompt: 'ପ୍ରତିଛବି ଅପଲୋଡ୍ କରିବାକୁ କ୍ଲିକ୍ କରନ୍ତୁ',
     gradeLevelsLabel: 'ଗ୍ରେଡ୍ ସ୍ତର',
-    gradeLevelsPlaceholder: 'ଉଦାହରଣ ସ୍ୱରୂପ, 2, 3, 4',
-    selectGrades: 'ଗ୍ରେଡ୍ ବାଛନ୍ତୁ',
+    selectGrades: 'ଗ୍ରେଡ୍ ବାଛନ୍ତୁ...',
     subjectLabel: 'ବିଷୟ',
     subjectPlaceholder: 'ଏକ ବିଷୟ ବାଛନ୍ତୁ',
     chapterLabel: 'ଅଧ୍ୟାୟ',
@@ -336,9 +383,16 @@ const translations = {
     errorDescription: 'କାର୍ଯ୍ୟପତ୍ର ସୃଷ୍ଟି କରିବାରେ ବିଫଳ। ଦୟାକରି ପୁଣି ଚେଷ୍ଟା କରନ୍ତୁ।',
     formErrors: {
       photo: 'ଦୟାକରି ଏକ ପ୍ରତିଛବି ଫାଇଲ୍ ଅପଲୋଡ୍ କରନ୍ତୁ।',
-      gradeLevels: 'ଦୟାକରି ଅତିକମରେ ଗୋଟିଏ ଗ୍ରେଡ୍ ସ୍ତର ପ୍ରବେଶ କରନ୍ତୁ (ଉଦାହରଣ ସ୍ୱରୂପ, 3, 4, 5)।',
+      gradeLevels: 'ଦୟାକରି ଅତିକମରେ ଗୋଟିଏ ଗ୍ରେଡ୍ ସ୍ତର ଚୟନ କରନ୍ତୁ।',
       subject: 'ଦୟାକରି ଏକ ବିଷୟ ବାଛନ୍ତୁ।',
       chapter: 'ଦୟାକରି ଏକ ଅଧ୍ୟାୟ ବାଛନ୍ତୁ।',
+    },
+    grades: {
+      'Grade 1': 'ଗ୍ରେଡ୍ 1', 'Grade 2': 'ଗ୍ରେଡ୍ 2', 'Grade 3': 'ଗ୍ରେଡ୍ 3', 'Grade 4': 'ଗ୍ରେଡ୍ 4', 'Grade 5': 'ଗ୍ରେଡ୍ 5', 'Grade 6': 'ଗ୍ରେଡ୍ 6', 'Grade 7': 'ଗ୍ରେଡ୍ 7', 'Grade 8': 'ଗ୍ରେଡ୍ 8', 'Grade 9': 'ଗ୍ରେଡ୍ 9', 'Grade 10': 'ଗ୍ରେଡ୍ 10', 'Grade 11': 'ଗ୍ରେଡ୍ 11', 'Grade 12': 'ଗ୍ରେଡ୍ 12',
+    },
+    command: {
+        empty: 'କୌଣସି ଗ୍ରେଡ୍ ମିଳିଲା ନାହିଁ।',
+        placeholder: 'ଗ୍ରେଡ୍ ଖୋଜନ୍ତୁ...',
     }
   },
   Assamese: {
@@ -347,8 +401,7 @@ const translations = {
     photoLabel: 'পাঠ্যপুথিৰ পৃষ্ঠাৰ ফটো',
     uploadPrompt: 'ছবি আপলোড কৰিবলৈ ক্লিক কৰক',
     gradeLevelsLabel: 'গ্ৰেড স্তৰ',
-    gradeLevelsPlaceholder: 'যেনে, ২, ৩, ৪',
-    selectGrades: 'গ্ৰেড বাছনি কৰক',
+    selectGrades: 'গ্ৰেড বাছনি কৰক...',
     subjectLabel: 'বিষয়',
     subjectPlaceholder: 'এটা বিষয় বাছনি কৰক',
     chapterLabel: 'অধ্যায়',
@@ -366,9 +419,16 @@ const translations = {
     errorDescription: 'কাৰ্যপত্ৰ সৃষ্টি কৰাত విఫಲ হৈছে। অনুগ্ৰহ কৰি পুনৰ চেষ্টা কৰক।',
     formErrors: {
       photo: 'অনুগ্ৰহ কৰি এখন ছবি ফাইল আপলোড কৰক।',
-      gradeLevels: 'অনুগ্ৰহ কৰি কমেও এটা গ্ৰেড স্তৰ প্ৰবিষ্ট কৰক (যেনে, ৩, ৪, ৫)।',
+      gradeLevels: 'অনুগ্ৰহ কৰি কমেও এটা গ্ৰেড স্তৰ বাছনি কৰক।',
       subject: 'অনুগ্ৰহ কৰি এটা বিষয় বাছনি কৰক।',
       chapter: 'অনুগ্ৰহ কৰি এটা অধ্যায় বাছনি কৰক।',
+    },
+    grades: {
+      'Grade 1': 'গ্ৰেড ১', 'Grade 2': 'গ্ৰেড ২', 'Grade 3': 'গ্ৰেড ৩', 'Grade 4': 'গ্ৰেড ৪', 'Grade 5': 'গ্ৰেড ৫', 'Grade 6': 'গ্ৰেড ৬', 'Grade 7': 'গ্ৰেড ৭', 'Grade 8': 'গ্ৰেড ৮', 'Grade 9': 'গ্ৰেড ৯', 'Grade 10': 'গ্ৰেড ১০', 'Grade 11': 'গ্ৰেড ১১', 'Grade 12': 'গ্ৰেড ১২',
+    },
+    command: {
+        empty: 'কোনো গ্ৰেড পোৱা ন’গ’ল।',
+        placeholder: 'গ্ৰেড সন্ধান কৰক...',
     }
   },
   Kannada: {
@@ -377,8 +437,7 @@ const translations = {
     photoLabel: 'ಪಠ್ಯಪುಸ್ತಕ ಪುಟದ ಫೋಟೋ',
     uploadPrompt: 'ಚಿತ್ರವನ್ನು ಅಪ್‌ಲೋಡ್ ಮಾಡಲು ಕ್ಲಿಕ್ ಮಾಡಿ',
     gradeLevelsLabel: 'ದರ್ಜೆ ಮಟ್ಟಗಳು',
-    gradeLevelsPlaceholder: 'ಉದಾ., 2, 3, 4',
-    selectGrades: 'ದರ್ಜೆಗಳನ್ನು ಆಯ್ಕೆಮಾಡಿ',
+    selectGrades: 'ದರ್ಜೆಗಳನ್ನು ಆಯ್ಕೆಮಾಡಿ...',
     subjectLabel: 'ವಿಷಯ',
     subjectPlaceholder: 'ಒಂದು ವಿಷಯವನ್ನು ಆಯ್ಕೆಮಾಡಿ',
     chapterLabel: 'ಅಧ್ಯಾಯ',
@@ -396,9 +455,16 @@ const translations = {
     errorDescription: 'ವರ್ಕ್‌ಶೀಟ್‌ಗಳನ್ನು ರಚಿಸಲು ವಿಫಲವಾಗಿದೆ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.',
     formErrors: {
       photo: 'ದಯವಿಟ್ಟು ಚಿತ್ರದ ಫೈಲ್ ಅನ್ನು ಅಪ್‌ಲೋಡ್ ಮಾಡಿ.',
-      gradeLevels: 'ದಯವಿಟ್ಟು ಕನಿಷ್ಠ ಒಂದು ದರ್ಜೆ ಮಟ್ಟವನ್ನು ನಮೂದಿಸಿ (ಉದಾ., 3, 4, 5).',
+      gradeLevels: 'ದಯವಿಟ್ಟು ಕನಿಷ್ಠ ಒಂದು ದರ್ಜೆ ಮಟ್ಟವನ್ನು ಆಯ್ಕೆಮಾಡಿ.',
       subject: 'ದಯವಿಟ್ಟು ಒಂದು ವಿಷಯವನ್ನು ಆಯ್ಕೆಮಾಡಿ.',
       chapter: 'ದಯವಿಟ್ಟು ಒಂದು ಅಧ್ಯಾಯವನ್ನು ಆಯ್ಕೆಮಾಡಿ.',
+    },
+    grades: {
+      'Grade 1': 'ದರ್ಜೆ 1', 'Grade 2': 'ದರ್ಜೆ 2', 'Grade 3': 'ದರ್ಜೆ 3', 'Grade 4': 'ದರ್ಜೆ 4', 'Grade 5': 'ದರ್ಜೆ 5', 'Grade 6': 'ದರ್ಜೆ 6', 'Grade 7': 'ದರ್ಜೆ 7', 'Grade 8': 'ದರ್ಜೆ 8', 'Grade 9': 'ದರ್ಜೆ 9', 'Grade 10': 'ದರ್ಜೆ 10', 'Grade 11': 'ದರ್ಜೆ 11', 'Grade 12': 'ದರ್ಜೆ 12',
+    },
+    command: {
+        empty: 'ಯಾವುದೇ ದರ್ಜೆಗಳು ಕಂಡುಬಂದಿಲ್ಲ.',
+        placeholder: 'ದರ್ಜೆಗಳನ್ನು ಹುಡುಕಿ...',
     }
   },
   Telugu: {
@@ -407,8 +473,7 @@ const translations = {
     photoLabel: 'పాఠ్యపుస్తక పేజీ ఫోటో',
     uploadPrompt: 'చిత్రాన్ని అప్‌లోడ్ చేయడానికి క్లిక్ చేయండి',
     gradeLevelsLabel: 'గ్రేడ్ స్థాయిలు',
-    gradeLevelsPlaceholder: 'ఉదా., 2, 3, 4',
-    selectGrades: 'గ్రేడ్‌లను ఎంచుకోండి',
+    selectGrades: 'గ్రేడ్‌లను ఎంచుకోండి...',
     subjectLabel: 'సబ్జెక్ట్',
     subjectPlaceholder: 'ఒక సబ్జెక్ట్‌ను ఎంచుకోండి',
     chapterLabel: 'అధ్యాయం',
@@ -426,9 +491,16 @@ const translations = {
     errorDescription: 'వర్క్‌షీట్‌లను రూపొందించడంలో విఫలమైంది. దయచేసి మళ్లీ ప్రయత్నించండి.',
     formErrors: {
       photo: 'దయచేసి ఒక చిత్ర ఫైల్‌ను అప్‌లోడ్ చేయండి.',
-      gradeLevels: 'దయచేసి కనీసం ఒక గ్రేడ్ స్థాయిని నమోదు చేయండి (ఉదా., 3, 4, 5).',
+      gradeLevels: 'దయచేసి కనీసం ఒక గ్రేడ్ స్థాయిని ఎంచుకోండి.',
       subject: 'దయచేసి ఒక సబ్జెక్ట్‌ను ఎంచుకోండి.',
       chapter: 'దయచేసి ఒక అధ్యాయాన్ని ఎంచుకోండి.',
+    },
+    grades: {
+      'Grade 1': 'గ్రేడ్ 1', 'Grade 2': 'గ్రేడ్ 2', 'Grade 3': 'గ్రేడ్ 3', 'Grade 4': 'గ్రేడ్ 4', 'Grade 5': 'గ్రేడ్ 5', 'Grade 6': 'గ్రేడ్ 6', 'Grade 7': 'గ్రేడ్ 7', 'Grade 8': 'గ్రేడ్ 8', 'Grade 9': 'గ్రేడ్ 9', 'Grade 10': 'గ్రేడ్ 10', 'Grade 11': 'గ్రేడ్ 11', 'Grade 12': 'గ్రేడ్ 12',
+    },
+    command: {
+        empty: 'గ్రేడ్‌లు ఏవీ కనుగొనబడలేదు.',
+        placeholder: 'గ్రేడ్‌లను శోధించండి...',
     }
   },
 };
@@ -516,6 +588,7 @@ export function WorksheetClient() {
   }
 
   const chaptersForSelectedSubject = subjects.find(s => s.value === selectedSubject)?.chapters || [];
+  const typedGradeTranslations = t.grades as Record<string, string>;
 
   return (
     <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
@@ -554,34 +627,54 @@ export function WorksheetClient() {
                 control={form.control}
                 name="gradeLevels"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="flex flex-col">
                     <FormLabel>{t.gradeLevelsLabel}</FormLabel>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <FormControl>
-                          <Button variant="outline" className="w-full justify-between">
-                            {selectedGrades.length > 0
-                              ? selectedGrades.map(g => `Grade ${g}`).join(', ')
-                              : t.selectGrades}
-                            <ChevronDown className="ml-2 h-4 w-4" />
-                          </Button>
-                        </FormControl>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width]">
-                        {grades.map((grade) => (
-                          <DropdownMenuCheckboxItem
-                            key={grade.value}
-                            checked={selectedGrades.includes(grade.value)}
-                            onSelect={(e) => {
-                              e.preventDefault();
-                              handleGradeSelect(grade.value);
-                            }}
-                          >
-                            {grade.label}
-                          </DropdownMenuCheckboxItem>
-                        ))}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                    <Popover>
+                        <PopoverTrigger asChild>
+                            <FormControl>
+                                <Button
+                                    variant="outline"
+                                    role="combobox"
+                                    className={cn(
+                                        "w-full justify-between",
+                                        !field.value && "text-muted-foreground"
+                                    )}
+                                >
+                                    {selectedGrades.length > 0
+                                        ? selectedGrades.map(g => typedGradeTranslations[grades.find(grade => grade.value === g)?.label || ''] || `Grade ${g}`).join(', ')
+                                        : t.selectGrades}
+                                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                </Button>
+                            </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+                            <Command>
+                                <CommandInput placeholder={t.command.placeholder} />
+                                <CommandList>
+                                    <CommandEmpty>{t.command.empty}</CommandEmpty>
+                                    <CommandGroup>
+                                        {grades.map((grade) => (
+                                            <CommandItem
+                                                value={grade.label}
+                                                key={grade.value}
+                                                onSelect={() => {
+                                                    handleGradeSelect(grade.value);
+                                                }}
+                                            >
+                                                <Check
+                                                    className={cn(
+                                                        "mr-2 h-4 w-4",
+                                                        selectedGrades.includes(grade.value) ? "opacity-100" : "opacity-0"
+                                                    )}
+                                                />
+                                                {typedGradeTranslations[grade.label] || grade.label}
+                                            </CommandItem>
+                                        ))}
+                                    </CommandGroup>
+                                </CommandList>
+                            </Command>
+                        </PopoverContent>
+                    </Popover>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -644,7 +737,7 @@ export function WorksheetClient() {
             {result && result.worksheets.length > 0 && (
               <Tabs defaultValue={result.worksheets[0].gradeLevel} className="w-full">
                 <TabsList>
-                  {result.worksheets.map(w => <TabsTrigger key={w.gradeLevel} value={w.gradeLevel}>Grade {w.gradeLevel}</TabsTrigger>)}
+                  {result.worksheets.map(w => <TabsTrigger key={w.gradeLevel} value={w.gradeLevel}>{typedGradeTranslations[grades.find(g => g.value === w.gradeLevel)?.label || ''] || `Grade ${w.gradeLevel}`}</TabsTrigger>)}
                 </TabsList>
                 {result.worksheets.map(w => (
                   <TabsContent key={w.gradeLevel} value={w.gradeLevel}>
