@@ -636,6 +636,9 @@ export function WorksheetClient() {
     setError(null);
     setPreview(null);
     setSelectedGrades([]);
+    if (isClient) {
+      localStorage.removeItem('generatedWorksheets');
+    }
   };
 
   const chaptersForSelectedSubject = subjects.find(s => s.value === selectedSubject)?.chapters || [];

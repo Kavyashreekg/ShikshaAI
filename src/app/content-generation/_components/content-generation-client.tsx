@@ -494,6 +494,9 @@ export function ContentGenerationClient() {
     setVideoUrl(null);
     setError(null);
     setVideoError(null);
+    if (isClient) {
+      localStorage.removeItem('generatedStory');
+    }
   }
 
   return (
