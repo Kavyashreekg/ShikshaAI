@@ -1,11 +1,12 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Send, Sparkles, User, BotMessageSquare, Lightbulb } from 'lucide-react';
+import {runFlow} from 'genkit/next/client';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -42,14 +43,18 @@ export function SahayakBotClient() {
     defaultValues: { prompt: '' },
   });
 
-  useEffect(() => {
+  const scrollToBottom = useCallback(() => {
     if (scrollAreaRef.current) {
-      scrollAreaRef.current.scrollTo({
+        scrollAreaRef.current.scrollTo({
         top: scrollAreaRef.current.scrollHeight,
         behavior: 'smooth',
       });
     }
-  }, [messages]);
+  }, []);
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, scrollToBottom]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
@@ -61,21 +66,54 @@ export function SahayakBotClient() {
     setMessages((prev) => [...prev, userMessage]);
     form.reset();
 
+    const botMessageId = (Date.now() + 1).toString();
+    // Add a placeholder bot message
+    setMessages((prev) => [...prev, { id: botMessageId, type: 'bot', content: '' }]);
+    
     try {
-      const result = await sahayakBotFlow({
-        query: values.prompt,
-        language: language,
-      });
+        const flow = await runFlow(sahayakBotFlow, {
+            query: values.prompt,
+            language: language,
+        });
 
-      const botMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        type: 'bot',
-        content: result.response,
-        data: result,
-      };
-      setMessages((prev) => [...prev, botMessage]);
+        let accumulatedContent = '';
+        for await (const chunk of flow.stream()) {
+            if (chunk.text) {
+                accumulatedContent += chunk.text;
+                setMessages(prev =>
+                    prev.map(msg =>
+                        msg.id === botMessageId
+                        ? { ...msg, content: accumulatedContent }
+                        : msg
+                    )
+                );
+            }
+        }
+        
+        const output = await flow.output();
+
+        if (output) {
+             setMessages(prev =>
+                prev.map(msg =>
+                    msg.id === botMessageId
+                    ? { ...msg, content: output.response || accumulatedContent, data: output }
+                    : msg
+                )
+            );
+        } else if (accumulatedContent) {
+            // This is a text-only response
+             setMessages(prev =>
+                prev.map(msg =>
+                    msg.id === botMessageId
+                    ? { ...msg, content: accumulatedContent, data: { response: accumulatedContent } }
+                    : msg
+                )
+            );
+        }
+
     } catch (e: any) {
       console.error(e);
+      setMessages((prev) => prev.filter(msg => msg.id !== botMessageId));
       toast({
         variant: 'destructive',
         title: 'An error occurred.',
@@ -88,9 +126,18 @@ export function SahayakBotClient() {
 
   const renderBotMessage = (message: Message) => {
     const { data } = message;
+    const isLoadingMessage = isLoading && !message.content && !message.data;
+
     return (
       <div className="space-y-4">
-        <p className="whitespace-pre-wrap">{message.content}</p>
+        {isLoadingMessage ? (
+             <div className="space-y-2">
+                <Skeleton className="h-4 w-3/4" />
+                <Skeleton className="h-4 w-1/2" />
+            </div>
+        ) : (
+            <p className="whitespace-pre-wrap">{message.content}</p>
+        )}
         {data?.story && (
           <Card>
             <CardHeader>
@@ -191,21 +238,6 @@ export function SahayakBotClient() {
               )}
             </div>
           ))}
-          {isLoading && (
-            <div className="flex items-start gap-4">
-              <Avatar className="h-9 w-9 border">
-                <AvatarFallback>
-                  <BotMessageSquare />
-                </AvatarFallback>
-              </Avatar>
-              <div className="max-w-xl rounded-lg p-3 bg-muted w-full">
-                <div className="space-y-2">
-                    <Skeleton className="h-4 w-3/4" />
-                    <Skeleton className="h-4 w-1/2" />
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       </ScrollArea>
       <div className="mt-4 border-t pt-4">
@@ -218,6 +250,7 @@ export function SahayakBotClient() {
             placeholder="e.g., Explain photosynthesis in simple terms"
             className="flex-1"
             disabled={isLoading}
+            autoComplete='off'
           />
           <Button type="submit" disabled={isLoading} size="icon">
             <Send className="h-5 w-5" />
