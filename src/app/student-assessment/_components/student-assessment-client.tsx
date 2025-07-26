@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useRef } from 'react';
@@ -35,6 +36,7 @@ import { useStudent } from '@/context/student-context';
 import { useLanguage } from '@/context/language-context';
 import { translateText } from '@/ai/flows/translate-text';
 import { Student } from '@/lib/student-data';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 
 const translations = {
@@ -308,14 +310,29 @@ export function StudentAssessmentClient() {
                 accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
                 onChange={handleFileSelect}
             />
-            <Button variant="outline" onClick={() => fileInputRef.current?.click()} disabled={isImporting}>
-                <Upload className="mr-2 h-4 w-4" />
-                {isImporting ? t.importing : t.import}
-            </Button>
-            <Button variant="outline" onClick={handleExport}>
-                <Download className="mr-2 h-4 w-4" />
-                {t.export}
-            </Button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="outline" size="icon" onClick={() => fileInputRef.current?.click()} disabled={isImporting}>
+                    <Upload className="h-4 w-4" />
+                    <span className="sr-only">{t.import}</span>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{isImporting ? t.importing : t.import}</p>
+              </TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="outline" size="icon" onClick={handleExport}>
+                    <Download className="h-4 w-4" />
+                    <span className="sr-only">{t.export}</span>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{t.export}</p>
+              </TooltipContent>
+            </Tooltip>
+
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger asChild>
                 <Button>
@@ -446,3 +463,5 @@ export function StudentAssessmentClient() {
     </Card>
   );
 }
+
+    
