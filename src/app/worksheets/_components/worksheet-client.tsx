@@ -10,7 +10,7 @@ import {
   createDifferentiatedWorksheet,
   CreateDifferentiatedWorksheetOutput,
 } from '@/ai/flows/create-differentiated-worksheet';
-import { subjects } from '@/lib/data';
+import { subjects, grades } from '@/lib/data';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -19,9 +19,26 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { UploadCloud, Layers, ShieldAlert } from 'lucide-react';
+import { UploadCloud, Layers, ShieldAlert, ChevronDown } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useLanguage } from '@/context/language-context';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '@/components/ui/command';
+import { Checkbox } from '@/components/ui/checkbox';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuCheckboxItem,
+} from '@/components/ui/dropdown-menu';
 
 const translations = {
   English: {
@@ -31,6 +48,7 @@ const translations = {
     uploadPrompt: 'Click to upload image',
     gradeLevelsLabel: 'Grade Levels',
     gradeLevelsPlaceholder: 'e.g., 2, 3, 4',
+    selectGrades: 'Select grades',
     subjectLabel: 'Subject',
     subjectPlaceholder: 'Select a subject',
     chapterLabel: 'Chapter',
@@ -60,6 +78,7 @@ const translations = {
     uploadPrompt: 'छवि अपलोड करने के लिए क्लिक करें',
     gradeLevelsLabel: 'ग्रेड स्तर',
     gradeLevelsPlaceholder: 'जैसे, 2, 3, 4',
+    selectGrades: 'ग्रेड चुनें',
     subjectLabel: 'विषय',
     subjectPlaceholder: 'एक विषय चुनें',
     chapterLabel: 'अध्याय',
@@ -89,6 +108,7 @@ const translations = {
     uploadPrompt: 'प्रतिमा अपलोड करण्यासाठी क्लिक करा',
     gradeLevelsLabel: 'इयत्ता स्तर',
     gradeLevelsPlaceholder: 'उदा., 2, 3, 4',
+    selectGrades: 'इयत्ता निवडा',
     subjectLabel: 'विषय',
     subjectPlaceholder: 'एक विषय निवडा',
     chapterLabel: 'धडा',
@@ -118,6 +138,7 @@ const translations = {
     uploadPrompt: 'تصویر اپلوڈ کرنہٕ خٲطرٕ کلک کریو',
     gradeLevelsLabel: 'گریڈ سطح',
     gradeLevelsPlaceholder: 'مثلن، 2، 3، 4',
+    selectGrades: 'گریڈ ژارٕو',
     subjectLabel: 'مضمون',
     subjectPlaceholder: 'اکھ مضمون ژارٕو',
     chapterLabel: 'باب',
@@ -147,6 +168,7 @@ const translations = {
     uploadPrompt: 'ছবি আপলোড করতে ক্লিক করুন',
     gradeLevelsLabel: 'গ্রেড স্তর',
     gradeLevelsPlaceholder: 'যেমন, ২, ৩, ৪',
+    selectGrades: 'গ্রেড নির্বাচন করুন',
     subjectLabel: 'বিষয়',
     subjectPlaceholder: 'একটি বিষয় নির্বাচন করুন',
     chapterLabel: 'অধ্যায়',
@@ -176,6 +198,7 @@ const translations = {
     uploadPrompt: 'படத்தை பதிவேற்ற கிளிக் செய்யவும்',
     gradeLevelsLabel: 'வகுப்பு நிலைகள்',
     gradeLevelsPlaceholder: 'எ.கா., 2, 3, 4',
+    selectGrades: 'வகுப்புகளைத் தேர்ந்தெடுக்கவும்',
     subjectLabel: 'பாடம்',
     subjectPlaceholder: 'ஒரு பாடத்தைத் தேர்ந்தெடுக்கவும்',
     chapterLabel: 'அத்தியாயம்',
@@ -205,6 +228,7 @@ const translations = {
     uploadPrompt: 'છબી અપલોડ કરવા માટે ક્લિક કરો',
     gradeLevelsLabel: 'ગ્રેડ સ્તર',
     gradeLevelsPlaceholder: 'દા.ત., 2, 3, 4',
+    selectGrades: 'ગ્રેડ પસંદ કરો',
     subjectLabel: 'વિષય',
     subjectPlaceholder: 'એક વિષય પસંદ કરો',
     chapterLabel: 'પ્રકરણ',
@@ -234,6 +258,7 @@ const translations = {
     uploadPrompt: 'ചിത്രം അപ്‌ലോഡ് ചെയ്യാൻ ക്ലിക്കുചെയ്യുക',
     gradeLevelsLabel: 'ഗ്രേഡ് നിലകൾ',
     gradeLevelsPlaceholder: 'ഉദാഹരണത്തിന്, 2, 3, 4',
+    selectGrades: 'ഗ്രേഡുകൾ തിരഞ്ഞെടുക്കുക',
     subjectLabel: 'വിഷയം',
     subjectPlaceholder: 'ഒരു വിഷയം തിരഞ്ഞെടുക്കുക',
     chapterLabel: 'അദ്ധ്യായം',
@@ -263,6 +288,7 @@ const translations = {
     uploadPrompt: 'ਚਿੱਤਰ ਅੱਪਲੋਡ ਕਰਨ ਲਈ ਕਲਿੱਕ ਕਰੋ',
     gradeLevelsLabel: 'ਗ੍ਰੇਡ ਪੱਧਰ',
     gradeLevelsPlaceholder: 'ਜਿਵੇਂ, 2, 3, 4',
+    selectGrades: 'ਗ੍ਰੇਡ ਚੁਣੋ',
     subjectLabel: 'ਵਿਸ਼ਾ',
     subjectPlaceholder: 'ਇੱਕ ਵਿਸ਼ਾ ਚੁਣੋ',
     chapterLabel: 'ਅਧਿਆਇ',
@@ -292,6 +318,7 @@ const translations = {
     uploadPrompt: 'ପ୍ରତିଛବି ଅପଲୋଡ୍ କରିବାକୁ କ୍ଲିକ୍ କରନ୍ତୁ',
     gradeLevelsLabel: 'ଗ୍ରେଡ୍ ସ୍ତର',
     gradeLevelsPlaceholder: 'ଉଦାହରଣ ସ୍ୱରୂପ, 2, 3, 4',
+    selectGrades: 'ଗ୍ରେଡ୍ ବାଛନ୍ତୁ',
     subjectLabel: 'ବିଷୟ',
     subjectPlaceholder: 'ଏକ ବିଷୟ ବାଛନ୍ତୁ',
     chapterLabel: 'ଅଧ୍ୟାୟ',
@@ -321,6 +348,7 @@ const translations = {
     uploadPrompt: 'ছবি আপলোড কৰিবলৈ ক্লিক কৰক',
     gradeLevelsLabel: 'গ্ৰেড স্তৰ',
     gradeLevelsPlaceholder: 'যেনে, ২, ৩, ৪',
+    selectGrades: 'গ্ৰেড বাছনি কৰক',
     subjectLabel: 'বিষয়',
     subjectPlaceholder: 'এটা বিষয় বাছনি কৰক',
     chapterLabel: 'অধ্যায়',
@@ -350,6 +378,7 @@ const translations = {
     uploadPrompt: 'ಚಿತ್ರವನ್ನು ಅಪ್‌ಲೋಡ್ ಮಾಡಲು ಕ್ಲಿಕ್ ಮಾಡಿ',
     gradeLevelsLabel: 'ದರ್ಜೆ ಮಟ್ಟಗಳು',
     gradeLevelsPlaceholder: 'ಉದಾ., 2, 3, 4',
+    selectGrades: 'ದರ್ಜೆಗಳನ್ನು ಆಯ್ಕೆಮಾಡಿ',
     subjectLabel: 'ವಿಷಯ',
     subjectPlaceholder: 'ಒಂದು ವಿಷಯವನ್ನು ಆಯ್ಕೆಮಾಡಿ',
     chapterLabel: 'ಅಧ್ಯಾಯ',
@@ -379,6 +408,7 @@ const translations = {
     uploadPrompt: 'చిత్రాన్ని అప్‌లోడ్ చేయడానికి క్లిక్ చేయండి',
     gradeLevelsLabel: 'గ్రేడ్ స్థాయిలు',
     gradeLevelsPlaceholder: 'ఉదా., 2, 3, 4',
+    selectGrades: 'గ్రేడ్‌లను ఎంచుకోండి',
     subjectLabel: 'సబ్జెక్ట్',
     subjectPlaceholder: 'ఒక సబ్జెక్ట్‌ను ఎంచుకోండి',
     chapterLabel: 'అధ్యాయం',
@@ -409,6 +439,7 @@ export function WorksheetClient() {
   const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [selectedGrades, setSelectedGrades] = useState<string[]>([]);
   const { toast } = useToast();
   const { language } = useLanguage();
   const typedLanguage = language as keyof typeof translations;
@@ -444,6 +475,14 @@ export function WorksheetClient() {
       };
       reader.readAsDataURL(file);
     }
+  };
+
+  const handleGradeSelect = (gradeValue: string) => {
+    const newSelectedGrades = selectedGrades.includes(gradeValue)
+      ? selectedGrades.filter((g) => g !== gradeValue)
+      : [...selectedGrades, gradeValue];
+    setSelectedGrades(newSelectedGrades);
+    form.setValue('gradeLevels', newSelectedGrades.join(', '));
   };
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
@@ -517,7 +556,32 @@ export function WorksheetClient() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>{t.gradeLevelsLabel}</FormLabel>
-                    <FormControl><Input placeholder={t.gradeLevelsPlaceholder} {...field} /></FormControl>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <FormControl>
+                          <Button variant="outline" className="w-full justify-between">
+                            {selectedGrades.length > 0
+                              ? selectedGrades.map(g => `Grade ${g}`).join(', ')
+                              : t.selectGrades}
+                            <ChevronDown className="ml-2 h-4 w-4" />
+                          </Button>
+                        </FormControl>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width]">
+                        {grades.map((grade) => (
+                          <DropdownMenuCheckboxItem
+                            key={grade.value}
+                            checked={selectedGrades.includes(grade.value)}
+                            onSelect={(e) => {
+                              e.preventDefault();
+                              handleGradeSelect(grade.value);
+                            }}
+                          >
+                            {grade.label}
+                          </DropdownMenuCheckboxItem>
+                        ))}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                     <FormMessage />
                   </FormItem>
                 )}
