@@ -36,15 +36,16 @@ export default function ForgotPasswordPage() {
 
       if (userExists) {
         toast({
-            title: 'Verification Link Sent',
-            description: 'If an account exists, a link to reset your password has been sent to your email.',
+            title: 'Proceeding to Reset Password',
+            description: 'This is a prototype. In a real app, an email would be sent. You will be redirected to the reset page.',
         });
         // In a real app, you'd send an email. Here we'll just redirect.
         router.push(`/reset-password?email=${encodeURIComponent(values.email)}`);
       } else {
          toast({
-            title: 'Verification Link Sent',
-            description: 'If an account exists, a link to reset your password has been sent to your email.',
+            title: 'Account Not Found',
+            description: 'This email is not registered. Please check the email address.',
+            variant: 'destructive',
         });
       }
     } catch (error) {
