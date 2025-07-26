@@ -57,6 +57,7 @@ const translations = {
     },
     downloadPdf: 'Download PDF',
     downloading: 'Downloading...',
+    pdfError: 'Could not generate PDF.'
   },
   Hindi: {
     lessonPlanDetails: 'पाठ योजना विवरण',
@@ -89,6 +90,7 @@ const translations = {
     },
     downloadPdf: 'पीडीएफ डाउनलोड करें',
     downloading: 'डाउनलोड हो रहा है...',
+    pdfError: 'पीडीएफ उत्पन्न नहीं हो सका।'
   },
   Marathi: {
     lessonPlanDetails: 'पाठ योजना तपशील',
@@ -121,6 +123,7 @@ const translations = {
     },
     downloadPdf: 'पीडीएफ डाउनलोड करा',
     downloading: 'डाउनलोड करत आहे...',
+    pdfError: 'पीडीएफ तयार करता आला नाही.'
   },
 };
 
@@ -248,7 +251,7 @@ export function LessonPlannerClient() {
         // Grade
         pdf.setFont('Helvetica', 'normal');
         pdf.setFontSize(10);
-        const gradeLabel = grades.find(g => g.value === watchedGrade)?.label || `Grade ${watchedGrade}`;
+        const gradeLabel = grades.find(g => g.value === watchedGrade)?.label || `${t.grade} ${watchedGrade}`;
         pdf.text(gradeLabel, pdfWidth / 2, y, { align: 'center' });
         y += 15;
         
@@ -294,7 +297,7 @@ export function LessonPlannerClient() {
         pdf.save(`${watchedLessonName}.pdf`);
     } catch (error) {
         console.error('Error generating PDF:', error);
-        toast({ variant: 'destructive', title: 'Error', description: 'Could not generate PDF.' });
+        toast({ variant: 'destructive', title: t.errorTitle, description: t.pdfError });
     } finally {
         setIsDownloading(false);
     }
@@ -445,3 +448,5 @@ export function LessonPlannerClient() {
     </div>
   );
 }
+
+    
