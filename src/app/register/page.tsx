@@ -15,7 +15,8 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Calendar } from '@/components/ui/calendar';
 import { BotMessageSquare, CalendarIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { format, parse } from 'date-fns';
+import { format, parse, isValid } from 'date-fns';
+import { useState } from 'react';
 
 
 const formSchema = z.object({
@@ -77,46 +78,59 @@ export default function RegisterPage() {
                <FormField
                   control={form.control}
                   name="dob"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Date of Birth</FormLabel>
-                        <div className="relative">
-                           <FormControl>
-                                <Input
-                                    placeholder="DD-MM-YYYY"
-                                    value={field.value ? format(field.value, "dd-MM-yyyy") : ""}
-                                    onChange={(e) => {
-                                        try {
-                                            const parsedDate = parse(e.target.value, "dd-MM-yyyy", new Date());
-                                            if (!isNaN(parsedDate.getTime())) {
-                                                field.onChange(parsedDate);
-                                            }
-                                        } catch (error) {
-                                            // Handle invalid date format if needed
-                                        }
-                                    }}
-                                />
-                            </FormControl>
-                            <Popover>
-                                <PopoverTrigger asChild>
-                                    <Button variant="ghost" size="icon" className="absolute right-1 top-1/2 h-7 w-7 -translate-y-1/2 text-muted-foreground">
-                                        <CalendarIcon className="h-4 w-4" />
-                                    </Button>
-                                </PopoverTrigger>
-                                <PopoverContent className="w-auto p-0" align="start">
-                                    <Calendar
-                                        mode="single"
-                                        selected={field.value}
-                                        onSelect={field.onChange}
-                                        disabled={(date) => date > new Date() || date < new Date("1900-01-01")}
-                                        initialFocus
+                  render={({ field }) => {
+                    const [dateString, setDateString] = useState(field.value ? format(field.value, 'dd-MM-yyyy') : '');
+
+                    const handleManualDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+                        const value = e.target.value;
+                        setDateString(value); // Update the visual input immediately
+                        
+                        // Try to parse the date and update the form value only if it's a valid, complete date
+                        const parsedDate = parse(value, 'dd-MM-yyyy', new Date());
+                        if (isValid(parsedDate) && value.length === 10) {
+                            field.onChange(parsedDate);
+                        }
+                    };
+                    
+                    const handleCalendarSelect = (date: Date | undefined) => {
+                       if(date) {
+                         field.onChange(date);
+                         setDateString(format(date, "dd-MM-yyyy"));
+                       }
+                    }
+
+                    return (
+                        <FormItem>
+                          <FormLabel>Date of Birth</FormLabel>
+                            <div className="relative">
+                               <FormControl>
+                                    <Input
+                                        placeholder="DD-MM-YYYY"
+                                        value={dateString}
+                                        onChange={handleManualDateChange}
                                     />
-                                </PopoverContent>
-                            </Popover>
-                        </div>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+                                </FormControl>
+                                <Popover>
+                                    <PopoverTrigger asChild>
+                                        <Button variant="ghost" size="icon" className="absolute right-1 top-1/2 h-7 w-7 -translate-y-1/2 text-muted-foreground">
+                                            <CalendarIcon className="h-4 w-4" />
+                                        </Button>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-auto p-0" align="start">
+                                        <Calendar
+                                            mode="single"
+                                            selected={field.value}
+                                            onSelect={handleCalendarSelect}
+                                            disabled={(date) => date > new Date() || date < new Date("1900-01-01")}
+                                            initialFocus
+                                        />
+                                    </PopoverContent>
+                                </Popover>
+                            </div>
+                          <FormMessage />
+                        </FormItem>
+                    )
+                  }}
                 />
               <FormField
                 control={form.control}
