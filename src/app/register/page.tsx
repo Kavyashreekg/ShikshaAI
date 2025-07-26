@@ -34,6 +34,7 @@ export default function RegisterPage() {
   const router = useRouter();
   const { register } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
+  const currentYear = new Date().getFullYear();
   
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -120,6 +121,9 @@ export default function RegisterPage() {
                                     <PopoverContent className="w-auto p-0" align="start">
                                         <Calendar
                                             mode="single"
+                                            captionLayout="dropdown-buttons"
+                                            fromYear={currentYear - 100}
+                                            toYear={currentYear}
                                             selected={field.value}
                                             onSelect={handleCalendarSelect}
                                             disabled={(date) => date > new Date() || date < new Date("1900-01-01")}
