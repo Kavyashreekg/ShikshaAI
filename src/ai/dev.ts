@@ -1,3 +1,4 @@
+'use server';
 import { config } from 'dotenv';
 config();
 
@@ -13,3 +14,4 @@ import '@/ai/flows/translate-text.ts';
 import '@/ai/flows/manage-student-flow.ts';
 import '@/ai/flows/generate-reading-assessment.ts';
 import '@/ai/flows/generate-reading-feedback.ts';
+import '@/ai/flows/generate-lesson-plan.ts';
