@@ -30,10 +30,8 @@ const translations = {
     selectGrade: 'Select a grade',
     subject: 'Subject',
     selectSubject: 'Select a subject',
-    lessonName: 'Lesson Name',
+    lessonName: 'Lesson Topic',
     lessonNamePlaceholder: "e.g., 'Introduction to Fractions'",
-    lessonPdfLabel: 'Lesson PDF',
-    uploadPrompt: 'Click to upload PDF',
     generatePlan: 'Generate Plan',
     generatingPlan: 'Generating Plan...',
     textbookResources: 'Textbook Resources',
@@ -43,17 +41,16 @@ const translations = {
     goToNCERT: 'Go to NCERT Portal',
     generatedLessonPlan: 'Generated Lesson Plan',
     planWillBeStructured: 'Your weekly plan will be structured here.',
-    emptyState: 'Upload a PDF and provide details to generate your lesson plan.',
+    emptyState: 'Provide details to generate your lesson plan.',
     clearButton: 'Clear',
     contentBlockedTitle: 'Content Blocked',
-    safetyError: 'The generated lesson plan was blocked for safety reasons. Please try a different PDF.',
+    safetyError: 'The generated lesson plan was blocked for safety reasons. Please try a different topic.',
     errorTitle: 'An error occurred.',
     errorDescription: 'Failed to generate the lesson plan. Please try again.',
     formErrors: {
       grade: 'Please select a grade.',
       subject: 'Please select a subject.',
-      lessonName: 'Please enter a lesson name.',
-      lessonPdf: 'Please upload a lesson PDF.',
+      lessonName: 'Please enter a lesson topic.',
     },
   },
   Hindi: {
@@ -63,10 +60,8 @@ const translations = {
     selectGrade: 'एक ग्रेड चुनें',
     subject: 'विषय',
     selectSubject: 'एक विषय चुनें',
-    lessonName: 'पाठ का नाम',
+    lessonName: 'पाठ का विषय',
     lessonNamePlaceholder: "जैसे, 'भिन्न का परिचय'",
-    lessonPdfLabel: 'पाठ पीडीएफ',
-    uploadPrompt: 'पीडीएफ अपलोड करने के लिए क्लिक करें',
     generatePlan: 'योजना बनाएं',
     generatingPlan: 'योजना बन रही है...',
     textbookResources: 'पाठ्यपुस्तक संसाधन',
@@ -76,17 +71,16 @@ const translations = {
     goToNCERT: 'एनसीईआरटी पोर्टल पर जाएं',
     generatedLessonPlan: 'उत्पन्न पाठ योजना',
     planWillBeStructured: 'आपकी साप्ताहिक योजना यहाँ संरचित की जाएगी।',
-    emptyState: 'अपनी पाठ योजना बनाने के लिए एक पीडीएफ अपलोड करें और विवरण प्रदान करें।',
+    emptyState: 'अपनी पाठ योजना बनाने के लिए विवरण प्रदान करें।',
     clearButton: 'साफ़ करें',
     contentBlockedTitle: 'सामग्री अवरुद्ध',
-    safetyError: 'सुरक्षा कारणों से उत्पन्न पाठ योजना को अवरुद्ध कर दिया गया था। कृपया एक अलग पीडीएफ का प्रयास करें।',
+    safetyError: 'सुरक्षा कारणों से उत्पन्न पाठ योजना को अवरुद्ध कर दिया गया था। कृपया एक अलग विषय का प्रयास करें।',
     errorTitle: 'एक त्रुटि हुई।',
     errorDescription: 'पाठ योजना बनाने में विफल। कृपया पुनः प्रयास करें।',
     formErrors: {
       grade: 'कृपया एक ग्रेड चुनें।',
       subject: 'कृपया एक विषय चुनें।',
-      lessonName: 'कृपया पाठ का नाम दर्ज करें।',
-      lessonPdf: 'कृपया एक पाठ पीडीएफ अपलोड करें।',
+      lessonName: 'कृपया पाठ का विषय दर्ज करें।',
     },
   },
   Marathi: {
@@ -96,10 +90,8 @@ const translations = {
     selectGrade: 'एक श्रेणी निवडा',
     subject: 'विषय',
     selectSubject: 'एक विषय निवडा',
-    lessonName: 'पाठाचे नाव',
+    lessonName: 'पाठाचा विषय',
     lessonNamePlaceholder: "उदा., 'अपूर्णांकांची ओळख'",
-    lessonPdfLabel: 'पाठ पीडीएफ',
-    uploadPrompt: 'पीडीएफ अपलोड करण्यासाठी क्लिक करा',
     generatePlan: 'योजना तयार करा',
     generatingPlan: 'योजना तयार होत आहे...',
     textbookResources: 'पाठ्यपुस्तक संसाधने',
@@ -109,17 +101,16 @@ const translations = {
     goToNCERT: 'एनसीईआरटी पोर्टलवर जा',
     generatedLessonPlan: 'तयार केलेली पाठ योजना',
     planWillBeStructured: 'तुमची साप्ताहिक योजना येथे संरचित केली जाईल.',
-    emptyState: 'तुमची पाठ योजना तयार करण्यासाठी पीडीएफ अपलोड करा आणि तपशील द्या.',
+    emptyState: 'तुमची पाठ योजना तयार करण्यासाठी तपशील द्या.',
     clearButton: 'साफ करा',
     contentBlockedTitle: 'सामग्री अवरोधित',
-    safetyError: 'सुरक्षेच्या कारणास्तव तयार केलेली पाठ योजना अवरोधित केली गेली. कृपया वेगळी पीडीएफ वापरून पहा.',
+    safetyError: 'सुरक्षेच्या कारणास्तव तयार केलेली पाठ योजना अवरोधित केली गेली. कृपया वेगळा विषय वापरून पहा.',
     errorTitle: 'एक त्रुटी आली.',
     errorDescription: 'पाठ योजना तयार करण्यात अयशस्वी. कृपया पुन्हा प्रयत्न करा.',
     formErrors: {
       grade: 'कृपया एक श्रेणी निवडा.',
       subject: 'कृपया एक विषय निवडा.',
-      lessonName: 'कृपया पाठाचे नाव प्रविष्ट करा.',
-      lessonPdf: 'कृपया पाठ पीडीएफ अपलोड करा.',
+      lessonName: 'कृपया पाठाचा विषय प्रविष्ट करा.',
     },
   },
 };
@@ -175,16 +166,12 @@ export function LessonPlannerClient() {
 
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<GenerateLessonPlanOutput | null>(null);
-  const [preview, setPreview] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const formSchema = z.object({
     grade: z.string().min(1, t.formErrors.grade),
     subject: z.string().min(1, t.formErrors.subject),
-    lessonName: z.string().min(1, t.formErrors.lessonName),
-    lessonPdfDataUri: z.string().refine((val) => val.startsWith('data:application/pdf'), {
-        message: t.formErrors.lessonPdf,
-    }),
+    lessonName: z.string().min(3, t.formErrors.lessonName),
   });
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -193,37 +180,16 @@ export function LessonPlannerClient() {
       grade: '',
       subject: '',
       lessonName: '',
-      lessonPdfDataUri: '',
     },
   });
 
   const watchedGrade = useWatch({ control: form.control, name: 'grade' });
   const watchedSubject = useWatch({ control: form.control, name: 'subject' });
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file && file.type === 'application/pdf') {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const dataUri = reader.result as string;
-        form.setValue('lessonPdfDataUri', dataUri);
-        setPreview(file.name);
-      };
-      reader.readAsDataURL(file);
-    } else {
-        toast({
-            variant: 'destructive',
-            title: 'Invalid File Type',
-            description: 'Please upload a valid PDF file.',
-        });
-    }
-  };
-
   const handleClear = () => {
     form.reset();
     setResult(null);
     setError(null);
-    setPreview(null);
   };
 
 
@@ -261,25 +227,6 @@ export function LessonPlannerClient() {
           <CardContent>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                 <FormField
-                    control={form.control}
-                    name="lessonPdfDataUri"
-                    render={() => (
-                    <FormItem>
-                        <FormLabel>{t.lessonPdfLabel}</FormLabel>
-                        <FormControl>
-                        <label htmlFor="file-upload" className="relative block w-full h-24 border-2 border-dashed rounded-lg cursor-pointer hover:border-primary">
-                            <div className="flex flex-col items-center justify-center h-full text-muted-foreground">
-                                <UploadCloud className="w-8 h-8 mb-2" />
-                                <span className="text-sm font-medium">{preview ? preview : t.uploadPrompt}</span>
-                            </div>
-                            <Input id="file-upload" type="file" accept="application/pdf" className="sr-only" onChange={handleFileChange} />
-                        </label>
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
-                    )}
-                />
                  <FormField
                   control={form.control}
                   name="lessonName"
