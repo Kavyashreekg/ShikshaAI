@@ -240,13 +240,13 @@ export function LessonPlannerClient() {
         let y = 40;
 
         // Header
-        pdf.setFont('Arial', 'bold');
+        pdf.setFont('Helvetica', 'bold');
         pdf.setFontSize(10);
         pdf.text(watchedLessonName, pdfWidth / 2, y, { align: 'center' });
         y += 15;
         
         // Grade
-        pdf.setFont('Arial', 'normal');
+        pdf.setFont('Helvetica', 'normal');
         pdf.setFontSize(10);
         const gradeLabel = grades.find(g => g.value === watchedGrade)?.label || `Grade ${watchedGrade}`;
         pdf.text(gradeLabel, pdfWidth / 2, y, { align: 'center' });
@@ -258,25 +258,25 @@ export function LessonPlannerClient() {
         y += 20;
 
         // Content
-        const contentNode = lessonPlanRef.current;
         const lines = result.lessonPlanContent.split('\n');
 
         lines.forEach(line => {
-            const isDayHeading = /^Day \d/.test(line.trim());
-            const isOtherHeading = /^\d+\./.test(line.trim()) || /^\*{1,2}/.test(line.trim());
-
+            const trimmedLine = line.trim();
+            const isDayHeading = /^Day \d/.test(trimmedLine);
+            const isOtherHeading = /^\d+\./.test(trimmedLine) || /^\*{1,2}/.test(trimmedLine) || /learning objectives/i.test(trimmedLine) || /materials required/i.test(trimmedLine) || /assessment/i.test(trimmedLine);
+            
             if (isDayHeading) {
-                pdf.setFont('Arial', 'bold');
+                pdf.setFont('Helvetica', 'bold');
                 pdf.setFontSize(8);
             } else if (isOtherHeading) {
-                pdf.setFont('Arial', 'bold');
+                pdf.setFont('Helvetica', 'bold');
                 pdf.setFontSize(10);
             } else {
-                pdf.setFont('Arial', 'normal');
+                pdf.setFont('Helvetica', 'normal');
                 pdf.setFontSize(10);
             }
             
-            const splitText = pdf.splitTextToSize(line, pdfWidth - margin * 2);
+            const splitText = pdf.splitTextToSize(trimmedLine, pdfWidth - margin * 2);
 
             splitText.forEach((textLine: string) => {
                  if (y > pdf.internal.pageSize.getHeight() - margin) {
@@ -286,6 +286,9 @@ export function LessonPlannerClient() {
                 pdf.text(textLine, margin, y);
                 y += 12; // line height
             });
+             if (trimmedLine === '') { // Add extra space for empty lines
+                y += 6;
+            }
         });
 
         pdf.save(`${watchedLessonName}.pdf`);
