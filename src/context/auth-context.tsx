@@ -21,6 +21,7 @@ type AuthContextType = {
   login: (emailOrContact: string, password: string) => Promise<boolean>;
   register: (user: Omit<User, 'id'>) => Promise<boolean>;
   logout: () => void;
+  resetPassword: (email: string, newPassword: string) => Promise<boolean>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -88,8 +89,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     router.push('/login');
   };
 
+  const resetPassword = async (email: string, newPassword: string): Promise<boolean> => {
+    try {
+      const storedUsers = JSON.parse(localStorage.getItem('shiksha-users') || '[]') as User[];
+      const userIndex = storedUsers.findIndex((u) => u.email === email);
+
+      if (userIndex > -1) {
+        storedUsers[userIndex].password = newPassword;
+        localStorage.setItem('shiksha-users', JSON.stringify(storedUsers));
+        return true;
+      }
+      return false;
+    } catch (e) {
+      console.error('Password reset failed', e);
+      return false;
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated: !!user, isAuthLoading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, isAuthenticated: !!user, isAuthLoading, login, register, logout, resetPassword }}>
       {children}
     </AuthContext.Provider>
   );
