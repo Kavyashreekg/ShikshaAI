@@ -440,7 +440,7 @@ const translations = {
     videoExplanationTitle: 'ವೀಡಿಯೊ ವಿವರಣೆ',
     videoGenerationProgress: 'ವೀಡಿಯೊವನ್ನು ರಚಿಸಲಾಗುತ್ತಿದೆ, ಇದಕ್ಕೆ ಒಂದು ನಿಮಿಷ ತೆಗೆದುಕೊಳ್ಳಬಹುದು...',
     safetyErrorVideo: 'ರಚಿಸಲಾದ ವೀಡಿಯೊವನ್ನು ಸುರಕ್ಷತಾ ಕಾರಣಗಳಿಗಾಗಿ ನಿರ್ಬಂಧಿಸಲಾಗಿದೆ. ಕಥೆಯಲ್ಲಿ ಸೂಕ್ಷ್ಮ ವಿಷಯವಿರಬಹುದು. ದಯವಿಟ್ಟು ಬೇರೆ ಕಥೆಯನ್ನು ರಚಿಸಲು ಪ್ರಯತ್ನಿಸಿ.',
-    errorDescriptionVideo: 'ವೀಡಿಯೊವನ್ನು ರಚಿಸಲು ವಿఫಲವಾಗಿದೆ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.',
+    errorDescriptionVideo: 'ವೀಡಿಯೊವನ್ನು ರಚಿಸಲು విఫలವಾಗಿದೆ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.',
     billingErrorVideo: 'ವೀಡಿಯೊ ರಚನೆಗೆ ಬಿಲ್ಲಿಂಗ್ ಸಕ್ರಿಯಗೊಳಿಸಿದ Google Cloud Platform ಯೋಜನೆ ಅಗತ್ಯವಿದೆ. ದಯವಿಟ್ಟು ನಿಮ್ಮ ಖಾತೆ ಸೆಟ್ಟಿಂಗ್‌ಗಳನ್ನು ಪರಿಶೀಲಿಸಿ.',
     clearButton: 'ಅಳಿಸಿ',
     viewHistoryButton: 'ಇತಿಹಾಸವನ್ನು ವೀಕ್ಷಿಸಿ',
@@ -803,3 +803,5 @@ export function ContentGenerationClient() {
     </div>
   );
 }
+
+    
