@@ -68,6 +68,8 @@ const translations = {
         languageMin: 'Please select a language.',
         topicMin: 'Please describe the topic in at least 10 characters.',
     },
+    futureScopeTitle: 'Feature Coming Soon',
+    futureScopeDescription: 'Video generation will be implemented in a future update.',
   },
   Hindi: {
     cardTitle: 'सामग्री विवरण',
@@ -103,6 +105,8 @@ const translations = {
         languageMin: 'कृपया एक भाषा चुनें।',
         topicMin: 'कृपया विषय का कम से कम 10 अक्षरों में वर्णन करें।',
     },
+    futureScopeTitle: 'सुविधा जल्द ही आ रही है',
+    futureScopeDescription: 'वीडियो उत्पादन भविष्य के अपडेट में लागू किया जाएगा।',
   },
   Marathi: {
     cardTitle: 'सामग्री तपशील',
@@ -138,6 +142,8 @@ const translations = {
         languageMin: 'कृपया एक भाषा निवडा.',
         topicMin: 'कृपया विषयाचे किमान १० अक्षरांमध्ये वर्णन करा.',
     },
+    futureScopeTitle: 'वैशिष्ट्य लवकरच येत आहे',
+    futureScopeDescription: 'व्हिडिओ निर्मिती भविष्यातील अद्ययावतमध्ये लागू केली जाईल.',
   },
   Kashmiri: {
     cardTitle: 'موادٕچ تفصیل',
@@ -173,6 +179,8 @@ const translations = {
       languageMin: 'مہربانی کرِتھ اکھ زبان ژارٕو۔',
       topicMin: 'مہربانی کرِتھ کم از کم 10 اَक्षरَن ہُنٛد اَکھ موضوع بیان کریو۔',
     },
+    futureScopeTitle: 'فیچر ییہِ زِیٛادٕ تر',
+    futureScopeDescription: 'ویڈیو جنریشن ییہِ مستقبلٕچ اپڈیٹس مَنٛز لاگو کرنہٕ۔',
   },
   Bengali: {
     cardTitle: 'বিষয়বস্তুর বিবরণ',
@@ -208,6 +216,8 @@ const translations = {
       languageMin: 'অনুগ্রহ করে একটি ভাষা নির্বাচন করুন।',
       topicMin: 'অনুগ্রহ করে কমপক্ষে ১০টি অক্ষরে বিষয়টি বর্ণনা করুন।',
     },
+    futureScopeTitle: 'বৈশিষ্ট্য শীঘ্রই আসছে',
+    futureScopeDescription: 'ভবিষ্যতের আপডেটে ভিডিও তৈরি করা হবে।',
   },
   Tamil: {
     cardTitle: 'உள்ளடக்க விவரங்கள்',
@@ -241,8 +251,10 @@ const translations = {
     deleteStoryButton: 'நீக்கு',
     formErrors: {
       languageMin: 'தயவுசெய்து ஒரு மொழியைத் தேர்ந்தெடுக்கவும்.',
-      topicMin: 'தயவுசெய்து தலைப்பை குறைந்தது 10 எழுத்துக்களில் விவரிக்கவும்.',
+      topicMin: 'தயவுசெய்து தலைப்பை குறைந்தது 10 எழுத்துக்களில் விவரிக்கவும்।',
     },
+    futureScopeTitle: 'அம்சம் விரைவில் வரும்',
+    futureScopeDescription: 'வீடியோ உருவாக்கம் எதிர்கால புதுப்பிப்பில் செயல்படுத்தப்படும்.',
   },
   Gujarati: {
     cardTitle: 'સામગ્રી વિગતો',
@@ -278,6 +290,8 @@ const translations = {
       languageMin: 'કૃપા કરીને એક ભાષા પસંદ કરો.',
       topicMin: 'કૃપા કરીને ઓછામાં ઓછા 10 અક્ષરોમાં વિષયનું વર્ણન કરો.',
     },
+    futureScopeTitle: 'સુવિધા ટૂંક સમયમાં આવી રહી છે',
+    futureScopeDescription: 'વિડિઓ જનરેશન ભવિષ્યના અપડેટમાં લાગુ કરવામાં આવશે.',
   },
   Malayalam: {
     cardTitle: 'ഉള്ളടക്ക വിശദാംശങ്ങൾ',
@@ -313,6 +327,8 @@ const translations = {
       languageMin: 'ദയവായി ഒരു ഭാഷ തിരഞ്ഞെടുക്കുക.',
       topicMin: 'ദയവായി കുറഞ്ഞത് 10 പ്രതീകങ്ങളിൽ വിഷയം വിവരിക്കുക.',
     },
+    futureScopeTitle: 'സവിശേഷത ഉടൻ വരുന്നു',
+    futureScopeDescription: 'ഭാവിയിലെ അപ്‌ഡേറ്റിൽ വീഡിയോ ജനറേഷൻ നടപ്പിലാക്കും.',
   },
   Punjabi: {
     cardTitle: 'ਸਮੱਗਰੀ ਦੇ ਵੇਰਵੇ',
@@ -348,6 +364,8 @@ const translations = {
       languageMin: 'ਕਿਰਪਾ ਕਰਕੇ ਇੱਕ ਭਾਸ਼ਾ ਚੁਣੋ।',
       topicMin: 'ਕਿਰਪਾ ਕਰਕੇ ਘੱਟੋ-ਘੱਟ 10 ਅੱਖਰਾਂ ਵਿੱਚ ਵਿਸ਼ੇ ਦਾ ਵਰਣਨ ਕਰੋ।',
     },
+    futureScopeTitle: 'ਫੀਚਰ ਜਲਦੀ ਆ ਰਿਹਾ ਹੈ',
+    futureScopeDescription: 'ਵੀਡੀਓ ਜਨਰੇਸ਼ਨ ਭਵਿੱਖ ਦੇ ਅਪਡੇਟ ਵਿੱਚ ਲਾਗੂ ਕੀਤਾ ਜਾਵੇਗਾ।',
   },
   Odia: {
     cardTitle: 'ବିଷୟବସ୍ତୁ ବିବରଣୀ',
@@ -383,6 +401,8 @@ const translations = {
       languageMin: 'ଦୟାକରି ଏକ ଭାଷା ବାଛନ୍ତୁ।',
       topicMin: 'ଦୟାକରି ଅତିକମରେ ୧୦ଟି ଅକ୍ଷରରେ ବିଷୟ ବର୍ଣ୍ଣନା କରନ୍ତୁ।',
     },
+    futureScopeTitle: 'ଫିଚର୍ ଶୀଘ୍ର ଆସୁଛି',
+    futureScopeDescription: 'ଭବିଷ୍ୟତର ଅପଡେଟରେ ଭିଡିଓ ଜେନେରେସନ୍ କାର୍ଯ୍ୟକାରୀ ହେବ।',
   },
   Assamese: {
     cardTitle: 'বিষয়বস্তুৰ বিৱৰণ',
@@ -418,6 +438,8 @@ const translations = {
       languageMin: 'অনুগ্ৰহ কৰি এটা ভাষা বাছনি কৰক।',
       topicMin: 'অনুগ্ৰহ কৰি বিষয়টো কমেও ১০টা আখৰত বৰ্ণনা কৰক।',
     },
+    futureScopeTitle: 'विशेषता সোনকালে আহি আছে',
+    futureScopeDescription: 'ভৱিষ্যতৰ আপডেটত ভিডিঅ’ জেনেৰেচন কাৰ্যকৰী কৰা হ’ব।',
   },
   Kannada: {
     cardTitle: 'ವಿಷಯದ ವಿವರಗಳು',
@@ -453,6 +475,8 @@ const translations = {
       languageMin: 'ದಯವಿಟ್ಟು ಒಂದು ಭಾಷೆಯನ್ನು ಆಯ್ಕೆಮಾಡಿ.',
       topicMin: 'ದಯವಿಟ್ಟು ವಿಷಯವನ್ನು ಕನಿಷ್ಠ 10 ಅಕ್ಷರಗಳಲ್ಲಿ ವಿವರಿಸಿ.',
     },
+    futureScopeTitle: 'ವೈಶಿಷ್ಟ್ಯ ಶೀಘ್ರದಲ್ಲೇ ಬರಲಿದೆ',
+    futureScopeDescription: 'ಭವಿಷ್ಯದ ಅಪ್‌ಡೇಟ್‌ನಲ್ಲಿ ವೀಡಿಯೊ ಉತ್ಪಾದನೆಯನ್ನು ಕಾರ್ಯಗತಗೊಳಿಸಲಾಗುತ್ತದೆ.',
   },
   Telugu: {
     cardTitle: 'విషయ వివరాలు',
@@ -488,6 +512,8 @@ const translations = {
       languageMin: 'దయచేసి ఒక భాషను ఎంచుకోండి.',
       topicMin: 'దయచేసి అంశాన్ని కనీసం 10 అక్షరాలలో వివరించండి.',
     },
+    futureScopeTitle: 'ఫీచర్ త్వరలో వస్తుంది',
+    futureScopeDescription: 'భవిష్యత్ నవీకరణలో వీడియో జనరేషన్ అమలు చేయబడుతుంది.',
   },
 };
 
@@ -591,25 +617,10 @@ export function ContentGenerationClient() {
   }
 
   async function handleGenerateVideo() {
-    if (!result?.story) return;
-    setIsGeneratingVideo(true);
-    setVideoUrl(null);
-    setVideoError(null);
-    try {
-      const videoResult = await generateStoryVideo({ story: result.story });
-      setVideoUrl(videoResult.video);
-    } catch (e: any) {
-      console.error(e);
-       if (e.message.includes('billing enabled')) {
-        setVideoError(t.billingErrorVideo);
-      } else if (e.message.includes('SAFETY')) {
-        setVideoError(t.safetyErrorVideo);
-      } else {
-        setVideoError(e.message || t.errorDescriptionVideo);
-      }
-    } finally {
-      setIsGeneratingVideo(false);
-    }
+    toast({
+        title: t.futureScopeTitle,
+        description: t.futureScopeDescription,
+    });
   }
   
   function handleClear() {
@@ -773,37 +784,8 @@ export function ContentGenerationClient() {
               </Button>
             </CardFooter>
           )}
-        </Card>
-        {(isGeneratingVideo || videoUrl || videoError) && (
-          <Card>
-            <CardHeader>
-              <CardTitle>{t.videoExplanationTitle}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {isGeneratingVideo && (
-                <div className="flex flex-col items-center justify-center space-y-2">
-                  <Skeleton className="h-48 w-full max-w-lg" />
-                  <p className="text-center text-muted-foreground">{t.videoGenerationProgress}</p>
-                </div>
-              )}
-               {videoError && (
-                <Alert variant="destructive">
-                  <ShieldAlert className="h-4 w-4" />
-                  <AlertTitle>{t.errorTitle}</AlertTitle>
-                  <AlertDescription>{videoError}</AlertDescription>
-                </Alert>
-              )}
-              {videoUrl && (
-                <video controls src={videoUrl} className="w-full rounded-md" />
-              )}
-            </CardContent>
-          </Card>
-        )}
+        </Card>>
       </div>
     </div>
   );
 }
-
-    
-
-    
