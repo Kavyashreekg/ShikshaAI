@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
+import jsPDF from 'jspdf';
 import {
   Dialog,
   DialogContent,
@@ -18,7 +19,6 @@ import {
   generateLocalizedStory
 } from '@/ai/flows/generate-localized-story';
 import { type GenerateLocalizedStoryOutput, type GenerateLocalizedStoryInput } from '@/ai/flows/schemas/generate-localized-story.schema';
-import { generateStoryVideo } from '@/ai/flows/generate-story-video';
 import { languages } from '@/lib/data';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
@@ -27,7 +27,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Sparkles, Video, ShieldAlert, XCircle, History, Trash2 } from 'lucide-react';
+import { Sparkles, Video, ShieldAlert, XCircle, History, Trash2, FileDown } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useLanguage } from '@/context/language-context';
 
@@ -70,6 +70,9 @@ const translations = {
     },
     futureScopeTitle: 'Feature Coming Soon',
     futureScopeDescription: 'Video generation will be implemented in a future update.',
+    downloadPdf: 'Download PDF',
+    downloading: 'Downloading...',
+    pdfError: 'Could not generate PDF.'
   },
   Hindi: {
     cardTitle: 'सामग्री विवरण',
@@ -107,6 +110,9 @@ const translations = {
     },
     futureScopeTitle: 'सुविधा जल्द ही आ रही है',
     futureScopeDescription: 'वीडियो उत्पादन भविष्य के अपडेट में लागू किया जाएगा।',
+    downloadPdf: 'पीडीएफ डाउनलोड करें',
+    downloading: 'डाउनलोड हो रहा है...',
+    pdfError: 'पीडीएफ उत्पन्न नहीं हो सका।'
   },
   Marathi: {
     cardTitle: 'सामग्री तपशील',
@@ -144,6 +150,9 @@ const translations = {
     },
     futureScopeTitle: 'वैशिष्ट्य लवकरच येत आहे',
     futureScopeDescription: 'व्हिडिओ निर्मिती भविष्यातील अद्ययावतमध्ये लागू केली जाईल.',
+    downloadPdf: 'पीडीएफ डाउनलोड करा',
+    downloading: 'डाउनलोड करत आहे...',
+    pdfError: 'पीडीएफ तयार करता आला नाही.'
   },
   Kashmiri: {
     cardTitle: 'موادٕچ تفصیل',
@@ -181,6 +190,9 @@ const translations = {
     },
     futureScopeTitle: 'فیچر ییہِ زِیٛادٕ تر',
     futureScopeDescription: 'ویڈیو جنریشن ییہِ مستقبلٕچ اپڈیٹس مَنٛز لاگو کرنہٕ۔',
+    downloadPdf: 'پی ڈی ایف ڈاؤنلوڈ کریو',
+    downloading: 'ڈاؤنلوڈ کران...',
+    pdfError: 'پی ڈی ایف تیار کٔرِتھ نہٕ ہیوٚک۔'
   },
   Bengali: {
     cardTitle: 'বিষয়বস্তুর বিবরণ',
@@ -218,6 +230,9 @@ const translations = {
     },
     futureScopeTitle: 'বৈশিষ্ট্য শীঘ্রই আসছে',
     futureScopeDescription: 'ভবিষ্যতের আপডেটে ভিডিও তৈরি করা হবে।',
+    downloadPdf: 'পিডিএফ ডাউনলোড করুন',
+    downloading: 'ডাউনলোড হচ্ছে...',
+    pdfError: 'পিডিএফ তৈরি করা যায়নি।'
   },
   Tamil: {
     cardTitle: 'உள்ளடக்க விவரங்கள்',
@@ -251,10 +266,13 @@ const translations = {
     deleteStoryButton: 'நீக்கு',
     formErrors: {
       languageMin: 'தயவுசெய்து ஒரு மொழியைத் தேர்ந்தெடுக்கவும்.',
-      topicMin: 'தயவுசெய்து தலைப்பை குறைந்தது 10 எழுத்துக்களில் விவரிக்கவும்।',
+      topicMin: 'தயவுசெய்து தலைப்பை குறைந்தது 10 எழுத்துக்களில் விவரிக்கவும்.',
     },
     futureScopeTitle: 'அம்சம் விரைவில் வரும்',
     futureScopeDescription: 'வீடியோ உருவாக்கம் எதிர்கால புதுப்பிப்பில் செயல்படுத்தப்படும்.',
+    downloadPdf: 'PDF பதிவிறக்கவும்',
+    downloading: 'பதிவிறக்குகிறது...',
+    pdfError: 'PDF ஐ உருவாக்க முடியவில்லை.'
   },
   Gujarati: {
     cardTitle: 'સામગ્રી વિગતો',
@@ -292,6 +310,9 @@ const translations = {
     },
     futureScopeTitle: 'સુવિધા ટૂંક સમયમાં આવી રહી છે',
     futureScopeDescription: 'વિડિઓ જનરેશન ભવિષ્યના અપડેટમાં લાગુ કરવામાં આવશે.',
+    downloadPdf: 'પીડીએફ ડાઉનલોડ કરો',
+    downloading: 'ડાઉનલોડ થઈ રહ્યું છે...',
+    pdfError: 'પીડીએફ બનાવી શકાયું નથી.'
   },
   Malayalam: {
     cardTitle: 'ഉള്ളടക്ക വിശദാംശങ്ങൾ',
@@ -329,6 +350,9 @@ const translations = {
     },
     futureScopeTitle: 'സവിശേഷത ഉടൻ വരുന്നു',
     futureScopeDescription: 'ഭാവിയിലെ അപ്‌ഡേറ്റിൽ വീഡിയോ ജനറേഷൻ നടപ്പിലാക്കും.',
+    downloadPdf: 'PDF ഡൗൺലോഡ് ചെയ്യുക',
+    downloading: 'ഡൗൺലോഡ് ചെയ്യുന്നു...',
+    pdfError: 'PDF ഉണ്ടാക്കാൻ കഴിഞ്ഞില്ല.'
   },
   Punjabi: {
     cardTitle: 'ਸਮੱਗਰੀ ਦੇ ਵੇਰਵੇ',
@@ -366,6 +390,9 @@ const translations = {
     },
     futureScopeTitle: 'ਫੀਚਰ ਜਲਦੀ ਆ ਰਿਹਾ ਹੈ',
     futureScopeDescription: 'ਵੀਡੀਓ ਜਨਰੇਸ਼ਨ ਭਵਿੱਖ ਦੇ ਅਪਡੇਟ ਵਿੱਚ ਲਾਗੂ ਕੀਤਾ ਜਾਵੇਗਾ।',
+    downloadPdf: 'ਪੀਡੀਐਫ ਡਾਊਨਲੋਡ ਕਰੋ',
+    downloading: 'ਡਾਊਨਲੋਡ ਹੋ ਰਿਹਾ ਹੈ...',
+    pdfError: 'ਪੀਡੀਐਫ ਤਿਆਰ ਨਹੀਂ ਕੀਤਾ ਜਾ ਸਕਿਆ।'
   },
   Odia: {
     cardTitle: 'ବିଷୟବସ୍ତୁ ବିବରଣୀ',
@@ -403,6 +430,9 @@ const translations = {
     },
     futureScopeTitle: 'ଫିଚର୍ ଶୀଘ୍ର ଆସୁଛି',
     futureScopeDescription: 'ଭବିଷ୍ୟତର ଅପଡେଟରେ ଭିଡିଓ ଜେନେରେସନ୍ କାର୍ଯ୍ୟକାରୀ ହେବ।',
+    downloadPdf: 'ପିଡିଏଫ୍ ଡାଉନଲୋଡ୍ କରନ୍ତୁ',
+    downloading: 'ଡାଉନଲୋଡ୍ କରୁଛି...',
+    pdfError: 'ପିଡିଏଫ୍ ସୃଷ୍ଟି ହୋଇପାରିଲା ନାହିଁ।'
   },
   Assamese: {
     cardTitle: 'বিষয়বস্তুৰ বিৱৰণ',
@@ -440,6 +470,9 @@ const translations = {
     },
     futureScopeTitle: 'विशेषता সোনকালে আহি আছে',
     futureScopeDescription: 'ভৱিষ্যতৰ আপডেটত ভিডিঅ’ জেনেৰেচন কাৰ্যকৰী কৰা হ’ব।',
+    downloadPdf: 'পিডিএফ ডাউনল’ড কৰক',
+    downloading: 'ডাউনল’ড কৰি আছে...',
+    pdfError: 'পিডিএফ সৃষ্টি কৰিব পৰা নগ\'ল।'
   },
   Kannada: {
     cardTitle: 'ವಿಷಯದ ವಿವರಗಳು',
@@ -477,6 +510,9 @@ const translations = {
     },
     futureScopeTitle: 'ವೈಶಿಷ್ಟ್ಯ ಶೀಘ್ರದಲ್ಲೇ ಬರಲಿದೆ',
     futureScopeDescription: 'ಭವಿಷ್ಯದ ಅಪ್‌ಡೇಟ್‌ನಲ್ಲಿ ವೀಡಿಯೊ ಉತ್ಪಾದನೆಯನ್ನು ಕಾರ್ಯಗತಗೊಳಿಸಲಾಗುತ್ತದೆ.',
+    downloadPdf: 'PDF ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ',
+    downloading: 'ಡೌನ್‌ಲೋಡ್ ಮಾಡಲಾಗುತ್ತಿದೆ...',
+    pdfError: 'PDF ರಚಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ.'
   },
   Telugu: {
     cardTitle: 'విషయ వివరాలు',
@@ -514,11 +550,15 @@ const translations = {
     },
     futureScopeTitle: 'ఫీచర్ త్వరలో వస్తుంది',
     futureScopeDescription: 'భవిష్యత్ నవీకరణలో వీడియో జనరేషన్ అమలు చేయబడుతుంది.',
+    downloadPdf: 'PDFని డౌన్‌లోడ్ చేయండి',
+    downloading: 'డౌన్‌లోడ్ చేస్తోంది...',
+    pdfError: 'PDFని సృష్టించడం సాధ్యం కాలేదు.'
   },
 };
 
 export function ContentGenerationClient() {
   const [isLoading, setIsLoading] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
   const [isGeneratingVideo, setIsGeneratingVideo] = useState(false);
   const [result, setResult] = useState<GenerateLocalizedStoryOutput | null>(null);
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
@@ -631,6 +671,50 @@ export function ContentGenerationClient() {
     setVideoError(null);
   }
 
+  const handleDownloadPDF = async () => {
+    if (!result || !form.getValues('topic')) return;
+    setIsDownloading(true);
+
+    try {
+        const pdf = new jsPDF('p', 'pt', 'a4');
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const margin = 40;
+        let y = 40;
+
+        pdf.setFont('Helvetica', 'bold');
+        pdf.setFontSize(16);
+        pdf.text(form.getValues('topic'), pdfWidth / 2, y, { align: 'center' });
+        y += 25;
+        
+        pdf.setDrawColor(200, 200, 200);
+        pdf.line(margin, y, pdfWidth - margin, y);
+        y += 20;
+
+        pdf.setFont('Helvetica', 'normal');
+        pdf.setFontSize(12);
+        
+        const lines = result.story.split('\n');
+        lines.forEach(line => {
+            const splitText = pdf.splitTextToSize(line, pdfWidth - margin * 2);
+            splitText.forEach((textLine: string) => {
+                 if (y > pdf.internal.pageSize.getHeight() - margin) {
+                    pdf.addPage();
+                    y = margin;
+                }
+                pdf.text(textLine, margin, y);
+                y += 15;
+            });
+        });
+
+        pdf.save(`${form.getValues('topic')}.pdf`);
+    } catch (error) {
+        console.error('Error generating PDF:', error);
+        toast({ variant: 'destructive', title: t.errorTitle, description: t.pdfError });
+    } finally {
+        setIsDownloading(false);
+    }
+  };
+
   return (
     <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
       <Card className="lg:col-span-1">
@@ -741,10 +825,16 @@ export function ContentGenerationClient() {
             </div>
              <div className="flex items-center gap-2">
                 {result && (
-                  <Button onClick={handleClear} variant="ghost" size="icon">
-                    <XCircle className="h-5 w-5" />
-                    <span className="sr-only">{t.clearButton}</span>
-                  </Button>
+                  <>
+                    <Button onClick={handleDownloadPDF} variant="ghost" size="icon" disabled={isDownloading}>
+                        <FileDown className="h-5 w-5" />
+                        <span className="sr-only">{isDownloading ? t.downloading : t.downloadPdf}</span>
+                    </Button>
+                    <Button onClick={handleClear} variant="ghost" size="icon">
+                        <XCircle className="h-5 w-5" />
+                        <span className="sr-only">{t.clearButton}</span>
+                    </Button>
+                  </>
                 )}
                 <Sparkles className="h-6 w-6 text-accent" />
             </div>
