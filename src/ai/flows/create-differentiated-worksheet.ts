@@ -86,7 +86,7 @@ const createDifferentiatedWorksheetFlow = ai.defineFlow(
     // This is a workaround for NextJS environments where worker threads are problematic.
     // It disables the worker and runs PDF processing on the main thread.
     const loadingTask = pdfjs.getDocument({
-        data: Buffer.from(input.photoDataUri.split(',')[1], 'base64'),
+        data: new Uint8Array(Buffer.from(input.photoDataUri.split(',')[1], 'base64')),
         isEvalSupported: false,
         useSystemFonts: true,
     });
