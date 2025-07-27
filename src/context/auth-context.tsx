@@ -78,9 +78,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         storedUsers.push(userWithId);
         localStorage.setItem('shiksha-users', JSON.stringify(storedUsers));
         
-        const { password, ...userToStore } = userWithId;
-        localStorage.setItem('shiksha-user', JSON.stringify(userToStore));
-        setUser(userToStore);
         return true;
     } catch(e) {
         console.error('Registration failed', e);

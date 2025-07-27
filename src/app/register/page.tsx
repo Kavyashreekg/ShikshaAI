@@ -13,6 +13,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import { BotMessageSquare, Eye, EyeOff } from 'lucide-react';
 import { useState } from 'react';
+import { useToast } from '@/hooks/use-toast';
 
 
 const formSchema = z.object({
@@ -27,6 +28,7 @@ export default function RegisterPage() {
   const router = useRouter();
   const { register } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
+  const { toast } = useToast();
   
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -38,7 +40,11 @@ export default function RegisterPage() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     const success = await register(values);
     if (success) {
-      router.push('/');
+      toast({
+        title: 'Registration Successful',
+        description: 'You can now log in with your credentials.',
+      });
+      router.push('/login');
     } else {
       setError('root', { type: 'manual', message: 'Registration failed. An account with this email or contact may already exist.' });
     }
