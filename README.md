@@ -2,6 +2,17 @@
 
 ShikshaAI is an AI-powered teaching assistant designed to empower teachers in multi-grade, low-resource environments. It provides a suite of tools to help with content generation, lesson planning, student assessment, and more, with a focus on localization and accessibility.
 
+## Features
+
+- **AI Lesson Planner**: Generate comprehensive, week-long lesson plans for any grade, subject, and topic, complete with daily activities and assessment ideas.
+- **Content Generation**: Create hyper-localized, culturally relevant stories and examples in multiple Indian languages to make learning more engaging.
+- **Differentiated Worksheets**: Upload a photo of a textbook page and instantly generate worksheets tailored to beginner, intermediate, and advanced levels.
+- **Instant Knowledge Base**: Get simple, clear explanations and analogies for any student question, with text-to-speech support to listen to the answers.
+- **Visual Aid Designer**: Describe a concept, and the AI will generate a simple, high-contrast line drawing or chart that is easy to replicate on a blackboard.
+- **Student Assessment & Progress Tracking**: Manage your student roster, track academic performance by subject, and receive AI-powered suggestions to support individual student needs.
+- **Reading Assessment**: Generate grade-appropriate reading passages, listen to students read them, and get instant, constructive feedback on their fluency and pronunciation.
+- **Sahayak AI Bot**: A versatile, conversational AI assistant that can explain concepts, create stories, or design visual aids on the fly.
+
 ## Tech Stack
 
 - **Framework**: [Next.js](https://nextjs.org/) (with App Router)
