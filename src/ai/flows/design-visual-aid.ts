@@ -1,3 +1,4 @@
+
 'use server';
 
 /**
@@ -26,9 +27,16 @@ const designVisualAidFlow = ai.defineFlow(
       // IMPORTANT: ONLY the googleai/gemini-2.0-flash-preview-image-generation model is able to generate images. You MUST use exactly this model to generate images.
       model: 'googleai/gemini-2.0-flash-preview-image-generation',
 
-      prompt: `You are an AI assistant that generates simple, clear, and high-quality visual aids, like line drawings or charts, based on the description provided by the teacher. The visual aid should be easily replicable on a blackboard.
+      prompt: `You are an expert graphic designer specializing in educational visual aids for teachers. Your task is to generate a simple, clear, and high-contrast line drawing or chart based on the user's description.
 
-Description: ${input.description}`,
+      The output MUST be:
+      - **Minimalist:** Use clean, simple lines. Avoid shading, complex textures, or excessive detail.
+      - **High Contrast:** Black and white or very simple, distinct colors suitable for a blackboard.
+      - **Easily Replicable:** The design should be simple enough for a teacher to easily draw on a blackboard.
+      - **Educational:** The style should be appropriate for a classroom setting (e.g., diagrams, simple illustrations, charts).
+      - **Focused:** The image should only contain the core concept described by the user.
+
+      User's Description: "${input.description}"`,
 
       config: {
         responseModalities: ['TEXT', 'IMAGE'], // MUST provide both TEXT and IMAGE, IMAGE only won't work
