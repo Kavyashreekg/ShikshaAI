@@ -19,21 +19,19 @@ const CreateDifferentiatedWorksheetInputSchema = z.object({
     .describe(
       "A photo of a textbook page, as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'."
     ),
-  gradeLevels: z
+  difficultyLevels: z
     .string()
-    .describe("The grade levels for which to differentiate the worksheet, separated by commas (e.g., '1, 2, 3')."),
-  subject: z.string().describe('The subject of the worksheet.'),
-  chapter: z.string().describe('The chapter of the textbook page.'),
+    .describe("The difficulty levels for which to differentiate the worksheet, separated by commas (e.g., 'Beginner,Intermediate')."),
 });
 export type CreateDifferentiatedWorksheetInput = z.infer<typeof CreateDifferentiatedWorksheetInputSchema>;
 
 const CreateDifferentiatedWorksheetOutputSchema = z.object({
   worksheets: z.array(
     z.object({
-      gradeLevel: z.string().describe('The grade level of the worksheet.'),
+      difficultyLevel: z.string().describe('The difficulty level of the worksheet.'),
       worksheetContent: z.string().describe('The content of the differentiated worksheet.'),
     })
-  ).describe('An array of differentiated worksheets for each grade level.'),
+  ).describe('An array of differentiated worksheets for each difficulty level.'),
 });
 export type CreateDifferentiatedWorksheetOutput = z.infer<typeof CreateDifferentiatedWorksheetOutputSchema>;
 
@@ -42,29 +40,30 @@ export async function createDifferentiatedWorksheet(input: CreateDifferentiatedW
 }
 
 const promptInputSchema = CreateDifferentiatedWorksheetInputSchema.extend({
-  gradeLevelsArray: z.array(z.string()),
+  difficultyLevelsArray: z.array(z.string()),
 });
 
 const createDifferentiatedWorksheetPrompt = ai.definePrompt({
   name: 'createDifferentiatedWorksheetPrompt',
   input: {schema: promptInputSchema},
   output: {schema: CreateDifferentiatedWorksheetOutputSchema},
-  prompt: `You are an expert teacher specializing in creating differentiated worksheets for multi-grade classrooms in Indian schools.
+  prompt: `You are an expert teacher specializing in creating differentiated worksheets for multi-level classrooms in Indian schools.
 
-You will receive a photo of a textbook page, the grade levels to differentiate for, the subject, and the chapter.
+You will receive a photo of a textbook page and the difficulty levels to differentiate for.
 
-Your task is to generate a worksheet tailored to each specified grade level. The worksheet should be relevant to the content of the textbook page and suitable for the specified grade level.
+Your task is to analyze the content of the textbook page and generate a worksheet tailored to each specified difficulty level. The worksheet should be relevant to the content of the textbook page.
 
-Subject: {{{subject}}}
-Chapter: {{{chapter}}}
+- **Beginner:** This level is for students who are just starting with the topic. The questions should be simple, direct, and focus on basic comprehension and vocabulary.
+- **Intermediate:** This level is for students who have a basic understanding. The questions should require some application of concepts and slightly more critical thinking.
+- **Advanced:** This level is for students who are ready for a challenge. The questions should be complex, require synthesis of information, and encourage higher-order thinking.
 
 Textbook Page: {{media url=photoDataUri}}
 
-Ensure that the output is an array of worksheets, with each worksheet containing the grade level and the worksheet content. Each worksheet should be simple and culturally relevant to engage the students.
+Ensure that the output is an array of worksheets, with each worksheet containing the difficulty level and the worksheet content. Each worksheet should be simple and culturally relevant to engage the students.
 
-Please generate worksheets for the following grade levels:
-{{#each gradeLevelsArray}}
-- Grade Level: {{this}}
+Please generate worksheets for the following difficulty levels:
+{{#each difficultyLevelsArray}}
+- Difficulty Level: {{this}}
 {{/each}}
 `,
   config: {
@@ -92,8 +91,8 @@ const createDifferentiatedWorksheetFlow = ai.defineFlow(
         useSystemFonts: true,
     });
     
-    const gradeLevelsArray = input.gradeLevels.split(',').map(s => s.trim()).filter(s => s);
-    const {output} = await createDifferentiatedWorksheetPrompt({...input, gradeLevelsArray});
+    const difficultyLevelsArray = input.difficultyLevels.split(',').map(s => s.trim()).filter(s => s);
+    const {output} = await createDifferentiatedWorksheetPrompt({...input, difficultyLevelsArray});
     return output!;
   }
 );
