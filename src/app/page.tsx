@@ -201,7 +201,7 @@ const features = [
         description: 'कोणत्याही प्रश्नासाठी सोपी स्पष्टीकरणे आणि उपमा मिळवा.',
       },
        Kashmiri: {
-        title: 'فوری علمٕچ بنیاد',
+        title: 'फوری علمٕچ بنیاد',
         description: 'کُنہِ تہِ سوال خٲطرٕ سادٕ وضاحت تہٕ مثال حٲصِل کریو۔',
       },
       Bengali: {
@@ -229,7 +229,7 @@ const features = [
         description: 'ଯେକୌଣସି ପ୍ରଶ୍ନ ପାଇଁ ସରଳ ବ୍ୟାଖ୍ୟା ଏବଂ ଅନୁରୂପତା ପାଆନ୍ତୁ।',
       },
       Assamese: {
-        title: 'तत्ক্ষণ জ্ঞান ভিত্তি',
+        title: 'तत्क्षण জ্ঞান ভিত্তি',
         description: 'যিকোনো প্রশ্নৰ বাবে সৰল ব্যাখ্যা আৰু সাদৃশ্য লাভ কৰক।',
       },
       Kannada: {
@@ -458,7 +458,7 @@ const features = [
       },
       Odia: {
         title: 'ପଠନ ମୂଲ୍ୟାଙ୍କନ',
-        description: 'ଶବ୍ଦକୋଷରେ ଉନ୍ନତି ଆଣିବା ପାଇଁ ଅନୁଚ୍ଛେଦ ସୃଷ୍ଟି କରନ୍ତୁ।',
+        description: 'ଶବ୍ଦକୋଷରେ ଉନ୍నତି ଆଣିବା ପାଇଁ ଅନୁଚ୍ଛେଦ ସୃଷ୍ଟି କରନ୍ତୁ।',
       },
       Assamese: {
         title: 'পঠন মূল্যায়ন',
@@ -498,33 +498,33 @@ export default function DashboardPage() {
   return (
     <AppShell>
       <div className="flex-1 space-y-8 p-4 pt-6 md:p-8">
-        <PageHeader
-          title={pageTranslation.title}
-          description={pageTranslation.description}
-        />
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {features.map((feature) => {
-            const translation = feature.translations[language as keyof typeof feature.translations] || feature.translations['English'];
-            return (
-              <Link href={feature.href} key={feature.href}>
-                <Card className="flex h-full flex-col justify-between transition-all hover:shadow-md hover:-translate-y-1">
-                  <CardHeader>
-                    <div className="flex items-start justify-between">
-                      <div className="space-y-2">
-                        <CardTitle className="text-lg font-headline">{translation.title}</CardTitle>
-                        <CardDescription>{translation.description}</CardDescription>
-                      </div>
-                      {feature.icon}
-                    </div>
-                  </CardHeader>
-                </Card>
-              </Link>
-            );
-          })}
+        <div className="mx-auto max-w-7xl space-y-8">
+            <PageHeader
+            title={pageTranslation.title}
+            description={pageTranslation.description}
+            />
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {features.map((feature) => {
+                const translation = feature.translations[language as keyof typeof feature.translations] || feature.translations['English'];
+                return (
+                <Link href={feature.href} key={feature.href}>
+                    <Card className="flex h-full flex-col justify-between transition-all hover:shadow-md hover:-translate-y-1">
+                    <CardHeader>
+                        <div className="flex items-start justify-between">
+                        <div className="space-y-2">
+                            <CardTitle className="text-lg font-headline">{translation.title}</CardTitle>
+                            <CardDescription>{translation.description}</CardDescription>
+                        </div>
+                        {feature.icon}
+                        </div>
+                    </CardHeader>
+                    </Card>
+                </Link>
+                );
+            })}
+            </div>
         </div>
       </div>
     </AppShell>
   );
 }
-
-    

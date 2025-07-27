@@ -69,12 +69,14 @@ export default function KnowledgeBasePage() {
   return (
     <AppShell>
       <div className="flex-1 space-y-8 p-4 pt-6 md:p-8">
-        <PageHeader
-          title={pageTranslation.title}
-          description={pageTranslation.description}
-          showCloseButton
-        />
-        <KnowledgeBaseClient />
+        <div className="mx-auto max-w-7xl space-y-8">
+            <PageHeader
+            title={pageTranslation.title}
+            description={pageTranslation.description}
+            showCloseButton
+            />
+            <KnowledgeBaseClient />
+        </div>
       </div>
     </AppShell>
   );

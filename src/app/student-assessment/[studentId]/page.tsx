@@ -339,77 +339,79 @@ export default function StudentDetailPage() {
   return (
     <AppShell>
       <div className="flex-1 space-y-8 p-4 pt-6 md:p-8">
-        <div className="flex items-center justify-between">
-            <PageHeader
-              title={studentName}
-              description={pageTranslation.description(studentName)}
-            />
-            <Button asChild variant="outline">
-                <Link href="/student-assessment">
-                    <ArrowLeft className="mr-2 h-4 w-4" />
-                    {pageTranslation.backToRoster}
-                </Link>
-            </Button>
-        </div>
-
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
-            <div className="lg:col-span-2 space-y-8">
-                 <Card>
-                    <CardHeader className="flex flex-row items-center justify-between">
-                        <div>
-                            <CardTitle>{pageTranslation.teachersNotes}</CardTitle>
-                            <CardDescription>{pageTranslation.notesDescription}</CardDescription>
-                        </div>
-                        <EditNotesForm student={student} onUpdate={handleUpdateStudent} />
-                    </CardHeader>
-                    <CardContent>
-                        <p className="whitespace-pre-wrap">{studentNotes || pageTranslation.noNotes}</p>
-                    </CardContent>
-                </Card>
-                <StudentSuggestions student={student} />
+        <div className="mx-auto max-w-7xl space-y-8">
+            <div className="flex items-center justify-between">
+                <PageHeader
+                title={studentName}
+                description={pageTranslation.description(studentName)}
+                />
+                <Button asChild variant="outline">
+                    <Link href="/student-assessment">
+                        <ArrowLeft className="mr-2 h-4 w-4" />
+                        {pageTranslation.backToRoster}
+                    </Link>
+                </Button>
             </div>
-            <div className="lg:col-span-1">
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between">
-                        <CardTitle>{pageTranslation.studentInfo}</CardTitle>
-                        <EditStudentForm student={student} onUpdate={handleUpdateStudent} />
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                        <div className="flex justify-between">
-                            <span className="text-muted-foreground">{pageTranslation.name}</span>
-                            <span className="font-medium">{studentName}</span>
-                        </div>
-                         <div className="flex justify-between">
-                            <span className="text-muted-foreground">{pageTranslation.grade}</span>
-                            <span className="font-medium">{student.grade}</span>
-                        </div>
-                    </CardContent>
-                    {student.subjects && student.subjects.length > 0 && (
-                        <>
-                        <CardHeader className='pt-0'>
-                            <CardTitle className="text-lg">{pageTranslation.subjectGpa}</CardTitle>
+
+            <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+                <div className="lg:col-span-2 space-y-8">
+                    <Card>
+                        <CardHeader className="flex flex-row items-center justify-between">
+                            <div>
+                                <CardTitle>{pageTranslation.teachersNotes}</CardTitle>
+                                <CardDescription>{pageTranslation.notesDescription}</CardDescription>
+                            </div>
+                            <EditNotesForm student={student} onUpdate={handleUpdateStudent} />
                         </CardHeader>
                         <CardContent>
-                            <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead>{pageTranslation.subject}</TableHead>
-                                        <TableHead className="text-right">{pageTranslation.gpa}</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {student.subjects.map((item) => (
-                                        <TableRow key={item.subject}>
-                                            <TableCell>{subjectTranslations[item.subject] || item.subject}</TableCell>
-                                            <TableCell className="text-right">{item.gpa.toFixed(1)}</TableCell>
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
+                            <p className="whitespace-pre-wrap">{studentNotes || pageTranslation.noNotes}</p>
                         </CardContent>
-                        </>
-                    )}
-                </Card>
+                    </Card>
+                    <StudentSuggestions student={student} />
+                </div>
+                <div className="lg:col-span-1">
+                    <Card>
+                        <CardHeader className="flex flex-row items-center justify-between">
+                            <CardTitle>{pageTranslation.studentInfo}</CardTitle>
+                            <EditStudentForm student={student} onUpdate={handleUpdateStudent} />
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            <div className="flex justify-between">
+                                <span className="text-muted-foreground">{pageTranslation.name}</span>
+                                <span className="font-medium">{studentName}</span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span className="text-muted-foreground">{pageTranslation.grade}</span>
+                                <span className="font-medium">{student.grade}</span>
+                            </div>
+                        </CardContent>
+                        {student.subjects && student.subjects.length > 0 && (
+                            <>
+                            <CardHeader className='pt-0'>
+                                <CardTitle className="text-lg">{pageTranslation.subjectGpa}</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead>{pageTranslation.subject}</TableHead>
+                                            <TableHead className="text-right">{pageTranslation.gpa}</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {student.subjects.map((item) => (
+                                            <TableRow key={item.subject}>
+                                                <TableCell>{subjectTranslations[item.subject] || item.subject}</TableCell>
+                                                <TableCell className="text-right">{item.gpa.toFixed(1)}</TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </CardContent>
+                            </>
+                        )}
+                    </Card>
+                </div>
             </div>
         </div>
       </div>

@@ -49,7 +49,7 @@ const pageTranslations = {
   },
   Assamese: {
     title: 'ছাত্র মূল্যায়ন',
-    description: 'ছাত্রৰ প্ৰগতি ট্ৰেক কৰক, তেওঁলোকৰ উন্নতিৰ মূল্যাঙ্কন কৰক, আৰু প্ৰতিজন ছাত্রৰ বিকাশৰ বাবে তৈয়াৰ কৰা পৰামৰ্শ গ্ৰহণ কৰক।',
+    description: 'ছাত্রৰ প্ৰগতি ট্ৰেক কৰক, তেওঁলোকৰ উন্নতিৰ মূল্যাঙ্কন কৰক, আৰু প্ৰতিজন ছাত্রৰ বিকাশৰ বাবে তৈয়াৰ কৰা পৰামৰ্শ গ্ৰହণ কৰক।',
   },
   Kannada: {
     title: 'ವಿದ್ಯಾರ್ಥಿ ಮೌಲ್ಯಮಾಪನ',
@@ -69,12 +69,14 @@ export default function StudentAssessmentPage() {
   return (
     <AppShell>
       <div className="flex-1 space-y-8 p-4 pt-6 md:p-8">
-        <PageHeader
-          title={pageTranslation.title}
-          description={pageTranslation.description}
-          showCloseButton
-        />
-        <StudentAssessmentClient />
+        <div className="mx-auto max-w-7xl space-y-8">
+            <PageHeader
+            title={pageTranslation.title}
+            description={pageTranslation.description}
+            showCloseButton
+            />
+            <StudentAssessmentClient />
+        </div>
       </div>
     </AppShell>
   );
