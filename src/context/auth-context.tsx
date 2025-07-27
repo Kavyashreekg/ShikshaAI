@@ -66,22 +66,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const register = async (newUser: Omit<User, 'id'>): Promise<boolean> => {
     try {
-        const storedUsers = JSON.parse(localStorage.getItem('shiksha-users') || '[]') as User[];
-        const userExists = storedUsers.some(u => u.email === newUser.email || u.contact === newUser.contact);
-
-        if (userExists) {
-            return false; // Indicate that user already exists
-        }
-
-        const userWithId = { ...newUser, id: new Date().toISOString() };
-        
-        storedUsers.push(userWithId);
-        localStorage.setItem('shiksha-users', JSON.stringify(storedUsers));
-        
-        return true;
+      const storedUsers = JSON.parse(localStorage.getItem('shiksha-users') || '[]') as User[];
+      const userExists = storedUsers.some(u => u.email === newUser.email || u.contact === newUser.contact);
+  
+      if (userExists) {
+        return false; // Indicate that user already exists
+      }
+  
+      // Explicitly construct the user object to avoid extra properties
+      const userWithId: User = {
+        id: new Date().toISOString(),
+        name: newUser.name,
+        school: newUser.school,
+        contact: newUser.contact,
+        email: newUser.email,
+        password: newUser.password,
+      };
+      
+      storedUsers.push(userWithId);
+      localStorage.setItem('shiksha-users', JSON.stringify(storedUsers));
+      
+      return true;
     } catch(e) {
-        console.error('Registration failed', e);
-        return false;
+      console.error('Registration failed', e);
+      return false;
     }
   };
 
