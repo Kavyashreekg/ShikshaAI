@@ -1,11 +1,12 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import Image from 'next/image';
+import jsPDF from 'jspdf';
 import {
   Dialog,
   DialogContent,
@@ -27,7 +28,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { UploadCloud, Layers, ShieldAlert, Check, ChevronsUpDown, XCircle, History, Trash2 } from 'lucide-react';
+import { UploadCloud, Layers, ShieldAlert, Check, ChevronsUpDown, XCircle, History, Trash2, FileDown } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useLanguage } from '@/context/language-context';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -75,6 +76,9 @@ const translations = {
     noHistory: 'You have not generated any worksheets yet.',
     loadWorksheetButton: 'Load Worksheets',
     deleteWorksheetButton: 'Delete',
+    downloadPdf: 'Download PDF',
+    downloading: 'Downloading...',
+    pdfError: 'Could not generate PDF.',
     formErrors: {
       photo: 'Please upload an image file.',
       difficultyLevels: 'Please select at least one difficulty level.',
@@ -114,6 +118,9 @@ const translations = {
     noHistory: 'आपने अभी तक कोई वर्कशीट उत्पन्न नहीं की है।',
     loadWorksheetButton: 'वर्कशीट लोड करें',
     deleteWorksheetButton: 'हटाएं',
+    downloadPdf: 'पीडीएफ डाउनलोड करें',
+    downloading: 'डाउनलोड हो रहा है...',
+    pdfError: 'पीडीएफ उत्पन्न नहीं हो सका।',
     formErrors: {
       photo: 'कृपया एक छवि फ़ाइल अपलोड करें।',
       difficultyLevels: 'कृपया कम से-कम एक कठिनाई स्तर चुनें।',
@@ -153,6 +160,9 @@ const translations = {
     noHistory: 'तुम्ही अद्याप कोणतीही कार्यपत्रके तयार केलेली नाहीत.',
     loadWorksheetButton: 'कार्यपत्रके लोड करा',
     deleteWorksheetButton: 'हटवा',
+    downloadPdf: 'पीडीएफ डाउनलोड करा',
+    downloading: 'डाउनलोड करत आहे...',
+    pdfError: 'पीडीएफ तयार करता आला नाही.',
     formErrors: {
       photo: 'कृपया एक प्रतिमा फाइल अपलोड करा.',
       difficultyLevels: 'कृपया किमान एक अडचण पातळी निवडा.',
@@ -192,6 +202,9 @@ const translations = {
     noHistory: 'توہہِ چھُ نہٕ وُنی تام کانٛہہ ورک شیٹ تیار کٔرؠ مٕژ۔',
     loadWorksheetButton: 'ورک شیٹ لوڈ کریو',
     deleteWorksheetButton: 'ہٹاو',
+    downloadPdf: 'پی ڈی ایف ڈاؤنلوڈ کریو',
+    downloading: 'ڈاؤنلوڈ کران...',
+    pdfError: 'پی ڈی ایف تیار کٔرِتھ نہٕ ہیوٚک۔',
     formErrors: {
       photo: 'مہربانی کرِتھ اَکھ تصویر فائل اپلوڈ کریو۔',
       difficultyLevels: 'مہربانی کرِتھ کم از کم اَکھ مشکل سطح ژارٕو۔',
@@ -231,6 +244,9 @@ const translations = {
     noHistory: 'আপনি এখনও কোন ওয়ার্কশিট তৈরি করেননি।',
     loadWorksheetButton: 'ওয়ার্কশিট লোড করুন',
     deleteWorksheetButton: 'মুছুন',
+    downloadPdf: 'পিডিএফ ডাউনলোড করুন',
+    downloading: 'ডাউনলোড হচ্ছে...',
+    pdfError: 'পিডিএফ তৈরি করা যায়নি।',
     formErrors: {
       photo: 'অনুগ্রহ করে একটি ছবি ফাইল আপলোড করুন।',
       difficultyLevels: 'অনুগ্রহ করে কমপক্ষে একটি অসুবিধার স্তর নির্বাচন করুন।',
@@ -270,6 +286,9 @@ const translations = {
     noHistory: 'நீங்கள் இதுவரை எந்த பணித்தாள்களையும் உருவாக்கவில்லை.',
     loadWorksheetButton: 'பணித்தாள்களை ஏற்று',
     deleteWorksheetButton: 'நீக்கு',
+    downloadPdf: 'PDF பதிவிறக்கவும்',
+    downloading: 'பதிவிறக்குகிறது...',
+    pdfError: 'PDF ஐ உருவாக்க முடியவில்லை.',
     formErrors: {
       photo: 'தயவுசெய்து ஒரு படக் கோப்பைப் பதிவேற்றவும்.',
       difficultyLevels: 'தயவுசெய்து குறைந்தது ஒரு சிரம நிலையையாவது தேர்ந்தெடுக்கவும்.',
@@ -309,6 +328,9 @@ const translations = {
     noHistory: 'તમે હજી સુધી કોઈ વર્કશીટ બનાવી નથી.',
     loadWorksheetButton: 'વર્કશીટ લોડ કરો',
     deleteWorksheetButton: 'કાઢી નાખો',
+    downloadPdf: 'પીડીએફ ડાઉનલોડ કરો',
+    downloading: 'ડાઉનલોડ થઈ રહ્યું છે...',
+    pdfError: 'પીડીએફ બનાવી શકાયું નથી.',
     formErrors: {
       photo: 'કૃપા કરીને એક છબી ફાઇલ અપલોડ કરો.',
       difficultyLevels: 'કૃપા કરીને ઓછામાં ઓછું એક મુશ્કેલી સ્તર પસંદ કરો.',
@@ -348,6 +370,9 @@ const translations = {
     noHistory: 'നിങ്ങൾ ഇതുവരെ വർക്ക്ഷീറ്റുകളൊന്നും ഉണ്ടാക്കിയിട്ടില്ല.',
     loadWorksheetButton: 'വർക്ക്ഷീറ്റുകൾ ലോഡുചെയ്യുക',
     deleteWorksheetButton: 'ഇല്ലാതാക്കുക',
+    downloadPdf: 'PDF ഡൗൺലോഡ് ചെയ്യുക',
+    downloading: 'ഡൗൺലോഡ് ചെയ്യുന്നു...',
+    pdfError: 'PDF ഉണ്ടാക്കാൻ കഴിഞ്ഞില്ല.',
     formErrors: {
         photo: 'ദയവായി ഒരു ചിത്ര ഫയൽ അപ്‌ലോഡ് ചെയ്യുക.',
         difficultyLevels: 'ദയവായി കുറഞ്ഞത് ഒരു പ്രയാസ നിലവാരമെങ്കിലും തിരഞ്ഞെടുക്കുക.',
@@ -387,6 +412,9 @@ const translations = {
     noHistory: 'ਤੁਸੀਂ ਹਾਲੇ ਤੱਕ ਕੋਈ ਵਰਕਸ਼ੀਟ ਨਹੀਂ ਬਣਾਈ ਹੈ।',
     loadWorksheetButton: 'ਵਰਕਸ਼ੀਟਾਂ ਲੋਡ ਕਰੋ',
     deleteWorksheetButton: 'ਮਿਟਾਓ',
+    downloadPdf: 'ਪੀਡੀਐਫ ਡਾਊਨਲੋਡ ਕਰੋ',
+    downloading: 'ਡਾਊਨਲੋਡ ਹੋ ਰਿਹਾ ਹੈ...',
+    pdfError: 'ਪੀਡੀਐਫ ਤਿਆਰ ਨਹੀਂ ਕੀਤਾ ਜਾ ਸਕਿਆ।',
     formErrors: {
         photo: 'ਕਿਰਪਾ ਕਰਕੇ ਇੱਕ ਚਿੱਤਰ ਫਾਈਲ ਅੱਪਲੋਡ ਕਰੋ।',
         difficultyLevels: 'ਕਿਰਪਾ ਕਰਕੇ ਘੱਟੋ-ਘੱਟ ਇੱਕ ਮੁਸ਼ਕਲ ਪੱਧਰ ਚੁਣੋ।',
@@ -426,6 +454,9 @@ const translations = {
     noHistory: 'ଆପଣ ଏପର୍ଯ୍ୟନ୍ତ କୌଣସି କାର୍ଯ୍ୟପତ୍ର ସୃଷ୍ଟି କରିନାହାଁନ୍ତି।',
     loadWorksheetButton: 'କାର୍ଯ୍ୟପତ୍ର ଲୋଡ୍ କରନ୍ତୁ',
     deleteWorksheetButton: 'ବିଲୋପ କରନ୍ତୁ',
+    downloadPdf: 'ପିଡିଏଫ୍ ଡାଉନଲୋଡ୍ କରନ୍ତୁ',
+    downloading: 'ଡାଉନଲୋଡ୍ କରୁଛି...',
+    pdfError: 'ପିଡିଏଫ୍ ସୃଷ୍ଟି ହୋଇପାରିଲା ନାହିଁ।',
     formErrors: {
         photo: 'ଦୟାକରି ଏକ ପ୍ରତିଛବି ଫାଇଲ୍ ଅପଲୋଡ୍ କରନ୍ତୁ।',
         difficultyLevels: 'ଦୟାକରି ଅତିକମରେ ଗୋଟିଏ କଠିନତା ସ୍ତର ବାଛନ୍ତୁ।',
@@ -458,6 +489,9 @@ const translations = {
     safetyError: 'সৃষ্ট বিষয়বস্তুটো সুৰক্ষাৰ কাৰণত অৱৰোধ কৰা হৈছিল। অনুগ্ৰহ কৰি এখন বেলেগ পাঠ্যপুথিৰ পৃষ্ঠাৰে পুনৰ চেষ্টা কৰক।',
     errorTitle: 'এটা ত্ৰুটি হৈছে।',
     errorDescription: 'কাৰ্যপত্ৰ সৃষ্টি কৰাত విఫಲ হৈছে। অনুগ্ৰহ কৰি পুনৰ চেষ্টা কৰক।',
+    downloadPdf: 'পিডিএফ ডাউনল’ড কৰক',
+    downloading: 'ডাউনল’ড কৰি আছে...',
+    pdfError: 'পিডিএফ সৃষ্টি কৰিব পৰা নগ\'ল।',
     formErrors: {
         photo: 'অনুগ্ৰহ কৰি এখন ছবি ফাইল আপলোড কৰক।',
         difficultyLevels: 'অনুগ্ৰহ কৰি কমেও এটা কঠিনতাৰ স্তৰ বাছনি কৰক।',
@@ -497,6 +531,9 @@ const translations = {
     noHistory: 'మీరు ఇంకా ఏ వర్క్‌షీట్‌లను రూపొందించలేదు.',
     loadWorksheetButton: 'వర్క్‌షీట్‌లను లోడ్ చేయండి',
     deleteWorksheetButton: 'తొలగించు',
+    downloadPdf: 'PDFని డౌన్‌లోడ్ చేయండి',
+    downloading: 'డౌన్‌లోడ్ చేస్తోంది...',
+    pdfError: 'PDFని సృష్టించడం సాధ్యం కాలేదు.',
     formErrors: {
         photo: 'దయచేసి ఒక చిత్ర ఫైల్‌ను అప్‌లోడ్ చేయండి.',
         difficultyLevels: 'దయచేసి కనీసం ఒక కష్టతర స్థాయిని ఎంచుకోండి.',
@@ -534,8 +571,11 @@ const translations = {
     historyDialogTitle: 'ಸಂಗ್ರಹಿಸಲಾದ ಕಾರ್ಯಪತ್ರಗಳು',
     historyDialogDescription: 'ನೀವು ಹಿಂದೆ ರಚಿಸಿದ ಕಾರ್ಯಪತ್ರಗಳು ಇಲ್ಲಿವೆ. ನೀವು ಅವುಗಳನ್ನು ವೀಕ್ಷಿಸಬಹುದು, ಲೋಡ್ ಮಾಡಬಹುದು ಅಥವಾ ಅಳಿಸಬಹುದು.',
     noHistory: 'ನೀವು ಇನ್ನೂ ಯಾವುದೇ ಕಾರ್ಯಪತ್ರಗಳನ್ನು ರಚಿಸಿಲ್ಲ.',
-    loadWorksheetButton: 'ಕಾರ್ಯಪತ್ರಗಳನ್ನು ಲೋಡ್ ಮಾಡಿ',
+    loadWorksheetButton: 'ಕಾರ্যಪತ್ರಗಳನ್ನು ಲೋಡ್ ಮಾಡಿ',
     deleteWorksheetButton: 'ಅಳಿಸಿ',
+    downloadPdf: 'PDF ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ',
+    downloading: 'ಡೌನ್‌ಲೋಡ್ ಮಾಡಲಾಗುತ್ತಿದೆ...',
+    pdfError: 'PDF ರಚಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ.',
     formErrors: {
         photo: 'ದಯವಿಟ್ಟು ಒಂದು ಚಿತ್ರ ಫೈಲ್ ಅನ್ನು ಅಪ್‌ಲೋಡ್ ಮಾಡಿ.',
         difficultyLevels: 'ದಯವಿಟ್ಟು ಕನಿಷ್ಠ ಒಂದು ಕಷ್ಟದ ಮಟ್ಟವನ್ನು ಆಯ್ಕೆಮಾಡಿ.',
@@ -554,6 +594,7 @@ const translations = {
 
 export function WorksheetClient() {
   const [isLoading, setIsLoading] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
   const [result, setResult] = useState<CreateDifferentiatedWorksheetOutput | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -613,7 +654,7 @@ export function WorksheetClient() {
 
 
   const formSchema = z.object({
-    photoDataUri: z.string().refine((val) => val.startsWith('data:image/'), {
+    photoDataUri: z.string().refine((val) => val.startsWith('data:image/') || val.startsWith('data:application/pdf'), {
       message: t.formErrors.photo,
     }),
     difficultyLevels: z.string().min(1, t.formErrors.difficultyLevels),
@@ -634,7 +675,11 @@ export function WorksheetClient() {
       reader.onloadend = () => {
         const dataUri = reader.result as string;
         form.setValue('photoDataUri', dataUri);
-        setPreview(dataUri);
+        if (file.type.startsWith('image/')) {
+            setPreview(dataUri);
+        } else {
+            setPreview('/pdf_icon.png');
+        }
       };
       reader.readAsDataURL(file);
     }
@@ -685,6 +730,49 @@ export function WorksheetClient() {
       setIsLoading(false);
     }
   }
+  
+  const handleDownloadPDF = async (content: string, level: string) => {
+    if (!content) return;
+    setIsDownloading(true);
+    try {
+        const pdf = new jsPDF('p', 'pt', 'a4');
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const margin = 40;
+        let y = 40;
+
+        pdf.setFont('Helvetica', 'bold');
+        pdf.setFontSize(14);
+        pdf.text(`Worksheet: ${level}`, pdfWidth / 2, y, { align: 'center' });
+        y += 25;
+        
+        pdf.setDrawColor(200, 200, 200);
+        pdf.line(margin, y, pdfWidth - margin, y);
+        y += 20;
+
+        pdf.setFont('Helvetica', 'normal');
+        pdf.setFontSize(11);
+        
+        const lines = content.split('\n');
+        lines.forEach(line => {
+            const splitText = pdf.splitTextToSize(line, pdfWidth - margin * 2);
+            splitText.forEach((textLine: string) => {
+                if (y > pdf.internal.pageSize.getHeight() - margin) {
+                    pdf.addPage();
+                    y = margin;
+                }
+                pdf.text(textLine, margin, y);
+                y += 15;
+            });
+        });
+
+        pdf.save(`Worksheet-${level}.pdf`);
+    } catch (error) {
+        console.error('Error generating PDF:', error);
+        toast({ variant: 'destructive', title: t.errorTitle, description: t.pdfError });
+    } finally {
+        setIsDownloading(false);
+    }
+  };
 
   const handleClear = () => {
     form.reset();
@@ -722,7 +810,7 @@ export function WorksheetClient() {
                             <span>{t.uploadPrompt}</span>
                           </div>
                         )}
-                        <Input id="file-upload" type="file" accept="image/*" className="sr-only" onChange={handleFileChange} />
+                        <Input id="file-upload" type="file" accept="image/*,application/pdf" className="sr-only" onChange={handleFileChange} />
                       </label>
                     </FormControl>
                     <FormMessage />
@@ -806,7 +894,7 @@ export function WorksheetClient() {
                             history.map(ws => (
                                 <Card key={ws.id}>
                                 <CardHeader className="flex-row items-center gap-4 space-y-0">
-                                    <Image src={ws.preview} alt="preview" width={64} height={64} className="rounded-md border"/>
+                                    <Image src={ws.preview.startsWith('data:image') ? ws.preview : '/pdf_icon.png'} alt="preview" width={64} height={64} className="rounded-md border"/>
                                     <div>
                                         <CardTitle className="text-base">{ws.difficultyLevels}</CardTitle>
                                         <CardDescription>{new Date(ws.id).toLocaleDateString()}</CardDescription>
@@ -867,6 +955,12 @@ export function WorksheetClient() {
                   <TabsContent key={w.difficultyLevel} value={w.difficultyLevel}>
                     <div className="prose prose-sm max-w-none whitespace-pre-wrap rounded-md border bg-muted/50 p-4">
                       {w.worksheetContent}
+                    </div>
+                     <div className="mt-4 flex justify-end">
+                      <Button onClick={() => handleDownloadPDF(w.worksheetContent, w.difficultyLevel)} disabled={isDownloading}>
+                        <FileDown className="mr-2 h-4 w-4" />
+                        {isDownloading ? t.downloading : t.downloadPdf}
+                      </Button>
                     </div>
                   </TabsContent>
                 ))}
