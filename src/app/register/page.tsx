@@ -19,8 +19,8 @@ import { useToast } from '@/hooks/use-toast';
 const formSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters.'),
   school: z.string().min(2, 'School name is required.'),
-  contact: z.string().regex(/^\d{10}$/, 'Please enter a valid 10-digit contact number.'),
-  email: z.string().email('Please enter a valid email address.'),
+  contact: z.string().regex(/^\d{10}$/, 'Invalid mobile number. Please enter a valid 10-digit contact number.'),
+  email: z.string().email('Invalid email id. Please enter a valid email address.'),
   password: z.string().min(8, 'Password must be at least 8 characters.'),
 });
 
