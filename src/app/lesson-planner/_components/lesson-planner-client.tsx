@@ -22,7 +22,7 @@ import { CalendarCheck, BookOpen, UploadCloud, Layers, ShieldAlert, XCircle, Fil
 import { useLanguage } from '@/context/language-context';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
-import { generateLessonPlan, GenerateLessonPlanOutput } from '@/ai/flows/generate-lesson-plan';
+import { generateLessonPlan, GenerateLessonPlanOutput, GenerateLessonPlanInput } from '@/ai/flows/generate-lesson-plan';
 
 
 const translations = {
@@ -105,7 +105,7 @@ const translations = {
     generatingPlan: 'योजना तयार होत आहे...',
     textbookResources: 'पाठ्यपुस्तक संसाधने',
     accessNCERT: 'अधिकृत एनसीईआरटी पाठ्यपुस्तके थेट मिळवा.',
-    findResourcesFor: (grade: string, subject: string) => `${grade}, ${subject} साठी संसाधনে शोधा.`,
+    findResourcesFor: (grade: string, subject: string) => `${grade}, ${subject} साठी संसाधने शोधा.`,
     searchNCERT: 'एनसीईआरटी पोर्टल शोधा',
     goToNCERT: 'एनसीईआरटी पोर्टलवर जा',
     generatedLessonPlan: 'तयार केलेली पाठ योजना',
@@ -126,7 +126,7 @@ const translations = {
     pdfError: 'पीडीएफ तयार करता आला नाही.'
   },
    Kashmiri: {
-    lessonPlanDetails: 'سبق منصوبہٕ تفصیل',
+    lessonPlanDetails: 'सबق منصوبہٕ تفصیل',
     specifyDetails: 'پننہٕ ہفتہ وار منصوبہٕ خٲطرٕ تفصیل دِیُت۔',
     grade: 'گریڈ',
     selectGrade: 'اکھ گریڈ ژارٕو',
@@ -538,14 +538,27 @@ export function LessonPlannerClient() {
     setError(null);
   };
 
+  const getCacheKey = (values: GenerateLessonPlanInput) =>
+    `lesson_plan_cache_${values.grade}_${values.subject}_${values.lessonName.toLowerCase().trim()}`;
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     setResult(null);
     setError(null);
+
+    const cacheKey = getCacheKey(values);
+    const cachedResult = localStorage.getItem(cacheKey);
+
+    if (cachedResult) {
+        setResult(JSON.parse(cachedResult));
+        setIsLoading(false);
+        return;
+    }
+
     try {
       const lessonPlanResult = await generateLessonPlan(values);
       setResult(lessonPlanResult);
+      localStorage.setItem(cacheKey, JSON.stringify(lessonPlanResult));
     } catch (e: any) {
       console.error(e);
        if (e.message.includes('SAFETY')) {
@@ -778,5 +791,3 @@ export function LessonPlannerClient() {
     </div>
   );
 }
-
-    

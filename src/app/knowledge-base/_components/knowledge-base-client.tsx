@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -8,7 +8,7 @@ import * as z from 'zod';
 import {
   instantKnowledgeExplanation,
 } from '@/ai/flows/instant-knowledge-explanation';
-import { type InstantKnowledgeExplanationOutput } from '@/ai/flows/schemas/instant-knowledge-explanation.schema';
+import { type InstantKnowledgeExplanationInput, type InstantKnowledgeExplanationOutput } from '@/ai/flows/schemas/instant-knowledge-explanation.schema';
 import { textToSpeech } from '@/ai/flows/text-to-speech';
 import { languages } from '@/lib/data';
 import { useToast } from '@/hooks/use-toast';
@@ -299,7 +299,7 @@ const translations = {
     safetyError: 'সুৰক্ষাৰ কাৰণত প্ৰতিক্ৰিয়াটো অৱৰোধ কৰা হৈছিল। অনুগ্ৰহ কৰি এটা বেলেগ প্ৰশ্ন সোধক।',
     errorTitle: 'এটা ত্ৰুটি হৈছে।',
     errorDescription: 'ব্যাখ্যা সৃষ্টি কৰাত విఫಲ হৈছে। অনুগ্ৰহ কৰি পুনৰ চেষ্টা কৰক।',
-    audioErrorDescription: 'অডিঅ’ সৃষ্টি কৰাত విఫಲ হৈছে। অনুগ্ৰহ কৰি পুনৰ চেষ্টা কৰক।',
+    audioErrorDescription: 'অডিঅ’ সৃষ্টি কৰাত విఫল হৈছে। অনুগ্ৰহ কৰি পুনৰ চেষ্টা কৰক।',
     explanationTitle: 'ব্যাখ্যা',
     explanationPlaceholder: 'ব্যাখ্যা ইয়াত দেখা যাব।',
     analogyTitle: 'সাদৃশ্য',
@@ -388,14 +388,28 @@ export function KnowledgeBaseClient() {
     },
   });
 
+  const getCacheKey = (values: z.infer<typeof formSchema>) =>
+    `kb_cache_${values.language}_${values.question.toLowerCase().trim()}`;
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     setResult(null);
     setAudioUrl(null);
     setError(null);
+
+    const cacheKey = getCacheKey(values);
+    const cachedResult = localStorage.getItem(cacheKey);
+
+    if (cachedResult) {
+      setResult(JSON.parse(cachedResult));
+      setIsLoading(false);
+      return;
+    }
+
     try {
       const explanationResult = await instantKnowledgeExplanation(values);
       setResult(explanationResult);
+      localStorage.setItem(cacheKey, JSON.stringify(explanationResult));
     } catch (e: any) {
       console.error(e);
       if (e.message.includes('SAFETY')) {
@@ -437,6 +451,7 @@ export function KnowledgeBaseClient() {
     setResult(null);
     setAudioUrl(null);
     setError(null);
+    form.reset();
   }
 
   return (

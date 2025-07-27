@@ -352,8 +352,8 @@ export function VisualAidClient() {
               <Image
                 src={result.visualAid}
                 alt="Generated visual aid"
-                width={500}
-                height={500}
+                width={400}
+                height={400}
                 className="rounded-lg border object-contain"
                 data-ai-hint="diagram drawing"
               />
